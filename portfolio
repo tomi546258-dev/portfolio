@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bódis Tamás – Mérnök & Kutató</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0f0f;
+      --bg2: #151717;
+      --bg3: #1c1f1f;
+      --border: #2a2e2e;
+      --accent: #c8a96e;
+      --accent2: #7eb8a4;
+      --text: #d8d4cc;
+      --text-dim: #7a7870;
+      --text-bright: #eeeae2;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Literata', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(14,15,15,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
+
+    .nav-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .nav-center {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-center a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .nav-center a:hover { color: var(--accent); }
+
+    .lang-switcher {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .lang-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid transparent;
+      padding: 0.3rem 0.55rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover { color: var(--accent); border-color: var(--border); }
+    .lang-btn.active { color: var(--accent); border-color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--text-dim);
+      transition: all 0.3s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 58px; left: 0; right: 0;
+      background: rgba(14,15,15,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      z-index: 99;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-lang {
+      display: flex;
+      gap: 0.5rem;
+      padding-top: 0.5rem;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      max-width: 780px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      color: var(--text-bright);
+      line-height: 1.05;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 2.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text);
+      max-width: 560px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .tag:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.7rem 1.6rem;
+      border-radius: 2px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--accent); color: #0e0f0f; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+    .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .hero-deco {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 500px;
+      height: 500px;
+      opacity: 0.035;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      line-height: 1.6;
+      color: var(--accent);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    section {
+      padding: 5rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--text-bright);
+      white-space: nowrap;
+    }
+
+    .divider { flex: 1; height: 1px; background: var(--border); min-width: 20px; }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      max-width: 1050px;
+    }
+
+    .about-text p { margin-bottom: 1.2rem; color: var(--text); font-size: 1rem; }
+
+    .about-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      border-left: 1px solid var(--border);
+      padding-left: 2.5rem;
+    }
+
+    .stat-item { padding-bottom: 1.2rem; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; }
+
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    .pubs-section { background: var(--bg2); }
+
+    .pub-list {
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pub-item {
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      padding: 1.6rem 1.8rem;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .pub-item:hover { border-color: var(--accent); }
+
+    .pub-year {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      padding-top: 0.3rem;
+    }
+
+    .pub-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      color: var(--text-bright);
+      margin-bottom: 0.35rem;
+    }
+
+    .pub-journal {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      letter-spacing: 0.08em;
+    }
+
+    .pub-tags { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1rem;
+      max-width: 1100px;
+    }
+
+    .project-card {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.8rem;
+      border-radius: 2px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--accent);
+      transition: height 0.3s;
+    }
+
+    .project-card:hover::before { height: 100%; }
+    .project-card:hover { transform: translateY(-2px); }
+
+    .project-icon { font-size: 1.6rem; margin-bottom: 0.8rem; display: block; }
+
+    .project-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.08rem;
+      color: var(--text-bright);
+      margin-bottom: 0.5rem;
+    }
+
+    .project-desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.65; }
+
+    .project-tech { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    .tech-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--accent2);
+      border: 1px solid rgba(126,184,164,0.3);
+      padding: 0.2rem 0.55rem;
+      border-radius: 1px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Sudoku project card ── */
+    .project-card.sudoku-card { cursor: pointer; }
+    .project-card.sudoku-card .launch-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .project-card.sudoku-card:hover .launch-hint { opacity: 1; }
+
+    /* ── Sudoku modal ── */
+    #sudoku-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    #sudoku-modal.open { display: flex; }
+
+    .sudoku-modal-inner {
+      position: relative;
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .sudoku-modal-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .sudoku-modal-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .sudoku-modal-close {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .sudoku-modal-close:hover { color: var(--accent); border-color: var(--accent); }
+
+    #sudoku-iframe {
+      width: 100%;
+      height: 80vh;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: #07111a;
+      display: block;
+    }
+
+    .blog-section { background: var(--bg2); }
+
+    .blog-list { max-width: 800px; display: flex; flex-direction: column; }
+
+    .blog-item {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      padding: 1.8rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .blog-item:hover .blog-title { color: var(--accent); }
+
+    .blog-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      padding-top: 0.35rem;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .blog-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.12rem;
+      color: var(--text-bright);
+      margin-bottom: 0.35rem;
+      transition: color 0.2s;
+    }
+
+    .blog-excerpt { font-size: 0.86rem; color: var(--text-dim); line-height: 1.65; }
+
+    .contact-inner { max-width: 580px; }
+    .contact-inner p { font-size: 1rem; color: var(--text); margin-bottom: 2rem; line-height: 1.8; }
+
+    .contact-links { display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.9rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      transition: all 0.2s;
+      word-break: break-all;
+    }
+
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    .contact-link-label {
+      font-size: 0.68rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      min-width: 70px;
+      flex-shrink: 0;
+    }
+
+    footer {
+      padding: 1.8rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .footer-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-label { animation: fadeUp 0.6s ease both; }
+    h1 { animation: fadeUp 0.7s 0.1s ease both; }
+    .hero-sub { animation: fadeUp 0.7s 0.2s ease both; }
+    .hero-desc { animation: fadeUp 0.7s 0.3s ease both; }
+    .hero-tags { animation: fadeUp 0.7s 0.4s ease both; }
+    .hero-cta { animation: fadeUp 0.7s 0.5s ease both; }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-center { display: none; }
+      .hamburger { display: flex; }
+      .hero { padding: 6rem 1.5rem 3rem; }
+      section { padding: 3.5rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-stats {
+        border-left: none; padding-left: 0;
+        border-top: 1px solid var(--border); padding-top: 1.5rem;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      }
+      .stat-item { padding-bottom: 1rem; }
+      .pub-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .pub-year { padding-top: 0; }
+      .blog-item { grid-template-columns: 55px 1fr; gap: 1rem; }
+      footer { padding: 1.5rem; }
+      #sudoku-iframe { height: 70vh; }
+      #sudoku-modal { padding: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2.2rem; }
+      .hero-deco { display: none; }
+      .about-stats { grid-template-columns: 1fr; }
+      .section-header { flex-wrap: wrap; }
+      .divider { display: none; }
+      .blog-item { grid-template-columns: 1fr; }
+      .blog-date { text-align: left; }
+      #sudoku-iframe { height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Bódis Tamás // BT Tech</div>
+    <ul class="nav-center">
+      <li><a href="#rolam" data-i18n="nav.about">Rólam</a></li>
+      <li><a href="#publikaciok" data-i18n="nav.pubs">Publikációk</a></li>
+      <li><a href="#projektek" data-i18n="nav.projects">Projektek</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#kapcsolat" data-i18n="nav.contact">Kapcsolat</a></li>
+    </ul>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#rolam" data-i18n="nav.about" onclick="closeMenu()">Rólam</a>
+    <a href="#publikaciok" data-i18n="nav.pubs" onclick="closeMenu()">Publikációk</a>
+    <a href="#projektek" data-i18n="nav.projects" onclick="closeMenu()">Projektek</a>
+    <a href="#blog" onclick="closeMenu()">Blog</a>
+    <a href="#kapcsolat" data-i18n="nav.contact" onclick="closeMenu()">Kapcsolat</a>
+    <div class="mobile-lang">
+      <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-deco">
+∇·E = ρ/ε₀   ∇×B = μ₀J + μ₀ε₀∂E/∂t
+∮E·dA = Q/ε₀   ∮B·dl = μ₀I
+ψ(x,t) = Ae^(i(kx−ωt))   ĤΨ = EΨ
+∂²ψ/∂t² = c²∇²ψ   δS = 0
+d/dt(∂L/∂q̇) − ∂L/∂q = 0
+R_μν − ½Rg_μν = 8πGT_μν
+    </div>
+    <div class="hero-content">
+      <p class="hero-label" data-i18n="hero.label">Mérnök & Kutató</p>
+      <h1 data-i18n="hero.h1">Precizitás<br>a <em>mérésben</em><br>és elméletben.</h1>
+      <p class="hero-sub">BT Tech · Óbudai Egyetem · Budapest</p>
+      <p class="hero-desc" data-i18n="hero.desc">
+        Mérésautomatizálás, precíziós kalibrálás és elméleti fizika metszéspontján dolgozom.
+        RF rendszerek, kvantummechanikai keretek és numerikus módszerek – ahol a matematika találkozik a valósággal.
+      </p>
+      <div class="hero-tags">
+        <span class="tag">Mérésautomatizálás</span>
+        <span class="tag">RF Kalibráció</span>
+        <span class="tag">Matematikai fizika</span>
+        <span class="tag">FPGA</span>
+        <span class="tag">VBA / Python</span>
+        <span class="tag">Geometriai mechanika</span>
+      </div>
+      <div class="hero-cta">
+        <a href="#publikaciok" class="btn btn-primary" data-i18n="hero.cta1">Publikációk</a>
+        <a href="#kapcsolat" class="btn btn-outline" data-i18n="hero.cta2">Kapcsolat</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RÓLAM -->
+  <section id="rolam">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 data-i18n="nav.about">Rólam</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p data-i18n="about.p1">
+          Mérőmérnökként precíziós kalibrálással és mérésautomatizálással
+          foglalkozom. Napi szinten dolgozom Fluke kalibrátorokkal, Keysight multiméterekkel
+          és RF tesztberendezésekkel, melyekhez VBA-alapú automatizálási rendszereket fejlesztek.
+        </p>
+        <p data-i18n="about.p2">
+          Az Óbudai Egyetem Kandó Kálmán Karán MSc hallgatóként önállóan folytatok kutatásokat
+          a matematikai fizika területén – különösen a kvantummechanika és hidrodinamikai
+          reprezentációk kapcsolatát vizsgálom geometriai módszerekkel.
+        </p>
+        <p data-i18n="about.p3">
+          A mérnöki precizitás és az elméleti mélység kettőssége vezérel: fontosnak tartom,
+          hogy az elméletek mérhetők, a mérések pedig matematikailag megalapozottak legyenek.
+        </p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-num">5+</div>
+          <div class="stat-label" data-i18n="about.stat1">Év szakmai tapasztalat</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label" data-i18n="about.stat2">Elfogadott publikáció</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">RF · DC · LF</div>
+          <div class="stat-label" data-i18n="about.stat3">Kalibrálási területek</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">MSc</div>
+          <div class="stat-label" data-i18n="about.stat4">Óbudai Egyetem</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PUBLIKÁCIÓK -->
+  <section id="publikaciok" class="pubs-section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 data-i18n="nav.pubs">Publikációk</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="pub-list">
+      <div class="pub-item">
+        <span class="pub-year">2024</span>
+        <div>
+          <div class="pub-title">Covariant Conservation Laws in Geometric Mechanics</div>
+          <div class="pub-journal">Journal of Geometric Mechanics</div>
+          <div class="pub-tags">
+            <span class="tag">geometriai mechanika</span>
+            <span class="tag">megmaradási tételek</span>
+          </div>
+        </div>
+      </div>
+      <div class="pub-item">
+        <span class="pub-year">2024</span>
+        <div>
+          <div class="pub-title">Vectorial Matrix Product (VMP) Framework for Quantum Systems</div>
+          <div class="pub-journal" data-i18n="pub.review">Preprint – bírálat alatt</div>
+          <div class="pub-tags">
+            <span class="tag">kvantummechanika</span>
+            <span class="tag">VMP keretrendszer</span>
+          </div>
+        </div>
+      </div>
+      <div class="pub-item">
+        <span class="pub-year">2023</span>
+        <div>
+          <div class="pub-title">Corner-Corrected Integral Method for Embedded Numerical Computation</div>
+          <div class="pub-journal" data-i18n="pub.conf">Konferencia közlemény</div>
+          <div class="pub-tags">
+            <span class="tag">numerikus módszerek</span>
+            <span class="tag">CCI módszer</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJEKTEK -->
+  <section id="projektek">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 data-i18n="nav.projects">Projektek</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="projects-grid">
+      <div class="project-card">
+        <span class="project-icon">⚡</span>
+        <div class="project-title" data-i18n="proj.rf.title">RF Mérőrendszer Automatizálás</div>
+        <p class="project-desc" data-i18n="proj.rf.desc">NRP-Z teljesítménymérők, FSV spektrumanalizátorok és Pendulum frekvenciamérők integrált vezérlése szignálgenerátorok komplex karakterizálásához.</p>
+        <div class="project-tech">
+          <span class="tech-badge">VBA</span><span class="tech-badge">VISA</span><span class="tech-badge">SCPI</span><span class="tech-badge">RF</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">∫</span>
+        <div class="project-title">Corner-Corrected Integral (CCI)</div>
+        <p class="project-desc" data-i18n="proj.cci.desc">Numerikus integrálási módszer mikrokontrollerekre optimalizálva. MATLAB implementáció és teljes tesztkészlet kidolgozása.</p>
+        <div class="project-tech">
+          <span class="tech-badge">MATLAB</span><span class="tech-badge">C</span><span class="tech-badge">Arduino</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">⊞</span>
+        <div class="project-title" data-i18n="proj.fpga.title">FPGA Fejlesztés – Spartan-6</div>
+        <p class="project-desc" data-i18n="proj.fpga.desc">Képfeldolgozási architektúrák vizsgálata Xilinx ISE 14.7 környezetben. Tórus-alapú adatfeldolgozás innovatív alkalmazásai.</p>
+        <div class="project-tech">
+          <span class="tech-badge">VHDL</span><span class="tech-badge">Xilinx ISE</span><span class="tech-badge">Spartan-6</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">🐍</span>
+        <div class="project-title">SFE100 Python Parser</div>
+        <p class="project-desc" data-i18n="proj.sfe.desc">Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Python</span><span class="tech-badge">Pandas</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">Ψ</span>
+        <div class="project-title" data-i18n="proj.qm.title">Kvantum-hidrodinamikai Keretek</div>
+        <p class="project-desc" data-i18n="proj.qm.desc">A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Matematikai fizika</span><span class="tech-badge">MATLAB</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">🔧</span>
+        <div class="project-title" data-i18n="proj.sc.title">SmartClone – Arduino Diagnosztika</div>
+        <p class="project-desc" data-i18n="proj.sc.desc">Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Arduino</span><span class="tech-badge">C++</span><span class="tech-badge">PCB</span>
+        </div>
+      </div>
+
+      <!-- ── Sudoku ILP kártya ── -->
+      <div class="project-card sudoku-card" onclick="openSudoku()">
+        <span class="project-icon">⊡</span>
+        <div class="project-title" data-i18n="proj.sudoku.title">Sudoku – ILP Megoldó</div>
+        <p class="project-desc" data-i18n="proj.sudoku.desc">A rejtvény visszavezetése 729 bináris változós Ax = b lineáris egyenletrendszerre. Branch-and-bound megoldó, interaktív mátrix-sparsity vizualizációval.</p>
+        <div class="project-tech">
+          <span class="tech-badge">ILP</span>
+          <span class="tech-badge">Exact Cover</span>
+          <span class="tech-badge">Branch &amp; Bound</span>
+        </div>
+        <div class="launch-hint">▸ Megnyitás</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section id="blog" class="blog-section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 data-i18n="nav.blog">Blog & Írások</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="blog-list">
+      <a href="#" class="blog-item">
+        <div class="blog-date">2025<br>JAN</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.1.title">A mérési bizonytalanság geometriai értelmezéséről</div>
+          <p class="blog-excerpt" data-i18n="blog.1.desc">Hogyan látjuk másképp a kalibrálási hibákat, ha differenciálgeometriai szemüvegen át nézzük a mérési teret.</p>
+        </div>
+      </a>
+      <a href="#" class="blog-item">
+        <div class="blog-date">2024<br>NOV</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.2.title">FPGA-alapú képfeldolgozás: a tórusz mint adatstruktúra</div>
+          <p class="blog-excerpt" data-i18n="blog.2.desc">Miért lehet előnyös toroidális geometriában gondolkodni párhuzamos adatfeldolgozás tervezésekor Spartan-6-on.</p>
+        </div>
+      </a>
+      <a href="#" class="blog-item">
+        <div class="blog-date">2024<br>OKT</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.3.title">RF kalibráció a gyakorlatban</div>
+          <p class="blog-excerpt" data-i18n="blog.3.desc">Egy precíziós jelgenerátor-karakterizálási munkamenet tapasztalatai, és amit a linearitásmérés valójában jelent.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- KAPCSOLAT -->
+  <section id="kapcsolat">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 data-i18n="nav.contact">Kapcsolat</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-inner">
+      <p data-i18n="contact.desc">
+        Kutatási együttműködések, mérésautomatizálási projektek vagy elméleti fizikai kérdések
+        kapcsán szívesen veszem a megkereséseket.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:tomi546258@gmail.com" class="contact-link">
+          <span class="contact-link-label">E-mail</span>
+          tomi546258@gmail.com
+        </a>
+        <a href="https://orcid.org/0009-0004-6349-712X" class="contact-link">
+          <span class="contact-link-label">ORCID</span>
+          0009-0004-6349-712X
+        </a>
+        <a href="https://github.com/tomi546258-dev" class="contact-link">
+          <span class="contact-link-label">GitHub</span>
+          github.com/tomi546258-dev
+        </a>
+        <a href="https://www.linkedin.com/in/tam%C3%A1s-b%C3%B3dis-aa41581b2" class="contact-link">
+          <span class="contact-link-label">LinkedIn</span>
+          linkedin.com/in/tamás-bódis
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-text">© 2025 Bódis Tamás — Budapest</div>
+    <div class="footer-text" data-i18n="footer.tagline">Mérés · Elmélet · Alkotás</div>
+  </footer>
+
+  <!-- ══ SUDOKU MODAL ══ -->
+  <div id="sudoku-modal" role="dialog" aria-modal="true" aria-label="Sudoku ILP megoldó">
+    <div class="sudoku-modal-inner">
+      <div class="sudoku-modal-bar">
+        <span class="sudoku-modal-title">Sudoku — ILP visszavezetés</span>
+        <button class="sudoku-modal-close" onclick="closeSudoku()">✕ Bezár</button>
+      </div>
+      <iframe
+        id="sudoku-iframe"
+        src=""
+        title="Sudoku ILP megoldó"
+        loading="lazy">
+      </iframe>
+    </div>
+  </div>
+
+  <script>
+    // ── i18n ──
+    const translations = {
+      hu: {
+        "nav.about": "Rólam", "nav.pubs": "Publikációk", "nav.projects": "Projektek",
+        "nav.blog": "Blog & Írások", "nav.contact": "Kapcsolat",
+        "hero.label": "Mérnök & Kutató",
+        "hero.h1": "Precizitás<br>a <em>mérésben</em><br>és elméletben.",
+        "hero.desc": "Mérésautomatizálás, precíziós kalibrálás és elméleti fizika metszéspontján dolgozom. RF rendszerek, kvantummechanikai keretek és numerikus módszerek – ahol a matematika találkozik a valósággal.",
+        "hero.cta1": "Publikációk", "hero.cta2": "Kapcsolat",
+        "about.p1": "Mérőmérnökként precíziós kalibrálással és mérésautomatizálással foglalkozom. Napi szinten dolgozom Fluke kalibrátorokkal, Keysight multiméterekkel és RF tesztberendezésekkel, melyekhez VBA-alapú automatizálási rendszereket fejlesztek.",
+        "about.p2": "Az Óbudai Egyetem Kandó Kálmán Karán MSc hallgatóként önállóan folytatok kutatásokat a matematikai fizika területén – különösen a kvantummechanika és hidrodinamikai reprezentációk kapcsolatát vizsgálom geometriai módszerekkel.",
+        "about.p3": "A mérnöki precizitás és az elméleti mélység kettőssége vezérel: fontosnak tartom, hogy az elméletek mérhetők, a mérések pedig matematikailag megalapozottak legyenek.",
+        "about.stat1": "Év szakmai tapasztalat", "about.stat2": "Elfogadott publikáció",
+        "about.stat3": "Kalibrálási területek", "about.stat4": "Óbudai Egyetem",
+        "pub.review": "Preprint – bírálat alatt", "pub.conf": "Konferencia közlemény",
+        "proj.rf.title": "RF Mérőrendszer Automatizálás",
+        "proj.rf.desc": "NRP-Z teljesítménymérők, FSV spektrumanalizátorok és Pendulum frekvenciamérők integrált vezérlése szignálgenerátorok komplex karakterizálásához.",
+        "proj.cci.desc": "Numerikus integrálási módszer mikrokontrollerekre optimalizálva. MATLAB implementáció és teljes tesztkészlet kidolgozása.",
+        "proj.fpga.title": "FPGA Fejlesztés – Spartan-6",
+        "proj.fpga.desc": "Képfeldolgozási architektúrák vizsgálata Xilinx ISE 14.7 környezetben. Tórus-alapú adatfeldolgozás innovatív alkalmazásai.",
+        "proj.sfe.desc": "Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.",
+        "proj.qm.title": "Kvantum-hidrodinamikai Keretek",
+        "proj.qm.desc": "A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.",
+        "proj.sc.title": "SmartClone – Arduino Diagnosztika",
+        "proj.sc.desc": "Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.",
+        "proj.sudoku.title": "Sudoku – ILP Megoldó",
+        "proj.sudoku.desc": "A rejtvény visszavezetése 729 bináris változós Ax = b lineáris egyenletrendszerre. Branch-and-bound megoldó, interaktív mátrix-sparsity vizualizációval.",
+        "blog.1.title": "A mérési bizonytalanság geometriai értelmezéséről",
+        "blog.1.desc": "Hogyan látjuk másképp a kalibrálási hibákat, ha differenciálgeometriai szemüvegen át nézzük a mérési teret.",
+        "blog.2.title": "FPGA-alapú képfeldolgozás: a tórusz mint adatstruktúra",
+        "blog.2.desc": "Miért lehet előnyös toroidális geometriában gondolkodni párhuzamos adatfeldolgozás tervezésekor Spartan-6-on.",
+        "blog.3.title": "RF kalibráció a gyakorlatban",
+        "blog.3.desc": "Egy precíziós jelgenerátor-karakterizálási munkamenet tapasztalatai, és amit a linearitásmérés valójában jelent.",
+        "contact.desc": "Kutatási együttműködések, mérésautomatizálási projektek vagy elméleti fizikai kérdések kapcsán szívesen veszem a megkereséseket.",
+        "footer.tagline": "Mérés · Elmélet · Alkotás"
+      },
+      de: {
+        "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
+        "nav.blog": "Blog & Texte", "nav.contact": "Kontakt",
+        "hero.label": "Ingenieur & Forscher",
+        "hero.h1": "Präzision<br>in der <em>Messung</em><br>und Theorie.",
+        "hero.desc": "Ich arbeite an der Schnittstelle von Messautomatisierung, Präzisionskalibrierung und theoretischer Physik. RF-Systeme, quantenmechanische Rahmenwerke und numerische Methoden – dort, wo Mathematik auf Realität trifft.",
+        "hero.cta1": "Publikationen", "hero.cta2": "Kontakt",
+        "about.p1": "Als Messingenieur beschäftige ich mich mit Präzisionskalibrierung und Messautomatisierung. Ich arbeite täglich mit Fluke-Kalibratoren, Keysight-Multimetern und HF-Testgeräten, für die ich VBA-basierte Automatisierungssysteme entwickle.",
+        "about.p2": "Als MSc-Student an der Óbuda-Universität betreibe ich eigenständige Forschung im Bereich der mathematischen Physik – insbesondere untersuche ich die Verbindung zwischen Quantenmechanik und hydrodynamischen Darstellungen mit geometrischen Methoden.",
+        "about.p3": "Mich antreibt die Dualität von ingenieurmäßiger Präzision und theoretischer Tiefe: Ich halte es für wichtig, dass Theorien messbar und Messungen mathematisch fundiert sind.",
+        "about.stat1": "Jahre Berufserfahrung", "about.stat2": "Angenommene Publikationen",
+        "about.stat3": "Kalibrierungsbereiche", "about.stat4": "Óbuda-Universität",
+        "pub.review": "Preprint – unter Begutachtung", "pub.conf": "Konferenzbeitrag",
+        "proj.rf.title": "HF-Messsystem Automatisierung",
+        "proj.rf.desc": "Integrierte Steuerung von NRP-Z-Leistungsmessgeräten, FSV-Spektrumanalysatoren und Pendulum-Frequenzzählern zur umfassenden Charakterisierung von Signalgeneratoren.",
+        "proj.cci.desc": "Numerisches Integrationsverfahren für Mikrocontroller optimiert. MATLAB-Implementierung und vollständige Testsammlung.",
+        "proj.fpga.title": "FPGA-Entwicklung – Spartan-6",
+        "proj.fpga.desc": "Untersuchung von Bildverarbeitungsarchitekturen in der Xilinx ISE 14.7-Umgebung. Innovative Anwendungen torusbasierter Datenverarbeitung.",
+        "proj.sfe.desc": "Automatisierte Verarbeitung und Analyse von Messdateien. Komplexe Messworkflows mit adaptivem Mittelungssystem.",
+        "proj.qm.title": "Quanten-hydrodynamische Rahmenwerke",
+        "proj.qm.desc": "Geometrische Untersuchung der Verbindung zwischen Quantenmechanik und Hydrodynamik. Eigenständige Forschung zur kovarianten Erhaltungstheorie.",
+        "proj.sc.title": "SmartClone – Arduino Diagnostik",
+        "proj.sc.desc": "Eingebettetes Diagnosesystem auf Arduino-Plattform. Entwicklung innovativer PCB-Spulen-Transformatoren.",
+        "proj.sudoku.title": "Sudoku – ILP-Löser",
+        "proj.sudoku.desc": "Das Rätsel wird auf ein lineares Gleichungssystem Ax = b mit 729 binären Variablen zurückgeführt. Branch-and-Bound-Löser mit interaktiver Matrix-Sparsity-Visualisierung.",
+        "blog.1.title": "Zur geometrischen Interpretation der Messunsicherheit",
+        "blog.1.desc": "Wie wir Kalibrierungsfehler anders sehen, wenn wir den Messraum durch die Brille der Differentialgeometrie betrachten.",
+        "blog.2.title": "FPGA-basierte Bildverarbeitung: der Torus als Datenstruktur",
+        "blog.2.desc": "Warum es vorteilhaft sein kann, bei der Planung paralleler Datenverarbeitung auf dem Spartan-6 in toroidaler Geometrie zu denken.",
+        "blog.3.title": "HF-Kalibrierung in der Praxis",
+        "blog.3.desc": "Erfahrungen aus einer Präzisions-Signalgenerator-Charakterisierungssitzung und was Linearitätsmessung wirklich bedeutet.",
+        "contact.desc": "Ich freue mich über Anfragen bezüglich Forschungskooperationen, Messautomatisierungsprojekte oder theoretisch-physikalische Fragestellungen.",
+        "footer.tagline": "Messung · Theorie · Schöpfung"
+      },
+      en: {
+        "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
+        "nav.blog": "Blog & Writing", "nav.contact": "Contact",
+        "hero.label": "Engineer & Researcher",
+        "hero.h1": "Precision<br>in <em>measurement</em><br>and theory.",
+        "hero.desc": "I work at the intersection of measurement automation, precision calibration, and theoretical physics. RF systems, quantum mechanical frameworks, and numerical methods – where mathematics meets reality.",
+        "hero.cta1": "Publications", "hero.cta2": "Contact",
+        "about.p1": "As a measurement engineer, I specialise in precision calibration and measurement automation. I work daily with Fluke calibrators, Keysight multimeters, and RF test equipment, developing VBA-based automation systems for their control.",
+        "about.p2": "As an MSc student at Óbuda University, I conduct independent research in mathematical physics – particularly investigating the connection between quantum mechanics and hydrodynamic representations using geometric methods.",
+        "about.p3": "I am driven by the duality of engineering precision and theoretical depth: I believe theories should be measurable, and measurements should be mathematically grounded.",
+        "about.stat1": "Years of experience", "about.stat2": "Accepted publications",
+        "about.stat3": "Calibration domains", "about.stat4": "Óbuda University",
+        "pub.review": "Preprint – under review", "pub.conf": "Conference proceedings",
+        "proj.rf.title": "RF Measurement System Automation",
+        "proj.rf.desc": "Integrated control of NRP-Z power meters, FSV spectrum analysers and Pendulum frequency counters for comprehensive signal generator characterisation.",
+        "proj.cci.desc": "Numerical integration method optimised for microcontrollers. MATLAB implementation with a complete test suite.",
+        "proj.fpga.title": "FPGA Development – Spartan-6",
+        "proj.fpga.desc": "Investigation of image processing architectures in the Xilinx ISE 14.7 environment. Novel applications of torus-based data processing.",
+        "proj.sfe.desc": "Automated processing and analysis of measurement files. Complex measurement workflows with an adaptive averaging system.",
+        "proj.qm.title": "Quantum-Hydrodynamic Frameworks",
+        "proj.qm.desc": "Geometric investigation of the connection between quantum mechanics and hydrodynamics. Independent research in covariant conservation theory.",
+        "proj.sc.title": "SmartClone – Arduino Diagnostics",
+        "proj.sc.desc": "Embedded diagnostic system on the Arduino platform. Development of innovative PCB-coil transformer designs.",
+        "proj.sudoku.title": "Sudoku – ILP Solver",
+        "proj.sudoku.desc": "The puzzle reduced to an Ax = b system with 729 binary variables. Branch-and-bound solver with interactive matrix sparsity visualisation.",
+        "blog.1.title": "On the geometric interpretation of measurement uncertainty",
+        "blog.1.desc": "How calibration errors look different when viewed through the lens of differential geometry applied to measurement space.",
+        "blog.2.title": "FPGA-based image processing: the torus as a data structure",
+        "blog.2.desc": "Why thinking in toroidal geometry can be advantageous when designing parallel data processing on a Spartan-6.",
+        "blog.3.title": "RF calibration in practice",
+        "blog.3.desc": "Lessons from a precision signal generator characterisation session, and what linearity measurement really means.",
+        "contact.desc": "I welcome enquiries regarding research collaborations, measurement automation projects, or theoretical physics questions.",
+        "footer.tagline": "Measurement · Theory · Creation"
+      }
+    };
+
+    let currentLang = 'hu';
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+      });
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const hamburger = document.getElementById('hamburger');
+      menu.classList.toggle('open');
+      hamburger.classList.toggle('open');
+    }
+
+    function closeMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
+    }
+
+    // ── Sudoku modal ──
+    function openSudoku() {
+      const modal = document.getElementById('sudoku-modal');
+      const iframe = document.getElementById('sudoku-iframe');
+      // Lazy-load: csak az első megnyitáskor tölti be
+      if (!iframe.src || iframe.src === window.location.href) {
+        iframe.src = 'sudoku-ilp.html';
+      }
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSudoku() {
+      document.getElementById('sudoku-modal').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // ESC billentyűre bezár
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSudoku();
+    });
+
+    // Modal háttérre kattintva bezár
+    document.getElementById('sudoku-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeSudoku();
+    });
+  </script>
+</body>
+</html>
