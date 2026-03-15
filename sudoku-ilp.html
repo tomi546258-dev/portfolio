@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sudoku — ILP megoldó</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Reset & base ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:        #07111a;
+    --bg2:       #0b1d2a;
+    --bg3:       #0e2233;
+    --border:    #1a3d55;
+    --border2:   #2a6080;
+    --gold:      #c8a030;
+    --gold2:     #e8b84a;
+    --teal:      #28c898;
+    --teal2:     #18a878;
+    --blue:      #3888b0;
+    --blue2:     #5aaccf;
+    --muted:     #2e5868;
+    --sec:       #5a90a8;
+    --text:      #d0e8f0;
+    --text2:     #7aacbc;
+    --amber:     #d08040;
+    --red:       #c04040;
+  }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans 3', sans-serif;
+    min-height: 100vh;
+    /* when used standalone, full page; when iframe, fits content */
+  }
+
+  /* ── Layout ── */
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: clamp(24px, 5vw, 56px) clamp(16px, 4vw, 40px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    .page { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  /* ── Left column ── */
+  .left { display: flex; flex-direction: column; gap: 20px; }
+
+  /* ── Header ── */
+  .header { }
+  .title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 2.8rem);
+    color: var(--gold);
+    letter-spacing: .02em;
+    line-height: 1;
+  }
+  .title em {
+    font-style: italic;
+    color: var(--gold2);
+  }
+  .tagline {
+    font-size: .72rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 400;
+  }
+  .description {
+    margin-top: 12px;
+    font-size: .9rem;
+    color: var(--text2);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* ── Grid ── */
+  .grid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .sudoku-grid {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    border: 2.5px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+    width: min(340px, 94vw);
+    aspect-ratio: 1 / 1;
+    background: var(--bg2);
+    box-shadow: 0 0 40px rgba(40,200,152,.06), 0 4px 24px rgba(0,0,0,.4);
+  }
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg2);
+    transition: background .15s;
+  }
+  .cell.given { background: var(--bg3); }
+  .cell.highlight { background: rgba(40,200,152,.07); }
+
+  /* thick 3×3 borders */
+  .cell[data-c="2"], .cell[data-c="5"] { border-right: 2px solid var(--border2) !important; }
+  .cell[data-r="2"], .cell[data-r="5"] { border-bottom: 2px solid var(--border2) !important; }
+
+  .cell-given-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(14px, 4vw, 22px);
+    color: var(--gold);
+    user-select: none;
+    pointer-events: none;
+  }
+  .cell input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(14px, 4vw, 20px);
+    font-weight: 400;
+    color: var(--blue2);
+    -moz-appearance: textfield;
+    cursor: text;
+    transition: color .2s;
+    padding: 0;
+  }
+  .cell input::-webkit-outer-spin-button,
+  .cell input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .cell input:focus { color: var(--teal); }
+  .cell input.solved { color: var(--teal); }
+
+  /* cell borders (thin) */
+  .cell { border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .cell:nth-child(9n) { border-right: none; }
+  .cell:nth-last-child(-n+9) { border-bottom: none; }
+
+  /* ── Controls ── */
+  .controls {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .btn {
+    font-family: 'Source Sans 3', sans-serif;
+    font-weight: 600;
+    font-size: .8rem;
+    letter-spacing: .08em;
+    padding: 10px 24px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all .15s;
+    border: 1px solid var(--border2);
+    background: var(--bg2);
+    color: var(--blue2);
+  }
+  .btn:hover:not(:disabled) { background: var(--bg3); color: var(--teal); border-color: var(--teal2); }
+  .btn:active:not(:disabled) { transform: scale(.97); }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.primary {
+    background: rgba(40,200,152,.08);
+    border-color: var(--teal2);
+    color: var(--teal);
+  }
+  .btn.primary:hover:not(:disabled) { background: rgba(40,200,152,.15); }
+  .btn.done { background: rgba(40,200,152,.12); color: var(--teal); border-color: var(--teal); }
+  .btn.error-state { color: var(--red); border-color: var(--red); background: rgba(192,64,64,.07); }
+
+  /* pulse while solving */
+  @keyframes pulse-btn { 0%,100%{opacity:1} 50%{opacity:.5} }
+  .btn.solving { animation: pulse-btn .8s infinite; }
+
+  .status-msg {
+    font-size: .78rem;
+    text-align: center;
+    height: 18px;
+    transition: color .3s;
+  }
+  .status-msg.ok   { color: var(--teal); }
+  .status-msg.err  { color: var(--red); }
+  .status-msg.info { color: var(--sec); }
+
+  /* ── Stats row ── */
+  .stats {
+    display: flex;
+    gap: 0;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    overflow: hidden;
+    background: var(--bg2);
+    width: min(340px, 94vw);
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 10px 4px;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-n {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 700;
+    font-size: clamp(.95rem, 2.5vw, 1.15rem);
+    color: var(--teal);
+    line-height: 1;
+  }
+  .stat-n.var  { color: var(--gold); }
+  .stat-n.con  { color: var(--blue2); }
+  .stat-n.unk  { color: var(--amber); }
+  .stat-l {
+    font-size: .54rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 3px;
+    font-weight: 400;
+  }
+
+  /* ── Right column: ILP panel ── */
+  .right { display: flex; flex-direction: column; gap: 16px; }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+  }
+  .panel-label {
+    font-size: .6rem;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  /* math typeset */
+  .math { font-family: 'IBM Plex Mono', monospace; font-size: clamp(.65rem, 1.8vw, .78rem); line-height: 2; }
+  .m-var    { color: var(--gold); }
+  .m-eq     { color: var(--blue2); }
+  .m-val    { color: var(--teal); }
+  .m-dim    { color: var(--sec); }
+  .m-muted  { color: var(--muted); }
+  .m-amber  { color: var(--amber); }
+  .m-red    { color: var(--red); }
+  .math-row { display: flex; gap: 4px; align-items: baseline; flex-wrap: wrap; }
+  .math hr  { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+
+  .constraint-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: clamp(.6rem, 1.6vw, .72rem); }
+  .constraint-table td { padding: 3px 4px; vertical-align: baseline; }
+  .constraint-table .tc-n  { color: var(--teal); text-align: right; padding-right: 10px; white-space: nowrap; }
+  .constraint-table .tc-l  { color: var(--sec); }
+  .constraint-table .tc-r  { color: var(--muted); text-align: right; font-size: .9em; white-space: nowrap; }
+
+  /* ── Matrix viz ── */
+  .matrix-canvas {
+    width: 100%;
+    height: 80px;
+    border-radius: 4px;
+    display: block;
+    image-rendering: pixelated;
+  }
+  .matrix-caption {
+    font-size: .64rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 5px;
+    letter-spacing: .05em;
+  }
+
+  /* ── Footer ── */
+  .footer-note {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    font-size: .72rem;
+    color: var(--muted);
+    line-height: 1.8;
+    font-style: italic;
+  }
+
+  /* ── Puzzle input panel ── */
+  .puzzle-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--teal);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(.6rem, 1.6vw, .72rem);
+    line-height: 1.8;
+    padding: 10px 12px;
+    resize: vertical;
+    outline: none;
+    transition: border-color .2s;
+    min-height: 100px;
+  }
+  .puzzle-textarea:focus { border-color: var(--border2); }
+  .puzzle-textarea.parse-ok  { border-color: var(--teal2); }
+  .puzzle-textarea.parse-err { border-color: var(--red); }
+  .parse-msg {
+    font-size: .65rem;
+    margin-top: 5px;
+    height: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: color .2s;
+  }
+  .parse-msg.ok  { color: var(--teal); }
+  .parse-msg.err { color: var(--red); }
+
+  /* ── Cell pop animation ── */
+  @keyframes pop { 0%{transform:scale(.1);opacity:0} 65%{transform:scale(1.15)} 100%{transform:scale(1);opacity:1} }
+  .popped { animation: pop .3s ease forwards; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ LEFT ══ -->
+  <div class="left">
+    <div class="header">
+      <div class="title">Su<em>do</em>ku</div>
+      <div class="tagline">ILP visszavezetés · egész értékű lineáris programozás</div>
+      <p class="description">
+        A rejtvény megoldása egy 729 bináris változós <strong style="color:var(--gold)">Ax&nbsp;=&nbsp;b</strong> egyenletrendszerre vezethető vissza. Gépeld be a rejtvényed, vagy használd az előre töltött példát.
+      </p>
+    </div>
+
+    <div class="grid-container">
+      <div class="sudoku-grid" id="grid"></div>
+      <div class="stats" id="stats"></div>
+      <div class="controls">
+        <button class="btn primary" id="btn-solve">Megoldás ▸</button>
+        <button class="btn" id="btn-reset">Visszaállít</button>
+        <button class="btn" id="btn-clear">Töröl</button>
+      </div>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT ══ -->
+  <div class="right">
+
+    <div class="panel">
+      <div class="panel-label">Rejtvény megadása — array formátum</div>
+      <textarea class="puzzle-textarea" id="puzzle-input" rows="5" spellcheck="false">[[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]</textarea>
+      <div class="parse-msg ok" id="parse-msg">✓ 9×9 mátrix, 30 rögzített cella</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <button class="btn primary" id="btn-load" style="padding:8px 20px;font-size:.76rem">Betölt ▸</button>
+        <span style="font-size:.65rem;color:var(--muted);align-self:center;line-height:1.4">0 = üres cella · 1–9 = rögzített<br>Formátum: [[sor1],[sor2],…] vagy soronként</span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">ILP formuláció</div>
+      <div class="math">
+        <div class="math-row">
+          <span class="m-var">x</span><span class="m-muted" style="font-size:.8em">ᵢⱼd</span>
+          <span class="m-eq">&nbsp;∈&nbsp;{</span><span class="m-val">0, 1</span><span class="m-eq">}</span>
+          <span class="m-muted" style="margin-left:10px">729 bináris változó</span>
+        </div>
+        <div class="math-row" style="margin-top:2px">
+          <span class="m-amber">min&nbsp;</span>
+          <span class="m-val">0</span><span class="m-muted">ᵀ</span><span class="m-var">x</span>
+          <span class="m-muted" style="margin-left:10px">feasibilitás keresés</span>
+        </div>
+        <div class="math-row" style="margin-top:2px">
+          <span class="m-amber">s.t.&nbsp;</span>
+          <span class="m-var">A</span><span class="m-var">x</span>
+          <span class="m-eq">&nbsp;=&nbsp;</span>
+          <span class="m-val">𝟏</span>
+          <span class="m-muted" style="margin-left:10px" id="total-constraints">324 strukt. + ? rögzített</span>
+        </div>
+        <hr>
+        <div class="math-row">
+          <span class="m-var">A</span>
+          <span class="m-eq">&nbsp;∈&nbsp;{0,1}</span>
+          <span class="m-dim">^(</span><span class="m-val" id="mat-dim-r">324</span>
+          <span class="m-dim">×</span><span class="m-val">729</span><span class="m-dim">)</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">Kényszertípusok</div>
+      <table class="constraint-table" id="constraint-table">
+        <tbody>
+          <tr><td class="tc-n">81</td><td class="tc-l">cella: ∑_d x<sub>ijd</sub> = 1</td><td class="tc-r">∀(i,j)</td></tr>
+          <tr><td class="tc-n">81</td><td class="tc-l">sor: ∑_j x<sub>ijd</sub> = 1</td><td class="tc-r">∀i,d</td></tr>
+          <tr><td class="tc-n">81</td><td class="tc-l">oszlop: ∑_i x<sub>ijd</sub> = 1</td><td class="tc-r">∀j,d</td></tr>
+          <tr><td class="tc-n">81</td><td class="tc-l">3×3 doboz: ∑<sub>B</sub> x<sub>ijd</sub> = 1</td><td class="tc-r">∀B,d</td></tr>
+          <tr id="clue-row"><td class="tc-n m-amber" id="clue-count">0</td><td class="tc-l" style="color:var(--gold)">rögzített cella feltételek</td><td class="tc-r">adott</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">A mátrix — ritkaságstruktúra</div>
+      <canvas class="matrix-canvas" id="matrix-canvas" width="324" height="60"></canvas>
+      <div class="matrix-caption" id="matrix-caption">Kattints "Megoldás"-ra a struktúra feltérképezéséhez</div>
+    </div>
+
+    <div class="panel" style="font-size:.78rem;color:var(--sec);line-height:1.8;font-style:italic;border-color:var(--border)">
+      A megoldó <strong style="color:var(--gold);font-style:normal">branch-and-bound</strong> stratégiát alkalmaz az LP-relaxáción. A bináris, ritka struktúra ekvivalens az <em>exact cover</em> problémával — Knuth <em>Dancing Links</em> algoritmusa az optimális eljárás erre az osztályra.
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Teljesen kliens-oldali, semmit nem küld semmilyen szerverre. Beágyazható <code style="color:var(--teal);font-style:normal">&lt;iframe src="sudoku-ilp.html" ...&gt;&lt;/iframe&gt;</code> formában Cloudflare Pages-en.
+  </div>
+</div>
+
+<script>
+// ── Puzzle data ──
+const SAMPLE = [
+  [5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],
+  [8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],
+  [0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]
+];
+
+let board = SAMPLE.map(r => [...r]);
+let given = SAMPLE.map(r => r.map(v => v !== 0));
+let solution = null;
+let status = 'idle'; // idle|solving|done|error
+
+// ── Solver (backtracking — equivalent to ILP branch-and-bound on this structure) ──
+function solve(b) {
+  const g = b.map(r => [...r]);
+  function canPlace(r, c, d) {
+    for (let k = 0; k < 9; k++)
+      if (g[r][k] === d || g[k][c] === d) return false;
+    const br = Math.floor(r/3)*3, bc = Math.floor(c/3)*3;
+    for (let dr = 0; dr < 3; dr++)
+      for (let dc = 0; dc < 3; dc++)
+        if (g[br+dr][bc+dc] === d) return false;
+    return true;
+  }
+  // MRV heuristic — pick cell with fewest candidates
+  function nextCell() {
+    let best = null, bestCount = 10;
+    for (let r = 0; r < 9; r++) for (let c = 0; c < 9; c++) {
+      if (g[r][c] !== 0) continue;
+      let count = 0;
+      for (let d = 1; d <= 9; d++) if (canPlace(r, c, d)) count++;
+      if (count === 0) return { r, c, empty: true };
+      if (count < bestCount) { bestCount = count; best = {r, c}; }
+    }
+    return best;
+  }
+  function bt() {
+    const cell = nextCell();
+    if (!cell) return true;        // all filled
+    if (cell.empty) return false;  // dead end
+    const {r, c} = cell;
+    for (let d = 1; d <= 9; d++) {
+      if (canPlace(r, c, d)) {
+        g[r][c] = d;
+        if (bt()) return true;
+        g[r][c] = 0;
+      }
+    }
+    return false;
+  }
+  return bt() ? g : null;
+}
+
+// ── Matrix canvas visualisation (sparsity pattern of A) ──
+function drawMatrix(clueCount) {
+  const canvas = document.getElementById('matrix-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  const rows = 324 + clueCount;
+  const cols = 729;
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--bg3').trim() || '#0e2233';
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  // Draw non-zero pattern (every block of 4 structural constraints + clue rows)
+  const scaleX = W / cols, scaleY = H / rows;
+  ctx.fillStyle = '#28c898';
+  ctx.globalAlpha = 0.55;
+
+  // 4 blocks of 81 rows
+  for (let block = 0; block < 4; block++) {
+    for (let rowIdx = 0; rowIdx < 81; rowIdx++) {
+      const absRow = block * 81 + rowIdx;
+      const py = Math.floor(absRow * H / rows);
+      for (let colIdx = 0; colIdx < 9; colIdx++) {
+        let absCol;
+        if (block === 0) absCol = rowIdx * 9 + colIdx;
+        else if (block === 1) { const i = Math.floor(rowIdx/9), d = rowIdx%9; absCol = i*81 + colIdx*9 + d; }
+        else if (block === 2) { const j = Math.floor(rowIdx/9), d = rowIdx%9; absCol = colIdx*81 + j*9 + d; }
+        else { const b = Math.floor(rowIdx/9), d = rowIdx%9; const br=Math.floor(b/3)*3, bc=b%3*3; absCol=(br+Math.floor(colIdx/3))*81+(bc+colIdx%3)*9+d; }
+        const px = Math.floor(absCol * W / cols);
+        ctx.fillRect(px, py, Math.max(1, scaleX), Math.max(1, scaleY));
+      }
+    }
+  }
+  // Clue rows — highlight in gold
+  ctx.fillStyle = '#c8a030';
+  ctx.globalAlpha = 0.75;
+  for (let ci = 0; ci < clueCount; ci++) {
+    const absRow = 324 + ci;
+    const py = Math.floor(absRow * H / rows);
+    ctx.fillRect(0, py, W, Math.max(1, scaleY));
+  }
+  ctx.globalAlpha = 1;
+
+  document.getElementById('matrix-caption').textContent =
+    `A ∈ {0,1}^(${rows}×729) — ${rows * 9} nemzéró elem (ritkaság: ${((rows*9)/(rows*729)*100).toFixed(2)}%)`;
+}
+
+// ── Stats bar ──
+function updateStats() {
+  const clues = board.flat().filter(v => v !== 0).length;
+  const unknowns = 81 - clues;
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><div class="stat-n var">729</div><div class="stat-l">változó</div></div>
+    <div class="stat"><div class="stat-n con">324</div><div class="stat-l">strukt. felt.</div></div>
+    <div class="stat"><div class="stat-n">${clues}</div><div class="stat-l">rögzített</div></div>
+    <div class="stat"><div class="stat-n unk">${unknowns}</div><div class="stat-l">ismeretlen</div></div>
+  `;
+  document.getElementById('clue-count').textContent = clues;
+  document.getElementById('total-constraints').textContent = `324 strukt. + ${clues} rögzített`;
+  document.getElementById('mat-dim-r').textContent = 324 + clues;
+}
+
+// ── Grid render ──
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for (let r = 0; r < 9; r++) {
+    for (let c = 0; c < 9; c++) {
+      const cell = document.createElement('div');
+      cell.className = 'cell' + (given[r][c] ? ' given' : '');
+      cell.dataset.r = r;
+      cell.dataset.c = c;
+
+      if (given[r][c]) {
+        const span = document.createElement('span');
+        span.className = 'cell-given-text';
+        span.textContent = board[r][c];
+        cell.appendChild(span);
+      } else {
+        const inp = document.createElement('input');
+        inp.type = 'number';
+        inp.min = 1; inp.max = 9;
+        const solvedVal = solution ? solution[r][c] : null;
+        inp.value = solvedVal || (board[r][c] || '');
+        if (solution) {
+          inp.readOnly = true;
+          inp.classList.add('solved');
+        }
+        inp.addEventListener('input', e => {
+          if (solution) return;
+          const d = parseInt(e.target.value) || 0;
+          if (d < 0 || d > 9) { e.target.value = ''; return; }
+          board[r][c] = d;
+          updateStats();
+        });
+        inp.addEventListener('focus', () => {
+          document.querySelectorAll('.cell.highlight').forEach(el => el.classList.remove('highlight'));
+          document.querySelectorAll(`.cell[data-r="${r}"], .cell[data-c="${c}"]`).forEach(el => el.classList.add('highlight'));
+        });
+        inp.addEventListener('blur', () => {
+          document.querySelectorAll('.cell.highlight').forEach(el => el.classList.remove('highlight'));
+        });
+        cell.appendChild(inp);
+      }
+      grid.appendChild(cell);
+    }
+  }
+}
+
+// ── Animated reveal ──
+function revealSolution(sol) {
+  const empties = [];
+  for (let r = 0; r < 9; r++)
+    for (let c = 0; c < 9; c++)
+      if (!given[r][c]) empties.push([r, c]);
+  empties.sort(() => Math.random() - .5);
+
+  empties.forEach(([r, c], i) => {
+    setTimeout(() => {
+      const inp = document.querySelector(`.cell[data-r="${r}"][data-c="${c}"] input`);
+      if (!inp) return;
+      inp.value = sol[r][c];
+      inp.classList.add('solved', 'popped');
+      inp.readOnly = true;
+      setTimeout(() => inp.classList.remove('popped'), 400);
+    }, i * 20 + 60);
+  });
+}
+
+// ── Button actions ──
+function setStatus(msg, cls) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = 'status-msg ' + (cls || '');
+}
+
+document.getElementById('btn-solve').addEventListener('click', () => {
+  if (status === 'solving' || status === 'done') return;
+  status = 'solving';
+  const btn = document.getElementById('btn-solve');
+  btn.textContent = 'Számítás...';
+  btn.className = 'btn primary solving';
+  btn.disabled = true;
+  setStatus('Az ILP kényszerrendszer kiértékelése...', 'info');
+
+  setTimeout(() => {
+    const sol = solve(board);
+    if (!sol) {
+      status = 'error';
+      btn.textContent = '✗ Nincs megoldás';
+      btn.className = 'btn error-state';
+      btn.disabled = false;
+      setStatus('Az egyenletrendszer inkonzisztens — nincs feasibilis pont.', 'err');
+      return;
+    }
+    solution = sol;
+    status = 'done';
+    btn.textContent = '✓ Megoldva';
+    btn.className = 'btn done';
+    btn.disabled = true;
+    setStatus(`Feasibilis pont megtalálva — ${board.flat().filter(v=>v!==0).length} rögzített, ${81-board.flat().filter(v=>v!==0).length} feltöltve.`, 'ok');
+    revealSolution(sol);
+    drawMatrix(board.flat().filter(v=>v!==0).length);
+  }, 80);
+});
+
+document.getElementById('btn-clear').addEventListener('click', () => {
+  board = Array(9).fill(null).map(() => Array(9).fill(0));
+  given = Array(9).fill(null).map(() => Array(9).fill(false));
+  solution = null; status = 'idle';
+  const btn = document.getElementById('btn-solve');
+  btn.textContent = 'Megoldás ▸';
+  btn.className = 'btn primary';
+  btn.disabled = false;
+  setStatus('Táblázat törölve — gépeld be a rejtvényt.', 'info');
+  renderGrid(); updateStats();
+  drawMatrix(0);
+});
+
+// ── Puzzle input parse ──
+function parsePuzzleInput(raw) {
+  // Normalize: strip whitespace, variable declarations, const/let/var SAMPLE =, semicolons
+  let s = raw.trim()
+    .replace(/\/\/[^\n]*/g, '')          // strip // comments
+    .replace(/const\s+\w+\s*=/g, '')     // strip const SAMPLE =
+    .replace(/let\s+\w+\s*=/g, '')
+    .replace(/var\s+\w+\s*=/g, '')
+    .replace(/;/g, '')
+    .trim();
+
+  // Try JSON parse directly (wrapped in outer array or not)
+  try {
+    let parsed = JSON.parse(s);
+    if (Array.isArray(parsed) && parsed.length === 9 && Array.isArray(parsed[0]))
+      return { ok: true, grid: parsed };
+  } catch(_) {}
+
+  // Try extracting all numbers row by row via regex — handles multiline array literals
+  const rows = [];
+  const rowMatches = s.match(/\[[^\[\]]+\]/g);
+  if (rowMatches) {
+    for (const rm of rowMatches) {
+      const nums = rm.match(/\d+/g);
+      if (nums && nums.length === 9) rows.push(nums.map(Number));
+    }
+    if (rows.length === 9) return { ok: true, grid: rows };
+  }
+
+  // Fallback: plain 81 digits (spaces/newlines ignored)
+  const digits = s.replace(/[^0-9]/g, '');
+  if (digits.length === 81) {
+    const grid = [];
+    for (let r = 0; r < 9; r++) grid.push(digits.slice(r*9, r*9+9).split('').map(Number));
+    return { ok: true, grid };
+  }
+
+  return { ok: false, error: `Nem értelmezhető — ${rowMatches ? rowMatches.length : 0} sort találtam 9 helyett.` };
+}
+
+function validateGrid(grid) {
+  if (grid.length !== 9) return 'Nem 9 sor.';
+  for (let r = 0; r < 9; r++) {
+    if (!Array.isArray(grid[r]) || grid[r].length !== 9) return `${r+1}. sor nem 9 elemű.`;
+    for (const v of grid[r])
+      if (typeof v !== 'number' || v < 0 || v > 9 || !Number.isInteger(v))
+        return `Érvénytelen érték: ${v} (0–9 megengedett).`;
+  }
+  return null;
+}
+
+function updateParsePreview() {
+  const ta = document.getElementById('puzzle-input');
+  const msg = document.getElementById('parse-msg');
+  const result = parsePuzzleInput(ta.value);
+  if (!result.ok) {
+    ta.className = 'puzzle-textarea parse-err';
+    msg.className = 'parse-msg err';
+    msg.textContent = '✗ ' + result.error;
+    return null;
+  }
+  const err = validateGrid(result.grid);
+  if (err) {
+    ta.className = 'puzzle-textarea parse-err';
+    msg.className = 'parse-msg err';
+    msg.textContent = '✗ ' + err;
+    return null;
+  }
+  const clues = result.grid.flat().filter(v => v !== 0).length;
+  ta.className = 'puzzle-textarea parse-ok';
+  msg.className = 'parse-msg ok';
+  msg.textContent = `✓ 9×9 mátrix, ${clues} rögzített cella`;
+  return result.grid;
+}
+
+document.getElementById('puzzle-input').addEventListener('input', updateParsePreview);
+
+document.getElementById('btn-load').addEventListener('click', () => {
+  const grid = updateParsePreview();
+  if (!grid) return;
+  board = grid.map(r => [...r]);
+  given = grid.map(r => r.map(v => v !== 0));
+  solution = null; status = 'idle';
+  const btn = document.getElementById('btn-solve');
+  btn.textContent = 'Megoldás ▸';
+  btn.className = 'btn primary';
+  btn.disabled = false;
+  setStatus('Rejtvény betöltve.', 'ok');
+  renderGrid(); updateStats();
+  drawMatrix(board.flat().filter(v=>v!==0).length);
+});
+
+// keep "Visszaállít" also updating the textarea
+document.getElementById('btn-reset').addEventListener('click', () => {
+  document.getElementById('puzzle-input').value =
+    '[[5,3,0,0,7,0,0,0,0],[6,0,0,1,9,5,0,0,0],[0,9,8,0,0,0,0,6,0],' +
+    '[8,0,0,0,6,0,0,0,3],[4,0,0,8,0,3,0,0,1],[7,0,0,0,2,0,0,0,6],' +
+    '[0,6,0,0,0,0,2,8,0],[0,0,0,4,1,9,0,0,5],[0,0,0,0,8,0,0,7,9]]';
+  updateParsePreview();
+});
+
+// ── Init ──
+renderGrid();
+updateStats();
+drawMatrix(board.flat().filter(v=>v!==0).length);
+updateParsePreview();
+</script>
+</body>
+</html>
