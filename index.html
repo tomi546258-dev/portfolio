@@ -784,6 +784,16 @@ R_μν − ½Rg_μν = 8πGT_μν
             <span class="tag">geometriai mechanika</span>
             <span class="tag">megmaradási tételek</span>
           </div>
+          <div style="margin-top:.8rem">
+            <button onclick="openModal('covariant-conservation.html','Covariant Conservation — Bódis Tamás')"
+              style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                     background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                     border-radius:2px;cursor:pointer;transition:all .2s;"
+              onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+              ▸ Részletek &amp; vizualizáció
+            </button>
+          </div>
         </div>
       </div>
       <div class="pub-item">
@@ -958,7 +968,7 @@ R_μν − ½Rg_μν = 8πGT_μν
   <div id="sudoku-modal" role="dialog" aria-modal="true" aria-label="Sudoku ILP megoldó">
     <div class="sudoku-modal-inner">
       <div class="sudoku-modal-bar">
-        <span class="sudoku-modal-title">Sudoku — ILP visszavezetés</span>
+        <span class="sudoku-modal-title" id="modal-title">Sudoku — ILP visszavezetés</span>
         <button class="sudoku-modal-close" onclick="closeSudoku()">✕ Bezár</button>
       </div>
       <iframe
@@ -1104,21 +1114,25 @@ R_μν − ½Rg_μν = 8πGT_μν
       document.getElementById('hamburger').classList.remove('open');
     }
 
-    // ── Sudoku modal ──
-    function openSudoku() {
+    // ── Általános modal ──
+    function openModal(src, title) {
       const modal = document.getElementById('sudoku-modal');
       const iframe = document.getElementById('sudoku-iframe');
-      // Lazy-load: csak az első megnyitáskor tölti be
-      if (!iframe.src || iframe.src === window.location.href) {
-        iframe.src = 'sudoku-ilp.html';
-      }
+      const titleEl = document.getElementById('modal-title');
+      if (titleEl) titleEl.textContent = title || src;
+      iframe.src = src;
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
     }
 
+    // visszafelé kompatibilis alias
+    function openSudoku() { openModal('sudoku-ilp.html', 'Sudoku — ILP visszavezetés'); }
+
     function closeSudoku() {
       document.getElementById('sudoku-modal').classList.remove('open');
       document.body.style.overflow = '';
+      // iframe src ürítése hogy ne fusson a háttérben
+      setTimeout(() => { document.getElementById('sudoku-iframe').src = ''; }, 300);
     }
 
     // ESC billentyűre bezár

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Covariant Conservation — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: { inlineMath: [['$','$'],['\\(','\\)']], displayMath: [['$$','$$'],['\\[','\\]']], tags: 'ams' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea'] },
+  startup: { typeset: true }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --bg:       #0e0f0f;
+  --bg2:      #151717;
+  --bg3:      #1c1f1f;
+  --border:   #2a2e2e;
+  --accent:   #c8a96e;
+  --accent2:  #7eb8a4;
+  --text:     #d8d4cc;
+  --text-dim: #7a7870;
+  --text-bright: #eeeae2;
+  --red:      #c06060;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,0.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.012) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ── layout ── */
+.page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: clamp(32px,5vw,64px) clamp(16px,4vw,40px);
+  position: relative; z-index: 1;
+}
+
+/* ── header ── */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  border: 1px solid var(--accent2); color: var(--accent2);
+  padding: .28rem .8rem; border-radius: 2px; margin-bottom: 1.4rem;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent2);
+  animation: blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.paper-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  color: var(--text-bright);
+  line-height: 1.1;
+  margin-bottom: .6rem;
+}
+.paper-title em { font-style: italic; color: var(--accent); }
+
+.paper-meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .72rem; color: var(--text-dim);
+  letter-spacing: .08em; margin-bottom: 2rem;
+  display: flex; flex-wrap: wrap; gap: .5rem 1.4rem;
+}
+.paper-meta a { color: var(--accent2); text-decoration: none; }
+.paper-meta a:hover { color: var(--accent); }
+
+/* ── section ── */
+.section { margin-top: 2.8rem; }
+.section-label {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.section-label::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+
+.section h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.3rem; color: var(--text-bright);
+  margin-bottom: .6rem;
+}
+
+/* ── abstract ── */
+.abstract-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 1.4rem 1.6rem; border-radius: 2px;
+  font-size: .97rem; line-height: 1.8;
+  color: var(--text);
+}
+
+/* ── key results ── */
+.results-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: .8rem;
+  margin-top: .8rem;
+}
+@media(max-width:600px){ .results-grid{ grid-template-columns:1fr; } }
+
+.result-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 1.2rem 1.4rem; border-radius: 2px;
+  transition: border-color .2s;
+  position: relative; overflow: hidden;
+}
+.result-card::before {
+  content: ''; position: absolute; top:0; left:0;
+  width:3px; height:0; background: var(--accent);
+  transition: height .3s;
+}
+.result-card:hover::before { height: 100%; }
+.result-card:hover { border-color: var(--accent); }
+
+.result-tag {
+  font-family: 'DM Mono', monospace; font-size: .6rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent2); margin-bottom: .5rem;
+}
+.result-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1rem; color: var(--text-bright);
+  margin-bottom: .45rem;
+}
+.result-body { font-size: .87rem; color: var(--text-dim); line-height: 1.7; }
+
+/* ── math display ── */
+.eq-block {
+  background: var(--bg3); border: 1px solid var(--border);
+  padding: 1rem 1.4rem; border-radius: 2px;
+  margin: 1rem 0; overflow-x: auto;
+  font-size: .97rem;
+}
+.eq-label {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  color: var(--text-dim); letter-spacing: .1em;
+  margin-bottom: .3rem;
+}
+
+/* ── canvas panels ── */
+.viz-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1.2rem;
+  margin-top: .8rem;
+}
+.viz-title {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: .8rem;
+}
+canvas { display: block; width: 100%; border-radius: 2px; }
+
+.viz-controls {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  margin-top: .9rem; align-items: center;
+}
+.ctrl-label {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  color: var(--text-dim); letter-spacing: .08em;
+  display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 140px;
+}
+.ctrl-label input[type=range] { flex: 1; accent-color: var(--accent); }
+.ctrl-val {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  color: var(--accent); min-width: 28px; text-align: right;
+}
+
+/* ── coupling table ── */
+.coupling-grid {
+  display: grid; gap: .4rem;
+  margin-top: .8rem;
+}
+.coupling-row {
+  display: flex; gap: .4rem; font-family: 'DM Mono', monospace;
+  font-size: .72rem;
+}
+.coup-cell {
+  width: 36px; height: 36px; display: flex;
+  align-items: center; justify-content: center;
+  border-radius: 2px; border: 1px solid var(--border);
+  transition: all .2s; cursor: default;
+  color: var(--text-dim);
+}
+.coup-cell.allowed {
+  background: rgba(126,184,164,.15);
+  border-color: var(--accent2); color: var(--accent2);
+  font-weight: 500;
+}
+.coup-cell.header { background: none; border-color: transparent; color: var(--accent); }
+.coup-cell.diag { background: rgba(200,169,110,.07); border-color: var(--accent); color: var(--accent); }
+
+/* ── BibTeX ── */
+.bibtex-box {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1rem 1.4rem;
+  font-family: 'DM Mono', monospace; font-size: .72rem;
+  color: var(--text-dim); line-height: 1.9;
+  overflow-x: auto; white-space: pre; position: relative;
+}
+.copy-btn {
+  position: absolute; top: .7rem; right: .8rem;
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  background: none; border: 1px solid var(--border);
+  color: var(--text-dim); padding: .25rem .65rem;
+  border-radius: 2px; cursor: pointer; transition: all .15s;
+}
+.copy-btn:hover { color: var(--accent); border-color: var(--accent); }
+.copy-btn.copied { color: var(--accent2); border-color: var(--accent2); }
+
+.bib-key    { color: var(--accent2); }
+.bib-field  { color: var(--text-dim); }
+.bib-val    { color: var(--accent); }
+
+/* ── footer ── */
+.page-footer {
+  margin-top: 3.5rem; padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between;
+  flex-wrap: wrap; gap: .5rem;
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem; color: var(--text-dim);
+  letter-spacing: .08em;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ══ HEADER ══ -->
+  <div class="status-pill">
+    <span class="status-dot"></span>
+    Under review · Journal of Geometric Mechanics
+  </div>
+
+  <h1 class="paper-title">
+    Covariant conservation,<br>
+    <em>metric volume forms,</em><br>
+    and symmetry-adapted spectral bases
+  </h1>
+
+  <div class="paper-meta">
+    <span>Bódis Tamás</span>
+    <span>·</span>
+    <a href="https://orcid.org/0009-0004-6349-712X" target="_blank">ORCID 0009-0004-6349-712X</a>
+    <span>·</span>
+    <span>Manuscript GM-D-25-00033</span>
+    <span>·</span>
+    <span>Handling editor: Arieh Iserles</span>
+  </div>
+
+  <!-- ══ ABSTRACT ══ -->
+  <div class="section">
+    <div class="section-label">Abstract</div>
+    <div class="abstract-box">
+      We establish a covariant conservation identity for the canonical divergence of a
+      vector density built from the metric volume form $\sqrt{|g|}$, and show how this
+      identity constrains the spectral decomposition of geometric differential operators on
+      curved domains. Applying the framework to a helical tube geometry, we prove that the
+      first-order perturbative correction to the ground-state eigenvalue vanishes identically
+      ($\lambda^{(1)} = 0$) as a direct consequence of the conservation law, and derive
+      selection rules governing inter-mode coupling. Second-order corrections are expressed
+      via Lommel-type Bessel integrals, yielding closed-form perturbative spectra not
+      previously reported in the literature.
+    </div>
+  </div>
+
+  <!-- ══ KEY RESULTS ══ -->
+  <div class="section">
+    <div class="section-label">Key results</div>
+    <div class="results-grid">
+
+      <div class="result-card">
+        <div class="result-tag">Theorem 1</div>
+        <div class="result-title">Covariant conservation identity</div>
+        <div class="result-body">
+          The canonical divergence of $\sqrt{|g|}\,V^\mu$ satisfies an exact identity
+          that is metric-compatible and coordinate-independent. This extends the
+          Piola–Nanson formula to curved spectral problems.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag">Theorem 2 — Helical tube</div>
+        <div class="result-title">Vanishing first-order correction</div>
+        <div class="result-body">
+          For the helical tube perturbation, $\lambda^{(1)} = 0$ follows directly from
+          the conservation law — no first-order energy shift occurs. This is a symmetry
+          consequence, not a coincidence.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag">Selection rule</div>
+        <div class="result-title">Coupling rule $\Delta m = \pm 1,\; \Delta n = 0$</div>
+        <div class="result-body">
+          Only modes with azimuthal index differing by exactly one are coupled by the
+          helical perturbation. Axial quantum number $n$ is conserved across the coupling.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag">New result</div>
+        <div class="result-title">Lommel–Bessel second-order spectrum</div>
+        <div class="result-body">
+          Second-order corrections $\lambda^{(2)}$ reduce to Lommel-type integrals of
+          Bessel functions, giving a closed-form perturbative spectrum not previously
+          reported in the geometric mechanics literature.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ CORE EQUATION ══ -->
+  <div class="section">
+    <div class="section-label">Central identity</div>
+    <div class="eq-label">Covariant conservation law</div>
+    <div class="eq-block">
+      $$\nabla_\mu \!\left(\sqrt{|g|}\;V^\mu\right) = \sqrt{|g|}\;\nabla_\mu V^\mu
+      + V^\mu\,\partial_\mu\!\sqrt{|g|}$$
+    </div>
+    <div class="eq-label">Perturbative eigenvalue expansion</div>
+    <div class="eq-block">
+      $$\lambda = \lambda^{(0)} + \varepsilon\,\lambda^{(1)} + \varepsilon^2\,\lambda^{(2)} + \mathcal{O}(\varepsilon^3),
+      \qquad \lambda^{(1)} = 0$$
+    </div>
+    <div class="eq-label">Second-order correction via Lommel integrals</div>
+    <div class="eq-block">
+      $$\lambda^{(2)} = -\sum_{m'\neq m} \frac{\left|\langle \psi_{m'n} \mid V^{(1)} \mid \psi_{mn}\rangle\right|^2}{\lambda^{(0)}_{m'n} - \lambda^{(0)}_{mn}},
+      \quad \langle \cdot \rangle = \int_0^R J_{m'}(k r)\,J_m(k r)\;r\,\mathrm{d}r$$
+    </div>
+  </div>
+
+  <!-- ══ HELIX VISUALISATION ══ -->
+  <div class="section">
+    <div class="section-label">Interactive — helical tube geometry</div>
+    <div class="viz-wrap">
+      <div class="viz-title">Tube cross-section &amp; perturbation profile — drag sliders to explore</div>
+      <canvas id="helix-canvas" height="260"></canvas>
+      <div class="viz-controls">
+        <label class="ctrl-label">
+          ε (perturbation)
+          <input type="range" id="eps-slider" min="0" max="60" value="20">
+          <span class="ctrl-val" id="eps-val">0.20</span>
+        </label>
+        <label class="ctrl-label">
+          φ (phase)
+          <input type="range" id="phi-slider" min="0" max="360" value="0">
+          <span class="ctrl-val" id="phi-val">0°</span>
+        </label>
+        <label class="ctrl-label">
+          m (azimuthal)
+          <input type="range" id="m-slider" min="0" max="4" value="1" step="1">
+          <span class="ctrl-val" id="m-val">1</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SPECTRUM VISUALISATION ══ -->
+  <div class="section">
+    <div class="section-label">Interactive — perturbative spectrum</div>
+    <div class="viz-wrap">
+      <div class="viz-title">Eigenvalue levels — zeroth order + second-order Lommel correction</div>
+      <canvas id="spectrum-canvas" height="220"></canvas>
+      <div class="viz-controls">
+        <label class="ctrl-label">
+          ε²
+          <input type="range" id="eps2-slider" min="0" max="80" value="25">
+          <span class="ctrl-val" id="eps2-val">0.25</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COUPLING TABLE ══ -->
+  <div class="section">
+    <div class="section-label">Selection rule — mode coupling matrix</div>
+    <p style="font-size:.88rem;color:var(--text-dim);margin-bottom:.8rem;">
+      Non-zero matrix elements $\langle \psi_{m'n'} \mid V^{(1)} \mid \psi_{mn} \rangle$
+      for $n=n'=0$. Only $\Delta m = \pm 1$ transitions are allowed.
+    </p>
+    <div id="coupling-table"></div>
+    <p style="font-size:.78rem;color:var(--text-dim);margin-top:.6rem;font-style:italic;">
+      <span style="color:var(--accent2)">■</span> allowed ($\Delta m = \pm 1$) &nbsp;·&nbsp;
+      <span style="color:var(--accent)">■</span> diagonal ($\Delta m = 0$, vanishes by symmetry) &nbsp;·&nbsp;
+      <span style="color:var(--border)">□</span> forbidden
+    </p>
+  </div>
+
+  <!-- ══ CITATION ══ -->
+  <div class="section">
+    <div class="section-label">Citation / BibTeX</div>
+    <div style="position:relative">
+      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@article</span>{bodis2025covariant,
+  <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
+  <span class="bib-field">title</span>   = {<span class="bib-val">Covariant conservation, metric volume forms,
+            and symmetry-adapted spectral bases</span>},
+  <span class="bib-field">journal</span> = {<span class="bib-val">Journal of Geometric Mechanics</span>},
+  <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
+  <span class="bib-field">note</span>    = {<span class="bib-val">Manuscript GM-D-25-00033, under review</span>},
+  <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
+}</pre>
+      <button class="copy-btn" id="copy-btn" onclick="copyBib()">Copy</button>
+    </div>
+  </div>
+
+  <!-- ══ FOOTER ══ -->
+  <div class="page-footer">
+    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>GM-D-25-00033 · Journal of Geometric Mechanics</span>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ════════════════════════════════════════════════
+// HELIX CANVAS
+// ════════════════════════════════════════════════
+const helixCanvas = document.getElementById('helix-canvas');
+const hctx = helixCanvas.getContext('2d');
+
+function drawHelix() {
+  const W = helixCanvas.offsetWidth;
+  helixCanvas.width  = W * devicePixelRatio;
+  helixCanvas.height = 260 * devicePixelRatio;
+  hctx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 260;
+
+  const eps = document.getElementById('eps-slider').value / 100;
+  const phi = document.getElementById('phi-slider').value * Math.PI / 180;
+  const m   = parseInt(document.getElementById('m-slider').value);
+
+  hctx.clearRect(0, 0, W, H);
+
+  // ── Left panel: cross-section ──
+  const cx = W * 0.28, cy = H * 0.5, R0 = Math.min(W * 0.18, 88);
+
+  // background
+  hctx.fillStyle = '#0b1d2a';
+  hctx.beginPath(); hctx.arc(cx, cy, R0 * 1.55, 0, Math.PI*2); hctx.fill();
+
+  // perturbed boundary
+  const N = 320;
+  hctx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const t = (i / N) * Math.PI * 2;
+    const r = R0 * (1 + eps * Math.cos(m * t + phi));
+    const x = cx + r * Math.cos(t);
+    const y = cy + r * Math.sin(t);
+    i === 0 ? hctx.moveTo(x, y) : hctx.lineTo(x, y);
+  }
+  hctx.closePath();
+  hctx.fillStyle = 'rgba(40,200,152,0.06)';
+  hctx.fill();
+  hctx.strokeStyle = '#28c898';
+  hctx.lineWidth = 1.5;
+  hctx.stroke();
+
+  // unperturbed circle
+  hctx.beginPath(); hctx.arc(cx, cy, R0, 0, Math.PI*2);
+  hctx.setLineDash([4, 4]);
+  hctx.strokeStyle = 'rgba(200,169,110,0.35)';
+  hctx.lineWidth = 1;
+  hctx.stroke();
+  hctx.setLineDash([]);
+
+  // mode wavefunction overlay
+  if (m > 0) {
+    hctx.beginPath();
+    for (let i = 0; i <= N; i++) {
+      const t = (i / N) * Math.PI * 2;
+      const amp = Math.cos(m * t + phi);
+      const r = R0 * 0.55 + amp * R0 * 0.28;
+      const x = cx + r * Math.cos(t);
+      const y = cy + r * Math.sin(t);
+      i === 0 ? hctx.moveTo(x, y) : hctx.lineTo(x, y);
+    }
+    hctx.strokeStyle = 'rgba(200,169,110,0.5)';
+    hctx.lineWidth = 1;
+    hctx.stroke();
+  }
+
+  // labels
+  hctx.font = `${11 * devicePixelRatio / devicePixelRatio}px DM Mono, monospace`;
+  hctx.fillStyle = '#5a90a8';
+  hctx.textAlign = 'center';
+  hctx.fillText('cross-section (r,φ)', cx, H - 14);
+  hctx.fillStyle = '#28c898';
+  hctx.fillText(`R(φ) = R₀(1 + ε cos(${m}φ))`, cx, 18);
+
+  // ── Right panel: perturbation along axis ──
+  const px0 = W * 0.54, pw = W * 0.42, py0 = H * 0.15, ph = H * 0.68;
+  const Nz = 200;
+
+  // axes
+  hctx.strokeStyle = '#2a2e2e'; hctx.lineWidth = 1;
+  hctx.beginPath(); hctx.moveTo(px0, py0); hctx.lineTo(px0, py0+ph); hctx.stroke();
+  hctx.beginPath(); hctx.moveTo(px0, py0+ph/2); hctx.lineTo(px0+pw, py0+ph/2); hctx.stroke();
+
+  hctx.fillStyle = '#2e5868'; hctx.textAlign = 'left';
+  hctx.fillText('z / L', px0+pw-10, py0+ph/2-6);
+  hctx.fillText('V⁽¹⁾', px0+4, py0+10);
+
+  // perturbation profile V(z)
+  hctx.beginPath();
+  for (let i = 0; i <= Nz; i++) {
+    const z = i / Nz;
+    const val = Math.cos(2 * Math.PI * z + phi) * eps;
+    const px = px0 + z * pw;
+    const py = py0 + ph/2 - val * ph * 0.42;
+    i === 0 ? hctx.moveTo(px, py) : hctx.lineTo(px, py);
+  }
+  hctx.strokeStyle = '#c8a96e'; hctx.lineWidth = 1.5; hctx.stroke();
+
+  // ε annotation
+  if (eps > 0.02) {
+    hctx.strokeStyle = 'rgba(200,169,110,0.35)'; hctx.lineWidth = 1;
+    hctx.setLineDash([3,3]);
+    const epsPy = py0 + ph/2 - eps * ph * 0.42;
+    hctx.beginPath(); hctx.moveTo(px0, epsPy); hctx.lineTo(px0+pw*0.3, epsPy); hctx.stroke();
+    hctx.setLineDash([]);
+    hctx.fillStyle = 'rgba(200,169,110,0.7)'; hctx.textAlign = 'left';
+    hctx.fillText(`ε=${eps.toFixed(2)}`, px0+4, epsPy-4);
+  }
+}
+
+// ════════════════════════════════════════════════
+// SPECTRUM CANVAS
+// ════════════════════════════════════════════════
+const specCanvas = document.getElementById('spectrum-canvas');
+const sctx = specCanvas.getContext('2d');
+
+// Bessel zeros approximation (first few) — j_{m,n} / R
+const besselZeros = {
+  0: [2.405, 5.520, 8.654],
+  1: [3.832, 7.016, 10.173],
+  2: [5.136, 8.417, 11.620],
+  3: [6.380, 9.761, 13.015],
+  4: [7.588, 11.065, 14.373],
+};
+
+function eigenvalues0(maxM = 4, maxN = 2) {
+  const vals = [];
+  for (let m = 0; m <= maxM; m++) {
+    for (let n = 0; n < maxN; n++) {
+      const k = besselZeros[m]?.[n];
+      if (k) vals.push({ m, n, lam: k * k });
+    }
+  }
+  return vals.sort((a,b) => a.lam - b.lam);
+}
+
+// Lommel integral approximation: I_{m,m'} ≈ analytical estimate
+function lommelCorrection(m, eps2) {
+  // second-order correction: Δλ ∝ -ε² × coupling_strength / Δλ₀
+  const k0 = besselZeros[m]?.[0] ?? 3;
+  const k1 = besselZeros[m+1 <= 4 ? m+1 : m-1]?.[0] ?? 5;
+  const deltaLam = k1*k1 - k0*k0;
+  const coupling = 0.18; // Lommel integral estimate
+  return -eps2 * coupling * coupling / deltaLam;
+}
+
+function drawSpectrum() {
+  const W = specCanvas.offsetWidth;
+  specCanvas.width  = W * devicePixelRatio;
+  specCanvas.height = 220 * devicePixelRatio;
+  sctx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 220;
+
+  const eps2 = document.getElementById('eps2-slider').value / 100;
+  const evs = eigenvalues0(4, 2);
+  const maxLam = evs[evs.length-1].lam * 1.08;
+  const minLam = 0;
+
+  sctx.clearRect(0, 0, W, H);
+
+  const leftPad = 54, rightPad = 20, topPad = 22, botPad = 28;
+  const plotW = W - leftPad - rightPad;
+  const plotH = H - topPad - botPad;
+
+  // axis
+  sctx.strokeStyle = '#2a2e2e'; sctx.lineWidth = 1;
+  sctx.beginPath();
+  sctx.moveTo(leftPad, topPad); sctx.lineTo(leftPad, topPad+plotH);
+  sctx.lineTo(leftPad+plotW, topPad+plotH);
+  sctx.stroke();
+
+  // y-axis label
+  sctx.save();
+  sctx.translate(13, topPad + plotH/2);
+  sctx.rotate(-Math.PI/2);
+  sctx.fillStyle = '#2e5868';
+  sctx.font = '11px DM Mono, monospace';
+  sctx.textAlign = 'center';
+  sctx.fillText('λ (eigenvalue)', 0, 0);
+  sctx.restore();
+
+  const mColors = ['#5a90a8','#28c898','#c8a96e','#a06898','#c06060'];
+  const colW = plotW / 5;
+
+  evs.forEach(({ m, n, lam }) => {
+    const corr = lommelCorrection(m, eps2);
+    const lam0y = topPad + plotH - (lam / maxLam) * plotH;
+    const lam1y = topPad + plotH - ((lam + corr) / maxLam) * plotH;
+    const x0 = leftPad + m * colW + colW*0.15;
+    const lw = colW * 0.7;
+    const col = mColors[m] ?? '#888';
+
+    // zeroth-order level
+    sctx.strokeStyle = col + '55';
+    sctx.lineWidth = 1;
+    sctx.setLineDash([4,3]);
+    sctx.beginPath(); sctx.moveTo(x0, lam0y); sctx.lineTo(x0+lw, lam0y); sctx.stroke();
+    sctx.setLineDash([]);
+
+    // corrected level
+    sctx.strokeStyle = col;
+    sctx.lineWidth = 2;
+    sctx.beginPath(); sctx.moveTo(x0, lam1y); sctx.lineTo(x0+lw, lam1y); sctx.stroke();
+
+    // shift arrow
+    if (Math.abs(lam1y - lam0y) > 2) {
+      sctx.strokeStyle = col + '88'; sctx.lineWidth = 1;
+      sctx.beginPath();
+      sctx.moveTo(x0+lw*0.5, lam0y);
+      sctx.lineTo(x0+lw*0.5, lam1y);
+      sctx.stroke();
+    }
+
+    // λ value label
+    sctx.fillStyle = col;
+    sctx.font = '10px DM Mono, monospace';
+    sctx.textAlign = 'right';
+    sctx.fillText(lam.toFixed(1), leftPad - 4, lam1y + 3);
+
+    // n label
+    if (lw > 20) {
+      sctx.fillStyle = col + 'bb';
+      sctx.textAlign = 'center';
+      sctx.fillText(`n=${n}`, x0+lw*0.5, lam1y - 5);
+    }
+  });
+
+  // m column headers
+  for (let m = 0; m <= 4; m++) {
+    const x0 = leftPad + m * colW;
+    sctx.fillStyle = mColors[m];
+    sctx.font = '11px DM Mono, monospace';
+    sctx.textAlign = 'center';
+    sctx.fillText(`m=${m}`, x0 + colW/2, H - 8);
+  }
+
+  // legend
+  sctx.font = '10px DM Mono, monospace'; sctx.textAlign = 'left';
+  sctx.fillStyle = '#2e5868';
+  sctx.setLineDash([4,3]);
+  sctx.strokeStyle = '#444'; sctx.lineWidth = 1;
+  sctx.beginPath(); sctx.moveTo(leftPad+4, topPad+8); sctx.lineTo(leftPad+22, topPad+8); sctx.stroke();
+  sctx.setLineDash([]);
+  sctx.strokeStyle = '#888'; sctx.lineWidth = 2;
+  sctx.beginPath(); sctx.moveTo(leftPad+30, topPad+8); sctx.lineTo(leftPad+48, topPad+8); sctx.stroke();
+  sctx.fillText('λ⁽⁰⁾', leftPad+4, topPad+6);
+  sctx.fillStyle = '#7aacbc';
+  sctx.fillText('λ⁽⁰⁾+λ⁽²⁾', leftPad+30, topPad+6);
+}
+
+// ════════════════════════════════════════════════
+// COUPLING TABLE
+// ════════════════════════════════════════════════
+function buildCouplingTable() {
+  const size = 6; // m = 0..5
+  const wrap = document.getElementById('coupling-table');
+  wrap.innerHTML = '';
+
+  // header row
+  let row = document.createElement('div');
+  row.className = 'coupling-row';
+  let hdr = document.createElement('div');
+  hdr.className = 'coup-cell header'; hdr.style.width='44px';
+  hdr.textContent = 'm\\m\''; row.appendChild(hdr);
+  for (let mp = 0; mp < size; mp++) {
+    let c = document.createElement('div');
+    c.className = 'coup-cell header'; c.textContent = mp; row.appendChild(c);
+  }
+  wrap.appendChild(row);
+
+  for (let m = 0; m < size; m++) {
+    row = document.createElement('div');
+    row.className = 'coupling-row';
+    let lbl = document.createElement('div');
+    lbl.className = 'coup-cell header'; lbl.style.width='44px';
+    lbl.textContent = m; row.appendChild(lbl);
+
+    for (let mp = 0; mp < size; mp++) {
+      let c = document.createElement('div');
+      const dm = Math.abs(m - mp);
+      if (dm === 1) {
+        c.className = 'coup-cell allowed'; c.textContent = '●';
+      } else if (dm === 0) {
+        c.className = 'coup-cell diag'; c.textContent = '○';
+      } else {
+        c.className = 'coup-cell'; c.textContent = '·';
+      }
+      row.appendChild(c);
+    }
+    wrap.appendChild(row);
+  }
+}
+
+// ════════════════════════════════════════════════
+// SLIDER EVENTS
+// ════════════════════════════════════════════════
+function initSliders() {
+  const epsS = document.getElementById('eps-slider');
+  const phiS = document.getElementById('phi-slider');
+  const mS   = document.getElementById('m-slider');
+  const eps2S = document.getElementById('eps2-slider');
+
+  function updateHelix() {
+    document.getElementById('eps-val').textContent = (epsS.value/100).toFixed(2);
+    document.getElementById('phi-val').textContent = phiS.value + '°';
+    document.getElementById('m-val').textContent   = mS.value;
+    drawHelix();
+  }
+  function updateSpectrum() {
+    document.getElementById('eps2-val').textContent = (eps2S.value/100).toFixed(2);
+    drawSpectrum();
+  }
+
+  epsS.addEventListener('input', updateHelix);
+  phiS.addEventListener('input', updateHelix);
+  mS.addEventListener('input', updateHelix);
+  eps2S.addEventListener('input', updateSpectrum);
+}
+
+// ════════════════════════════════════════════════
+// BibTeX copy
+// ════════════════════════════════════════════════
+function copyBib() {
+  const raw = `@article{bodis2025covariant,
+  author  = {Bódis, Tamás},
+  title   = {Covariant conservation, metric volume forms, and symmetry-adapted spectral bases},
+  journal = {Journal of Geometric Mechanics},
+  year    = {2025},
+  note    = {Manuscript GM-D-25-00033, under review},
+  orcid   = {0009-0004-6349-712X}
+}`;
+  navigator.clipboard.writeText(raw).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+function init() {
+  buildCouplingTable();
+  initSliders();
+  drawHelix();
+  drawSpectrum();
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => { drawHelix(); drawSpectrum(); });
+</script>
+</body>
+</html>
