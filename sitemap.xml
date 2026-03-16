@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://tomi546258-dev.github.io/portfolio/</loc>
+    <lastmod>2025-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://tomi546258-dev.github.io/portfolio/covariant-conservation.html</loc>
+    <lastmod>2025-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tomi546258-dev.github.io/portfolio/vmp.html</loc>
+    <lastmod>2025-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tomi546258-dev.github.io/portfolio/rf-automation.html</loc>
+    <lastmod>2025-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tomi546258-dev.github.io/portfolio/sudoku-ilp.html</loc>
+    <lastmod>2025-03-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+</urlset>

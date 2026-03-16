@@ -3,7 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bódis Tamás – Mérnök & Kutató</title>
+  <title>Bódis Tamás – Mérőmérnök, Kutató & BT Tech | Budapest</title>
+
+  <!-- ── SEO alapok ── -->
+  <meta name="description" content="Bódis Tamás – mérőmérnök, MSc hallgató az Óbudai Egyetemen, BT Tech alapítója. Szakterület: mérésautomatizálás, RF kalibráció, VMP keretrendszer, geometriai mechanika, FPGA fejlesztés, LabVIEW, Python, VBA.">
+  <meta name="author" content="Bódis Tamás">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="
+    Bódis Tamás, BT Tech, mérőmérnök, mérésautomatizálás, RF kalibráció,
+    Vektoriális Mátrixszorzat, VMP, Vectorial Matrix Product,
+    geometriai mechanika, covariant conservation, matematikai fizika,
+    Óbudai Egyetem, Kandó Kálmán, MSc hallgató,
+    FPGA fejlesztés, Spartan-6, Xilinx ISE,
+    LabVIEW, Python, VBA, SCPI, VISA, GPIB,
+    Fluke 5520A, Keysight, R&S FSV, NI PXIe,
+    mérési bizonytalanság, GUM, kalibrálás,
+    numerikus módszerek, CCI módszer, Arduino,
+    Budapest, Magyarország, mérnök, kutató,
+    measurement automation, calibration engineer, Budapest
+  ">
+  <link rel="canonical" href="https://tomi546258-dev.github.io/portfolio/">
+
+  <!-- ── Open Graph (közösségi megosztáshoz) ── -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bódis Tamás – Mérőmérnök & Kutató | BT Tech">
+  <meta property="og:description" content="Mérésautomatizálás, RF kalibráció és elméleti fizika metszéspontján. VMP keretrendszer, geometriai mechanika, FPGA, Python/VBA automatizálás.">
+  <meta property="og:url" content="https://tomi546258-dev.github.io/portfolio/">
+  <meta property="og:locale" content="hu_HU">
+
+  <!-- ── JSON-LD strukturált adat (Google-nek) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Bódis Tamás",
+    "alternateName": "Tamas Bodis",
+    "url": "https://tomi546258-dev.github.io/portfolio/",
+    "email": "tomi546258@gmail.com",
+    "sameAs": [
+      "https://orcid.org/0009-0004-6349-712X",
+      "https://github.com/tomi546258-dev",
+      "https://www.linkedin.com/in/tam%C3%A1s-b%C3%B3dis-aa41581b2"
+    ],
+    "jobTitle": "Mérőmérnök, MSc hallgató",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "BT Tech"
+    },
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "Óbudai Egyetem, Kandó Kálmán Villamosmérnöki Kar"
+    },
+    "knowsAbout": [
+      "Mérésautomatizálás", "RF kalibráció", "Vektoriális Mátrixszorzat",
+      "Geometriai mechanika", "FPGA fejlesztés", "LabVIEW", "Python", "VBA",
+      "Mérési bizonytalanság", "Numerikus módszerek"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Budapest",
+      "addressCountry": "HU"
+    }
+  }
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
   <style>
@@ -981,7 +1043,18 @@ R_μν − ½Rg_μν = 8πGT_μν
 
   <footer>
     <div class="footer-text">© 2025 Bódis Tamás — Budapest</div>
-    <div class="footer-text" data-i18n="footer.tagline">Mérés · Elmélet · Alkotás</div>
+    <div class="footer-text" style="display:flex;align-items:center;gap:.6rem">
+      <span data-i18n="footer.tagline">Mérés · Elmélet · Alkotás</span>
+      <span style="color:var(--border)">·</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:.5">
+          <circle cx="5" cy="5" r="4" stroke="var(--accent2)" stroke-width="1"/>
+          <circle cx="5" cy="5" r="1.5" fill="var(--accent2)"/>
+        </svg>
+        <span id="visit-count" style="color:var(--text-dim)">—</span>
+        <span style="color:var(--text-dim)" data-i18n="footer.visits">látogatás</span>
+      </span>
+    </div>
   </footer>
 
   <!-- ══ SUDOKU MODAL ══ -->
@@ -1035,7 +1108,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "blog.3.title": "RF kalibráció a gyakorlatban",
         "blog.3.desc": "Egy precíziós jelgenerátor-karakterizálási munkamenet tapasztalatai, és amit a linearitásmérés valójában jelent.",
         "contact.desc": "Kutatási együttműködések, mérésautomatizálási projektek vagy elméleti fizikai kérdések kapcsán szívesen veszem a megkereséseket.",
-        "footer.tagline": "Mérés · Elmélet · Alkotás"
+        "footer.tagline": "Mérés · Elmélet · Alkotás",
+        "footer.visits": "látogatás"
       },
       de: {
         "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
@@ -1069,7 +1143,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "blog.3.title": "HF-Kalibrierung in der Praxis",
         "blog.3.desc": "Erfahrungen aus einer Präzisions-Signalgenerator-Charakterisierungssitzung und was Linearitätsmessung wirklich bedeutet.",
         "contact.desc": "Ich freue mich über Anfragen bezüglich Forschungskooperationen, Messautomatisierungsprojekte oder theoretisch-physikalische Fragestellungen.",
-        "footer.tagline": "Messung · Theorie · Schöpfung"
+        "footer.tagline": "Messung · Theorie · Schöpfung",
+        "footer.visits": "Besuche"
       },
       en: {
         "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
@@ -1103,7 +1178,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "blog.3.title": "RF calibration in practice",
         "blog.3.desc": "Lessons from a precision signal generator characterisation session, and what linearity measurement really means.",
         "contact.desc": "I welcome enquiries regarding research collaborations, measurement automation projects, or theoretical physics questions.",
-        "footer.tagline": "Measurement · Theory · Creation"
+        "footer.tagline": "Measurement · Theory · Creation",
+        "footer.visits": "visits"
       }
     };
 
@@ -1164,6 +1240,22 @@ R_μν − ½Rg_μν = 8πGT_μν
     document.getElementById('sudoku-modal').addEventListener('click', function(e) {
       if (e.target === this) closeSudoku();
     });
+
+    // ── Látogatásszámláló (countapi.xyz) ──
+    (async function() {
+      const el = document.getElementById('visit-count');
+      try {
+        const res = await fetch('https://api.countapi.xyz/hit/tomi546258-dev.github.io/visits');
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        if (data && data.value) {
+          el.textContent = data.value.toLocaleString('hu-HU');
+        }
+      } catch {
+        el.style.display = 'none';
+        el.previousElementSibling && (el.previousElementSibling.style.display = 'none');
+      }
+    })();
   </script>
 </body>
 </html>

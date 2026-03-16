@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tomi546258-dev.github.io/portfolio/sitemap.xml
