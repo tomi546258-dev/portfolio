@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RF Mérőrendszer Automatizálás — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:          #0e0f0f;
+  --bg2:         #151717;
+  --bg3:         #1c1f1f;
+  --border:      #2a2e2e;
+  --accent:      #c8a96e;
+  --accent2:     #7eb8a4;
+  --text:        #d8d4cc;
+  --text-dim:    #7a7870;
+  --text-bright: #eeeae2;
+  --orange:      #d4703a;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none; z-index: 0;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: clamp(28px,5vw,60px) clamp(16px,4vw,40px);
+  position: relative; z-index: 1;
+}
+
+/* ── lang switcher ── */
+.lang-bar {
+  display: flex; justify-content: flex-end; gap: .3rem;
+  margin-bottom: 1.6rem;
+}
+.lang-btn {
+  font-family: 'DM Mono', monospace; font-size: .65rem;
+  letter-spacing: .12em; text-transform: uppercase;
+  background: none; border: 1px solid transparent;
+  color: var(--text-dim); padding: .28rem .6rem;
+  border-radius: 2px; cursor: pointer; transition: all .18s;
+}
+.lang-btn:hover  { color: var(--accent); border-color: var(--border); }
+.lang-btn.active { color: var(--accent); border-color: var(--accent); }
+
+/* ── header ── */
+.proj-icon {
+  font-size: 2rem; margin-bottom: .7rem; display: block;
+  filter: drop-shadow(0 0 12px rgba(212,112,58,.4));
+}
+.proj-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.5rem,4vw,2.3rem);
+  color: var(--text-bright); line-height: 1.1;
+  margin-bottom: .5rem;
+}
+.proj-title em { font-style: italic; color: var(--accent); }
+.proj-sub {
+  font-family: 'DM Mono', monospace; font-size: .7rem;
+  color: var(--text-dim); letter-spacing: .1em;
+  margin-bottom: 1.8rem; display: flex; flex-wrap: wrap; gap: .4rem 1.2rem;
+}
+.tech-badge {
+  font-family: 'DM Mono', monospace; font-size: .62rem;
+  color: var(--accent2); border: 1px solid rgba(126,184,164,.3);
+  padding: .2rem .55rem; border-radius: 1px; letter-spacing: .08em;
+}
+
+/* ── section ── */
+.section { margin-top: 2.6rem; }
+.section-label {
+  font-family: 'DM Mono', monospace; font-size: .6rem;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: .8rem;
+  display: flex; align-items: center; gap: .7rem;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── overview box ── */
+.overview-box {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-left: 3px solid var(--orange);
+  padding: 1.3rem 1.6rem; border-radius: 2px;
+  font-size: .97rem; line-height: 1.8; color: var(--text);
+}
+
+/* ── instrument grid ── */
+.instr-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: .7rem; margin-top: .6rem;
+}
+.instr-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: 1rem 1.2rem; border-radius: 2px;
+  transition: border-color .2s; position: relative; overflow: hidden;
+}
+.instr-card::before {
+  content:''; position:absolute; top:0; left:0;
+  width:2px; height:0; background:var(--orange);
+  transition: height .25s;
+}
+.instr-card:hover::before { height:100%; }
+.instr-card:hover { border-color: var(--orange); }
+.instr-role {
+  font-family: 'DM Mono', monospace; font-size: .6rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent2); margin-bottom: .35rem;
+}
+.instr-name {
+  font-family: 'DM Serif Display', serif;
+  font-size: .98rem; color: var(--text-bright); margin-bottom: .3rem;
+}
+.instr-detail { font-size: .82rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ── flow canvas ── */
+.viz-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1.2rem; margin-top: .6rem;
+}
+.viz-title {
+  font-family: 'DM Mono', monospace; font-size: .63rem;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-dim); margin-bottom: .8rem;
+}
+canvas { display: block; width: 100%; border-radius: 2px; }
+
+/* ── linearity chart ── */
+.chart-wrap {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 2px; padding: 1.2rem; margin-top: .6rem;
+}
+.chart-controls {
+  display: flex; gap: 1rem; flex-wrap: wrap;
+  margin-top: .9rem; align-items: center;
+}
+.ctrl-label {
+  font-family: 'DM Mono', monospace; font-size: .64rem;
+  color: var(--text-dim); letter-spacing: .08em;
+  display: flex; align-items: center; gap: .5rem; flex: 1; min-width: 140px;
+}
+.ctrl-label input[type=range] { flex: 1; accent-color: var(--accent); }
+.ctrl-val {
+  font-family: 'DM Mono', monospace; font-size: .64rem;
+  color: var(--accent); min-width: 38px; text-align: right;
+}
+
+/* ── feature list ── */
+.feature-list { display: flex; flex-direction: column; gap: .5rem; margin-top: .6rem; }
+.feature-row {
+  display: flex; align-items: flex-start; gap: .9rem;
+  background: var(--bg2); border: 1px solid var(--border);
+  padding: .85rem 1.1rem; border-radius: 2px;
+  font-size: .88rem; color: var(--text); transition: border-color .18s;
+}
+.feature-row:hover { border-color: var(--accent2); }
+.feature-icon {
+  font-family: 'DM Mono', monospace; font-size: .68rem;
+  color: var(--accent); min-width: 22px; padding-top: 2px;
+}
+
+/* ── four zone table ── */
+.zone-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'DM Mono', monospace; font-size: .72rem;
+  margin-top: .6rem;
+}
+.zone-table th {
+  padding: .5rem .8rem; text-align: left;
+  border-bottom: 1px solid var(--border);
+  color: var(--accent); font-weight: 500; letter-spacing: .08em;
+}
+.zone-table td {
+  padding: .55rem .8rem;
+  border-bottom: 1px solid var(--bg3);
+  color: var(--text-dim); vertical-align: middle;
+}
+.zone-table tr:hover td { color: var(--text); background: var(--bg3); }
+.zone-label {
+  display: inline-block; padding: .15rem .55rem;
+  border-radius: 2px; font-size: .65rem; letter-spacing: .08em;
+}
+
+/* ── footer ── */
+.page-footer {
+  margin-top: 3rem; padding-top: 1.2rem;
+  border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+  font-family: 'DM Mono', monospace; font-size: .63rem; color: var(--text-dim);
+  letter-spacing: .08em;
+}
+
+@keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.2} }
+.live-dot {
+  display: inline-block; width:7px; height:7px; border-radius:50%;
+  background:var(--accent2); margin-right:6px;
+  animation: pulse-dot 2.2s ease-in-out infinite;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- lang -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+
+  <!-- header -->
+  <span class="proj-icon">⚡</span>
+  <h1 class="proj-title" data-i18n="title">RF Mérőrendszer <em>Automatizálás</em></h1>
+  <div class="proj-sub">
+    <span>Bódis Tamás · BT Tech</span>
+    <span data-i18n="sub.scope">RF · LF · DC kalibrálás</span>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.2rem">
+    <span class="tech-badge">VBA</span>
+    <span class="tech-badge">VISA / SCPI</span>
+    <span class="tech-badge">NI LabVIEW</span>
+    <span class="tech-badge">Python</span>
+    <span class="tech-badge">R&amp;S FSV</span>
+    <span class="tech-badge">Fluke 5520A</span>
+  </div>
+
+  <!-- overview -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.overview">Áttekintés</div>
+    <div class="overview-box" data-i18n="overview.text">
+      Integrált mérőrendszer-vezérlő keretrendszer RF szignálgenerátorok komplex automatizált karakterizálásához.
+      A rendszer NRP-Z teljesítménymérőket, FSV spektrumanalizátorokat és Pendulum
+      frekvenciamérőket vezérel egyetlen VBA/Python alapú automatizálási rétegen keresztül,
+      kétciklusú linearitásmérési sémával és négyzónás átlagoló algoritmussal.
+    </div>
+  </div>
+
+  <!-- instruments -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.instruments">Eszközök</div>
+    <div class="instr-grid">
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.power.role">Teljesítménymérő</div>
+        <div class="instr-name">R&amp;S NRP-Z</div>
+        <div class="instr-detail" data-i18n="instr.power.detail">USB/GPIB csatolás, −67…+44 dBm tartomány. Négyzónás átlagolás alacsony teljesítményű mérésekhez.</div>
+      </div>
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.spectrum.role">Spektrumanalizátor</div>
+        <div class="instr-name">R&amp;S FSV / FSH6</div>
+        <div class="instr-detail" data-i18n="instr.spectrum.detail">9 kHz–13 GHz. Marker-alapú automatikus csúcskereső rutin, RBW/VBW vezérlés SCPI-n keresztül.</div>
+      </div>
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.freq.role">Frekvenciamérő</div>
+        <div class="instr-name">Pendulum CNT-91</div>
+        <div class="instr-detail" data-i18n="instr.freq.detail">12 jegyű felbontás. Referencia oszcillátor szinkronizálás, gateidő automatikus optimalizálás.</div>
+      </div>
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.cal.role">Kalibrátor / Referencia</div>
+        <div class="instr-name">Fluke 5520A / 5550A</div>
+        <div class="instr-detail" data-i18n="instr.cal.detail">DC–1 MHz referencia. ZLINE kalibrálás, AC/DC átváltás, Metrel Eurotest integrálás.</div>
+      </div>
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.siggen.role">Szignálgenerátor (DUT)</div>
+        <div class="instr-name">R&amp;S SFE100</div>
+        <div class="instr-detail" data-i18n="instr.siggen.detail">DVB-T/C/S tesztgenerátor. Python Excel-parser az SFE100 mérési naplók automatikus feldolgozásához.</div>
+      </div>
+      <div class="instr-card">
+        <div class="instr-role" data-i18n="instr.pxi.role">DAQ / PXI</div>
+        <div class="instr-name">NI PXIe-4468</div>
+        <div class="instr-detail" data-i18n="instr.pxi.detail">24-bit, 204.8 kS/s. Mérési bizonytalanság számítás GUM módszerrel, Fluke 5520A referenciával.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- measurement flow -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.flow">Mérési folyamat</div>
+    <div class="viz-wrap">
+      <div class="viz-title" data-i18n="flow.subtitle">Kétciklusú linearitásmérés — animált folyamat</div>
+      <canvas id="flow-canvas" height="170"></canvas>
+    </div>
+  </div>
+
+  <!-- linearity chart -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.linearity">Linearitásgörbe — interaktív</div>
+    <div class="chart-wrap">
+      <div class="viz-title"><span class="live-dot"></span><span data-i18n="chart.subtitle">Szignálgenerátor kimeneti szint vs. beállított érték — zajszint és nemlinearitás szimulálva</span></div>
+      <canvas id="lin-canvas" height="200"></canvas>
+      <div class="chart-controls">
+        <label class="ctrl-label">
+          <span data-i18n="ctrl.noise">Zajszint</span>
+          <input type="range" id="noise-slider" min="0" max="60" value="15">
+          <span class="ctrl-val" id="noise-val">0.15 dB</span>
+        </label>
+        <label class="ctrl-label">
+          <span data-i18n="ctrl.nonlin">Nemlinearitás</span>
+          <input type="range" id="nl-slider" min="0" max="80" value="20">
+          <span class="ctrl-val" id="nl-val">0.20 dB</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- four zone averaging -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.zones">Négyzónás átlagoló séma</div>
+    <p style="font-size:.87rem;color:var(--text-dim);margin-bottom:.6rem" data-i18n="zones.desc">
+      Alacsony teljesítményű mérési tartományban a zajszint torzítja az egyszerű átlagot.
+      A négyzónás séma a teljesítménytartomány négy részére külön átlagoló ablakot alkalmaz.
+    </p>
+    <table class="zone-table">
+      <thead>
+        <tr>
+          <th data-i18n="zone.th.zone">Zóna</th>
+          <th data-i18n="zone.th.range">Tartomány</th>
+          <th data-i18n="zone.th.window">Átlagoló ablak</th>
+          <th data-i18n="zone.th.reason">Indoklás</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="zone-label" style="background:rgba(40,200,152,.12);color:var(--accent2)">A</span></td>
+          <td>&gt; −10 dBm</td>
+          <td data-i18n="zone.a.win">8 minta</td>
+          <td data-i18n="zone.a.reason">Nagy SNR, gyors konvergencia</td>
+        </tr>
+        <tr>
+          <td><span class="zone-label" style="background:rgba(200,169,110,.12);color:var(--accent)">B</span></td>
+          <td>−10 … −30 dBm</td>
+          <td data-i18n="zone.b.win">16 minta</td>
+          <td data-i18n="zone.b.reason">Közepes SNR, kiegyensúlyozott</td>
+        </tr>
+        <tr>
+          <td><span class="zone-label" style="background:rgba(212,112,58,.12);color:var(--orange)">C</span></td>
+          <td>−30 … −50 dBm</td>
+          <td data-i18n="zone.c.win">32 minta</td>
+          <td data-i18n="zone.c.reason">Alacsony SNR, bővített átlagolás</td>
+        </tr>
+        <tr>
+          <td><span class="zone-label" style="background:rgba(160,80,80,.12);color:#c08080">D</span></td>
+          <td>&lt; −50 dBm</td>
+          <td data-i18n="zone.d.win">64 minta</td>
+          <td data-i18n="zone.d.reason">Zajhatár közelében, maximális átlagolás</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- features -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.features">Funkciók</div>
+    <div class="feature-list">
+      <div class="feature-row">
+        <span class="feature-icon">▸</span>
+        <span data-i18n="feat.1">Automatizált kétciklusú mérési séma: az első ciklus durva felmérést végez, a második finomhangolja az átlagoló ablakokat a négyzónás modell alapján.</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">▸</span>
+        <span data-i18n="feat.2">VISA/SCPI réteg VBA-ban és Pythonban — eszközfüggetlen vezérlési logika, könnyen bővíthető új műszerekkel.</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">▸</span>
+        <span data-i18n="feat.3">SFE100 Python Excel-parser: in-place lista mutáción alapuló LabVIEW Python Node integráció a mérési naplók automatikus feldolgozásához.</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">▸</span>
+        <span data-i18n="feat.4">EA-PSI 8040-120 tápegység kommunikáció: IF-U1 interfész fordított tervezéssel feltérképezett proprietáris telegram-struktúra.</span>
+      </div>
+      <div class="feature-row">
+        <span class="feature-icon">▸</span>
+        <span data-i18n="feat.5">GUM-kompatibilis mérési bizonytalanság számítás NI PXIe-4468 eszközhöz, Fluke 5520A referenciastandarddal.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>RF · LF · DC kalibrálás &amp; automatizálás</span>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+// ════════════════════════════════════════
+// i18n
+// ════════════════════════════════════════
+const T = {
+  hu: {
+    "title": "RF Mérőrendszer <em>Automatizálás</em>",
+    "sub.scope": "RF · LF · DC kalibrálás",
+    "sec.overview": "Áttekintés",
+    "overview.text": "Integrált mérőrendszer-vezérlő keretrendszer RF szignálgenerátorok komplex automatizált karakterizálásához. A rendszer NRP-Z teljesítménymérőket, FSV spektrumanalizátorokat és Pendulum frekvenciamérőket vezérel egyetlen VBA/Python alapú automatizálási rétegen keresztül, kétciklusú linearitásmérési sémával és négyzónás átlagoló algoritmussal.",
+    "sec.instruments": "Eszközök",
+    "instr.power.role": "Teljesítménymérő",
+    "instr.power.detail": "USB/GPIB csatolás, −67…+44 dBm tartomány. Négyzónás átlagolás alacsony teljesítményű mérésekhez.",
+    "instr.spectrum.role": "Spektrumanalizátor",
+    "instr.spectrum.detail": "9 kHz–13 GHz. Marker-alapú automatikus csúcskereső rutin, RBW/VBW vezérlés SCPI-n keresztül.",
+    "instr.freq.role": "Frekvenciamérő",
+    "instr.freq.detail": "12 jegyű felbontás. Referencia oszcillátor szinkronizálás, gateidő automatikus optimalizálás.",
+    "instr.cal.role": "Kalibrátor / Referencia",
+    "instr.cal.detail": "DC–1 MHz referencia. ZLINE kalibrálás, AC/DC átváltás, Metrel Eurotest integrálás.",
+    "instr.siggen.role": "Szignálgenerátor (DUT)",
+    "instr.siggen.detail": "DVB-T/C/S tesztgenerátor. Python Excel-parser az SFE100 mérési naplók automatikus feldolgozásához.",
+    "instr.pxi.role": "DAQ / PXI",
+    "instr.pxi.detail": "24-bit, 204.8 kS/s. Mérési bizonytalanság számítás GUM módszerrel, Fluke 5520A referenciával.",
+    "sec.flow": "Mérési folyamat",
+    "flow.subtitle": "Kétciklusú linearitásmérés — animált folyamat",
+    "sec.linearity": "Linearitásgörbe — interaktív",
+    "chart.subtitle": "Szignálgenerátor kimeneti szint vs. beállított érték — zajszint és nemlinearitás szimulálva",
+    "ctrl.noise": "Zajszint",
+    "ctrl.nonlin": "Nemlinearitás",
+    "sec.zones": "Négyzónás átlagoló séma",
+    "zones.desc": "Alacsony teljesítményű mérési tartományban a zajszint torzítja az egyszerű átlagot. A négyzónás séma a teljesítménytartomány négy részére külön átlagoló ablakot alkalmaz.",
+    "zone.th.zone": "Zóna", "zone.th.range": "Tartomány", "zone.th.window": "Átlagoló ablak", "zone.th.reason": "Indoklás",
+    "zone.a.win": "8 minta",  "zone.a.reason": "Nagy SNR, gyors konvergencia",
+    "zone.b.win": "16 minta", "zone.b.reason": "Közepes SNR, kiegyensúlyozott",
+    "zone.c.win": "32 minta", "zone.c.reason": "Alacsony SNR, bővített átlagolás",
+    "zone.d.win": "64 minta", "zone.d.reason": "Zajhatár közelében, maximális átlagolás",
+    "sec.features": "Funkciók",
+    "feat.1": "Automatizált kétciklusú mérési séma: az első ciklus durva felmérést végez, a második finomhangolja az átlagoló ablakokat a négyzónás modell alapján.",
+    "feat.2": "VISA/SCPI réteg VBA-ban és Pythonban — eszközfüggetlen vezérlési logika, könnyen bővíthető új műszerekkel.",
+    "feat.3": "SFE100 Python Excel-parser: in-place lista mutáción alapuló LabVIEW Python Node integráció a mérési naplók automatikus feldolgozásához.",
+    "feat.4": "EA-PSI 8040-120 tápegység kommunikáció: IF-U1 interfész fordított tervezéssel feltérképezett proprietáris telegram-struktúra.",
+    "feat.5": "GUM-kompatibilis mérési bizonytalanság számítás NI PXIe-4468 eszközhöz, Fluke 5520A referenciastandarddal.",
+  },
+  de: {
+    "title": "HF-Messsystem <em>Automatisierung</em>",
+    "sub.scope": "RF · LF · DC Kalibrierung",
+    "sec.overview": "Überblick",
+    "overview.text": "Integriertes Messsystem-Steuerungsframework für die komplexe automatisierte Charakterisierung von HF-Signalgeneratoren. Das System steuert NRP-Z-Leistungsmessgeräte, FSV-Spektrumanalysatoren und Pendulum-Frequenzzähler über eine einheitliche VBA/Python-Automatisierungsschicht mit einem Zwei-Zyklus-Linearitätsmessschema und einem Vier-Zonen-Mittelungsalgorithmus.",
+    "sec.instruments": "Instrumente",
+    "instr.power.role": "Leistungsmessgerät",
+    "instr.power.detail": "USB/GPIB-Schnittstelle, −67…+44 dBm Bereich. Vier-Zonen-Mittelung für Niedrigleistungsmessungen.",
+    "instr.spectrum.role": "Spektrumanalysator",
+    "instr.spectrum.detail": "9 kHz–13 GHz. Marker-basierte automatische Spitzensuchroutine, RBW/VBW-Steuerung über SCPI.",
+    "instr.freq.role": "Frequenzzähler",
+    "instr.freq.detail": "12-stellige Auflösung. Referenzoszillatorsynchronisation, automatische Gate-Zeit-Optimierung.",
+    "instr.cal.role": "Kalibrator / Referenz",
+    "instr.cal.detail": "DC–1 MHz Referenz. ZLINE-Kalibrierung, AC/DC-Umschaltung, Metrel Eurotest-Integration.",
+    "instr.siggen.role": "Signalgenerator (DUT)",
+    "instr.siggen.detail": "DVB-T/C/S-Testgenerator. Python-Excel-Parser für automatische Verarbeitung von SFE100-Messprotokollen.",
+    "instr.pxi.role": "DAQ / PXI",
+    "instr.pxi.detail": "24-bit, 204,8 kS/s. Messunsicherheitsberechnung nach GUM mit Fluke 5520A-Referenz.",
+    "sec.flow": "Messprozess",
+    "flow.subtitle": "Zwei-Zyklus-Linearitätsmessung — animierter Ablauf",
+    "sec.linearity": "Linearitätskurve — interaktiv",
+    "chart.subtitle": "Ausgangspegel des Signalgenerators vs. Sollwert — Rauschen und Nichtlinearität simuliert",
+    "ctrl.noise": "Rauschen",
+    "ctrl.nonlin": "Nichtlinearität",
+    "sec.zones": "Vier-Zonen-Mittelungsschema",
+    "zones.desc": "Im Niedrigleistungsbereich verzerrt der Rauschpegel den einfachen Mittelwert. Das Vier-Zonen-Schema wendet für vier Teilbereiche des Leistungsbereichs separate Mittelungsfenster an.",
+    "zone.th.zone": "Zone", "zone.th.range": "Bereich", "zone.th.window": "Mittelungsfenster", "zone.th.reason": "Begründung",
+    "zone.a.win": "8 Samples",  "zone.a.reason": "Hohes SNR, schnelle Konvergenz",
+    "zone.b.win": "16 Samples", "zone.b.reason": "Mittleres SNR, ausgewogen",
+    "zone.c.win": "32 Samples", "zone.c.reason": "Niedriges SNR, erweitertes Mitteln",
+    "zone.d.win": "64 Samples", "zone.d.reason": "Nahe der Rauschgrenze, maximales Mitteln",
+    "sec.features": "Funktionen",
+    "feat.1": "Automatisiertes Zwei-Zyklus-Messschema: Der erste Zyklus führt eine grobe Erfassung durch, der zweite optimiert die Mittelungsfenster anhand des Vier-Zonen-Modells.",
+    "feat.2": "VISA/SCPI-Schicht in VBA und Python — geräteunabhängige Steuerungslogik, leicht erweiterbar um neue Instrumente.",
+    "feat.3": "SFE100-Python-Excel-Parser: LabVIEW-Python-Node-Integration basierend auf In-Place-Listenmutation für automatische Verarbeitung von Messprotokollen.",
+    "feat.4": "EA-PSI 8040-120-Netzteilkommunikation: proprietäre Telegrammstruktur der IF-U1-Schnittstelle durch Reverse Engineering erschlossen.",
+    "feat.5": "GUM-konforme Messunsicherheitsberechnung für NI PXIe-4468 mit Fluke 5520A als Referenzstandard.",
+  },
+  en: {
+    "title": "RF Measurement System <em>Automation</em>",
+    "sub.scope": "RF · LF · DC calibration",
+    "sec.overview": "Overview",
+    "overview.text": "Integrated measurement system control framework for the complex automated characterisation of RF signal generators. The system drives NRP-Z power meters, FSV spectrum analysers and Pendulum frequency counters through a unified VBA/Python automation layer, implementing a two-cycle linearity measurement scheme and a four-zone averaging algorithm.",
+    "sec.instruments": "Instruments",
+    "instr.power.role": "Power meter",
+    "instr.power.detail": "USB/GPIB interface, −67…+44 dBm range. Four-zone averaging for low-power measurements.",
+    "instr.spectrum.role": "Spectrum analyser",
+    "instr.spectrum.detail": "9 kHz–13 GHz. Marker-based automatic peak-search routine, RBW/VBW control via SCPI.",
+    "instr.freq.role": "Frequency counter",
+    "instr.freq.detail": "12-digit resolution. Reference oscillator synchronisation, automatic gate-time optimisation.",
+    "instr.cal.role": "Calibrator / Reference",
+    "instr.cal.detail": "DC–1 MHz reference. ZLINE calibration, AC/DC transfer, Metrel Eurotest integration.",
+    "instr.siggen.role": "Signal generator (DUT)",
+    "instr.siggen.detail": "DVB-T/C/S test generator. Python Excel parser for automated processing of SFE100 measurement logs.",
+    "instr.pxi.role": "DAQ / PXI",
+    "instr.pxi.detail": "24-bit, 204.8 kS/s. Measurement uncertainty calculation per GUM with Fluke 5520A reference standard.",
+    "sec.flow": "Measurement flow",
+    "flow.subtitle": "Two-cycle linearity measurement — animated flow",
+    "sec.linearity": "Linearity curve — interactive",
+    "chart.subtitle": "Signal generator output level vs. set value — noise and nonlinearity simulated",
+    "ctrl.noise": "Noise level",
+    "ctrl.nonlin": "Nonlinearity",
+    "sec.zones": "Four-zone averaging scheme",
+    "zones.desc": "At low power levels, the noise floor distorts simple averaging. The four-zone scheme applies separate averaging windows to four sub-ranges of the power domain.",
+    "zone.th.zone": "Zone", "zone.th.range": "Range", "zone.th.window": "Averaging window", "zone.th.reason": "Rationale",
+    "zone.a.win": "8 samples",  "zone.a.reason": "High SNR, fast convergence",
+    "zone.b.win": "16 samples", "zone.b.reason": "Medium SNR, balanced",
+    "zone.c.win": "32 samples", "zone.c.reason": "Low SNR, extended averaging",
+    "zone.d.win": "64 samples", "zone.d.reason": "Near noise floor, maximum averaging",
+    "sec.features": "Features",
+    "feat.1": "Automated two-cycle measurement scheme: the first cycle performs a coarse survey, the second refines the averaging windows using the four-zone model.",
+    "feat.2": "VISA/SCPI layer in VBA and Python — instrument-agnostic control logic, easily extensible with new instruments.",
+    "feat.3": "SFE100 Python Excel parser: LabVIEW Python Node integration based on in-place list mutation for automated processing of measurement logs.",
+    "feat.4": "EA-PSI 8040-120 power supply communication: proprietary telegram structure of the IF-U1 interface mapped by reverse engineering.",
+    "feat.5": "GUM-compliant measurement uncertainty calculation for NI PXIe-4468 with Fluke 5520A as reference standard.",
+  }
+};
+
+let lang = 'hu';
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (T[l][k] !== undefined) el.innerHTML = T[l][k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent === l.toUpperCase())
+  );
+}
+
+// ════════════════════════════════════════
+// FLOW CANVAS — animated measurement flow
+// ════════════════════════════════════════
+const flowCanvas = document.getElementById('flow-canvas');
+const fctx = flowCanvas.getContext('2d');
+let flowAnim = 0;
+let flowRaf;
+
+const FLOW_STEPS = [
+  { label: 'Init\nVISA',       color: '#5a90a8' },
+  { label: 'Cycle 1\nCoarse',  color: '#c8a96e' },
+  { label: 'Zone\nDetect',     color: '#7eb8a4' },
+  { label: 'Cycle 2\nFine',    color: '#c8a96e' },
+  { label: 'Average\n4-zone',  color: '#7eb8a4' },
+  { label: 'Log &\nReport',    color: '#5a90a8' },
+];
+
+function drawFlow() {
+  const W = flowCanvas.offsetWidth;
+  flowCanvas.width  = W * devicePixelRatio;
+  flowCanvas.height = 170 * devicePixelRatio;
+  fctx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 170;
+  fctx.clearRect(0, 0, W, H);
+
+  const n = FLOW_STEPS.length;
+  const pad = 16;
+  const bw = Math.min((W - pad * 2 - (n - 1) * 12) / n, 100);
+  const bh = 52;
+  const totalW = bw * n + 12 * (n - 1);
+  const startX = (W - totalW) / 2;
+  const cy = H / 2;
+
+  const progress = (flowAnim % 100) / 100; // 0..1 continuous
+  const activeFloat = progress * n;
+
+  FLOW_STEPS.forEach((step, i) => {
+    const x = startX + i * (bw + 12);
+    const y = cy - bh / 2;
+
+    // activity glow
+    const dist = Math.abs(activeFloat - i);
+    const glow = Math.max(0, 1 - dist * 1.2);
+
+    if (glow > 0.01) {
+      fctx.save();
+      fctx.shadowColor = step.color;
+      fctx.shadowBlur = 18 * glow;
+      fctx.globalAlpha = 0.18 * glow;
+      fctx.fillStyle = step.color;
+      fctx.beginPath();
+      fctx.roundRect(x - 3, y - 3, bw + 6, bh + 6, 4);
+      fctx.fill();
+      fctx.restore();
+    }
+
+    // box
+    fctx.globalAlpha = 0.35 + 0.65 * glow;
+    fctx.fillStyle = '#151717';
+    fctx.strokeStyle = glow > 0.3 ? step.color : '#2a2e2e';
+    fctx.lineWidth = glow > 0.3 ? 1.5 : 1;
+    fctx.beginPath();
+    fctx.roundRect(x, y, bw, bh, 4);
+    fctx.fill(); fctx.stroke();
+
+    // label
+    fctx.globalAlpha = 0.4 + 0.6 * glow;
+    fctx.fillStyle = glow > 0.3 ? step.color : '#5a90a8';
+    fctx.font = `${11}px DM Mono, monospace`;
+    fctx.textAlign = 'center';
+    const lines = step.label.split('\n');
+    lines.forEach((ln, li) => {
+      fctx.fillText(ln, x + bw / 2, y + 17 + li * 16);
+    });
+
+    fctx.globalAlpha = 1;
+
+    // arrow
+    if (i < n - 1) {
+      const ax = x + bw + 2, ay = cy;
+      const arrowGlow = Math.max(0, 1 - Math.abs(activeFloat - i - 0.5) * 2);
+      fctx.strokeStyle = arrowGlow > 0.2 ? '#c8a96e' : '#2a2e2e';
+      fctx.lineWidth = 1;
+      fctx.globalAlpha = 0.4 + 0.6 * arrowGlow;
+      fctx.beginPath(); fctx.moveTo(ax, ay); fctx.lineTo(ax + 8, ay); fctx.stroke();
+      fctx.beginPath(); fctx.moveTo(ax + 6, ay - 3); fctx.lineTo(ax + 10, ay); fctx.lineTo(ax + 6, ay + 3); fctx.stroke();
+      fctx.globalAlpha = 1;
+    }
+  });
+
+  // cycle markers
+  fctx.font = '10px DM Mono, monospace';
+  fctx.textAlign = 'center';
+  fctx.fillStyle = 'rgba(200,169,110,0.35)';
+  const c1x = startX + bw / 2 + (bw + 12);
+  const c2x = startX + bw / 2 + 3 * (bw + 12);
+  fctx.fillText('← cycle 1 →', c1x, H - 14);
+  fctx.fillText('← cycle 2 →', c2x, H - 14);
+}
+
+function animateFlow() {
+  flowAnim += 0.35;
+  if (flowAnim > 100) flowAnim = 0;
+  drawFlow();
+  flowRaf = requestAnimationFrame(animateFlow);
+}
+
+// ════════════════════════════════════════
+// LINEARITY CANVAS
+// ════════════════════════════════════════
+const linCanvas = document.getElementById('lin-canvas');
+const lctx = linCanvas.getContext('2d');
+
+function drawLinearity() {
+  const W = linCanvas.offsetWidth;
+  linCanvas.width  = W * devicePixelRatio;
+  linCanvas.height = 200 * devicePixelRatio;
+  lctx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 200;
+
+  const noise = document.getElementById('noise-slider').value / 100;
+  const nl    = document.getElementById('nl-slider').value / 100;
+
+  lctx.clearRect(0, 0, W, H);
+
+  const lp = 52, rp = 18, tp = 16, bp = 30;
+  const pw = W - lp - rp, ph = H - tp - bp;
+
+  // axes
+  lctx.strokeStyle = '#2a2e2e'; lctx.lineWidth = 1;
+  lctx.beginPath(); lctx.moveTo(lp, tp); lctx.lineTo(lp, tp + ph); lctx.lineTo(lp + pw, tp + ph); lctx.stroke();
+
+  // grid
+  lctx.setLineDash([2, 4]); lctx.strokeStyle = '#1c1f1f';
+  for (let i = 1; i < 5; i++) {
+    const gy = tp + (i / 5) * ph;
+    lctx.beginPath(); lctx.moveTo(lp, gy); lctx.lineTo(lp + pw, gy); lctx.stroke();
+  }
+  lctx.setLineDash([]);
+
+  const N = 60;
+  const setVals = Array.from({ length: N }, (_, i) => -60 + i * (60 / (N - 1)));
+
+  // ideal line
+  lctx.beginPath();
+  setVals.forEach((sv, i) => {
+    const x = lp + (i / (N - 1)) * pw;
+    const y = tp + ph - ((sv + 60) / 60) * ph;
+    i === 0 ? lctx.moveTo(x, y) : lctx.lineTo(x, y);
+  });
+  lctx.strokeStyle = 'rgba(90,144,168,0.3)'; lctx.lineWidth = 1;
+  lctx.setLineDash([4, 3]); lctx.stroke(); lctx.setLineDash([]);
+
+  // measured (noisy + nonlinear)
+  const seed = 42;
+  function rng(i) { return (Math.sin(i * 127.1 + seed) * 43758.5453) % 1; }
+
+  lctx.beginPath();
+  setVals.forEach((sv, i) => {
+    const x = lp + (i / (N - 1)) * pw;
+    const nlErr = nl * Math.sin(i * 0.18) * (1 + 0.3 * Math.sin(i * 0.07));
+    const noiseErr = (rng(i) - 0.5) * 2 * noise;
+    const measured = sv + nlErr + noiseErr;
+    const y = tp + ph - ((measured + 60) / 60) * ph;
+    i === 0 ? lctx.moveTo(x, y) : lctx.lineTo(x, y);
+  });
+  lctx.strokeStyle = '#c8a96e'; lctx.lineWidth = 1.5; lctx.stroke();
+
+  // error band (residuals)
+  lctx.beginPath();
+  setVals.forEach((sv, i) => {
+    const x = lp + (i / (N - 1)) * pw;
+    const nlErr = nl * Math.sin(i * 0.18);
+    const y = tp + ph - ((sv + nlErr + noise * 0.6 + 60) / 60) * ph;
+    i === 0 ? lctx.moveTo(x, y) : lctx.lineTo(x, y);
+  });
+  setVals.slice().reverse().forEach((sv, i) => {
+    const ri = N - 1 - i;
+    const x = lp + (ri / (N - 1)) * pw;
+    const nlErr = nl * Math.sin(ri * 0.18);
+    const y = tp + ph - ((sv + nlErr - noise * 0.6 + 60) / 60) * ph;
+    lctx.lineTo(x, y);
+  });
+  lctx.closePath();
+  lctx.fillStyle = 'rgba(200,169,110,0.07)'; lctx.fill();
+
+  // zone markers
+  const zones = [
+    { lvl: -10, col: 'rgba(40,200,152,.25)',  label: 'A' },
+    { lvl: -30, col: 'rgba(200,169,110,.2)', label: 'B' },
+    { lvl: -50, col: 'rgba(212,112,58,.2)',  label: 'C' },
+  ];
+  zones.forEach(z => {
+    const x = lp + ((z.lvl + 60) / 60) * pw;
+    lctx.strokeStyle = z.col; lctx.lineWidth = 1;
+    lctx.setLineDash([3, 3]);
+    lctx.beginPath(); lctx.moveTo(x, tp); lctx.lineTo(x, tp + ph); lctx.stroke();
+    lctx.setLineDash([]);
+    lctx.fillStyle = z.col; lctx.font = '10px DM Mono, monospace'; lctx.textAlign = 'left';
+    lctx.fillText(z.label, x + 3, tp + 14);
+  });
+
+  // axis labels
+  lctx.fillStyle = '#2e5868'; lctx.font = '10px DM Mono, monospace'; lctx.textAlign = 'center';
+  lctx.fillText('Set level (dBm)', lp + pw / 2, H - 6);
+  lctx.save();
+  lctx.translate(13, tp + ph / 2); lctx.rotate(-Math.PI / 2);
+  lctx.fillText('Output (dBm)', 0, 0); lctx.restore();
+
+  // y ticks
+  lctx.textAlign = 'right'; lctx.fillStyle = '#2e5868';
+  ['-60', '-30', '0'].forEach((v, i) => {
+    const y = tp + ph - (i / 2) * ph;
+    lctx.fillText(v, lp - 4, y + 3);
+  });
+
+  // legend
+  lctx.setLineDash([4,3]); lctx.strokeStyle = 'rgba(90,144,168,0.4)'; lctx.lineWidth=1;
+  lctx.beginPath(); lctx.moveTo(lp+8, tp+8); lctx.lineTo(lp+28, tp+8); lctx.stroke();
+  lctx.setLineDash([]);
+  lctx.strokeStyle = '#c8a96e'; lctx.lineWidth=1.5;
+  lctx.beginPath(); lctx.moveTo(lp+44, tp+8); lctx.lineTo(lp+64, tp+8); lctx.stroke();
+  lctx.fillStyle='#2e5868'; lctx.textAlign='left'; lctx.font='10px DM Mono,monospace';
+  lctx.fillText('ideal', lp+8, tp+7);
+  lctx.fillStyle='#c8a96e';
+  lctx.fillText('measured', lp+44, tp+7);
+}
+
+// ════════════════════════════════════════
+// SLIDERS
+// ════════════════════════════════════════
+function initSliders() {
+  const nS = document.getElementById('noise-slider');
+  const nlS = document.getElementById('nl-slider');
+  nS.addEventListener('input', () => {
+    document.getElementById('noise-val').textContent = (nS.value/100).toFixed(2) + ' dB';
+    drawLinearity();
+  });
+  nlS.addEventListener('input', () => {
+    document.getElementById('nl-val').textContent = (nlS.value/100).toFixed(2) + ' dB';
+    drawLinearity();
+  });
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init() {
+  initSliders();
+  animateFlow();
+  drawLinearity();
+}
+
+window.addEventListener('load', init);
+window.addEventListener('resize', () => { drawFlow(); drawLinearity(); });
+</script>
+</body>
+</html>
