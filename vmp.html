@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VMP — Torzított terek & megmaradó törvények</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], tags:'ams' },
+  options: { skipHtmlTags:['script','noscript','style','textarea'] },
+  startup: { typeset: true }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --bg:          #0e0f0f;
+  --bg2:         #151717;
+  --bg3:         #1c1f1f;
+  --border:      #2a2e2e;
+  --accent:      #c8a96e;
+  --accent2:     #7eb8a4;
+  --text:        #d8d4cc;
+  --text-dim:    #7a7870;
+  --text-bright: #eeeae2;
+  --purple:      #8878c8;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Literata', Georgia, serif;
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-x: hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(to right, rgba(255,255,255,.012) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,.012) 1px, transparent 1px);
+  background-size:60px 60px;
+  pointer-events:none; z-index:0;
+}
+
+.page {
+  max-width:860px; margin:0 auto;
+  padding:clamp(32px,5vw,64px) clamp(16px,4vw,40px);
+  position:relative; z-index:1;
+}
+
+/* lang */
+.lang-bar { display:flex; justify-content:flex-end; gap:.3rem; margin-bottom:1.6rem; }
+.lang-btn {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  letter-spacing:.12em; text-transform:uppercase;
+  background:none; border:1px solid transparent;
+  color:var(--text-dim); padding:.28rem .6rem;
+  border-radius:2px; cursor:pointer; transition:all .18s;
+}
+.lang-btn:hover  { color:var(--accent); border-color:var(--border); }
+.lang-btn.active { color:var(--accent); border-color:var(--accent); }
+
+/* header */
+.status-pill {
+  display:inline-flex; align-items:center; gap:6px;
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  letter-spacing:.14em; text-transform:uppercase;
+  border:1px solid var(--accent2); color:var(--accent2);
+  padding:.28rem .8rem; border-radius:2px; margin-bottom:1.4rem;
+}
+.status-dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--accent2);
+  animation:blink 2s ease-in-out infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+
+.paper-title {
+  font-family:'DM Serif Display',serif;
+  font-size:clamp(1.5rem,4vw,2.4rem);
+  color:var(--text-bright); line-height:1.1; margin-bottom:.6rem;
+}
+.paper-title em { font-style:italic; color:var(--accent); }
+.paper-meta {
+  font-family:'DM Mono',monospace; font-size:.72rem;
+  color:var(--text-dim); letter-spacing:.08em;
+  margin-bottom:2rem; display:flex; flex-wrap:wrap; gap:.5rem 1.4rem;
+}
+.paper-meta a { color:var(--accent2); text-decoration:none; }
+.paper-meta a:hover { color:var(--accent); }
+
+/* section */
+.section { margin-top:2.8rem; }
+.section-label {
+  font-family:'DM Mono',monospace; font-size:.6rem;
+  letter-spacing:.22em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:.8rem;
+  display:flex; align-items:center; gap:.7rem;
+}
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* abstract */
+.abstract-box {
+  background:var(--bg2); border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  padding:1.4rem 1.6rem; border-radius:2px;
+  font-size:.97rem; line-height:1.8; color:var(--text);
+}
+
+/* result cards */
+.results-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:.8rem;
+}
+@media(max-width:580px){ .results-grid{grid-template-columns:1fr;} }
+
+.result-card {
+  background:var(--bg2); border:1px solid var(--border);
+  padding:1.2rem 1.4rem; border-radius:2px;
+  transition:border-color .2s; position:relative; overflow:hidden;
+}
+.result-card::before {
+  content:''; position:absolute; top:0; left:0;
+  width:3px; height:0; background:var(--accent);
+  transition:height .3s;
+}
+.result-card:hover::before { height:100%; }
+.result-card:hover { border-color:var(--accent); }
+.result-tag {
+  font-family:'DM Mono',monospace; font-size:.6rem;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent2); margin-bottom:.5rem;
+}
+.result-title {
+  font-family:'DM Serif Display',serif;
+  font-size:1rem; color:var(--text-bright); margin-bottom:.4rem;
+}
+.result-body { font-size:.87rem; color:var(--text-dim); line-height:1.7; }
+
+/* eq block */
+.eq-block {
+  background:var(--bg3); border:1px solid var(--border);
+  padding:1rem 1.4rem; border-radius:2px;
+  margin:.8rem 0; overflow-x:auto; font-size:.95rem;
+}
+.eq-label {
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  color:var(--text-dim); letter-spacing:.1em; margin-bottom:.3rem;
+}
+
+/* viz */
+.viz-wrap {
+  background:var(--bg2); border:1px solid var(--border);
+  border-radius:2px; padding:1.2rem; margin-top:.8rem;
+}
+.viz-title {
+  font-family:'DM Mono',monospace; font-size:.63rem;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--text-dim); margin-bottom:.8rem;
+}
+canvas { display:block; width:100%; border-radius:2px; }
+.viz-controls {
+  display:flex; gap:1rem; flex-wrap:wrap;
+  margin-top:.9rem; align-items:center;
+}
+.ctrl-label {
+  font-family:'DM Mono',monospace; font-size:.64rem;
+  color:var(--text-dim); letter-spacing:.08em;
+  display:flex; align-items:center; gap:.5rem; flex:1; min-width:140px;
+}
+.ctrl-label input[type=range] { flex:1; accent-color:var(--accent); }
+.ctrl-val {
+  font-family:'DM Mono',monospace; font-size:.64rem;
+  color:var(--accent); min-width:38px; text-align:right;
+}
+
+/* theorem box */
+.theorem-box {
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-left:3px solid var(--purple);
+  padding:1.2rem 1.5rem; border-radius:2px; margin-top:.8rem;
+}
+.theorem-label {
+  font-family:'DM Mono',monospace; font-size:.6rem;
+  letter-spacing:.18em; text-transform:uppercase;
+  color:var(--purple); margin-bottom:.6rem;
+}
+.theorem-body { font-size:.9rem; color:var(--text); line-height:1.8; }
+
+/* invariance table */
+.inv-table {
+  width:100%; border-collapse:collapse;
+  font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.6rem;
+}
+.inv-table th {
+  padding:.5rem .9rem; text-align:left;
+  border-bottom:1px solid var(--border);
+  color:var(--accent); font-weight:500; letter-spacing:.08em;
+}
+.inv-table td {
+  padding:.55rem .9rem; border-bottom:1px solid var(--bg3);
+  color:var(--text-dim); vertical-align:top; line-height:1.6;
+}
+.inv-table tr:hover td { color:var(--text); background:var(--bg3); }
+
+/* bibtex */
+.bibtex-box {
+  background:var(--bg3); border:1px solid var(--border);
+  border-radius:2px; padding:1rem 1.4rem;
+  font-family:'DM Mono',monospace; font-size:.72rem;
+  color:var(--text-dim); line-height:1.9;
+  overflow-x:auto; white-space:pre; position:relative;
+}
+.copy-btn {
+  position:absolute; top:.7rem; right:.8rem;
+  font-family:'DM Mono',monospace; font-size:.62rem;
+  letter-spacing:.1em; text-transform:uppercase;
+  background:none; border:1px solid var(--border);
+  color:var(--text-dim); padding:.25rem .65rem;
+  border-radius:2px; cursor:pointer; transition:all .15s;
+}
+.copy-btn:hover { color:var(--accent); border-color:var(--accent); }
+.copy-btn.copied { color:var(--accent2); border-color:var(--accent2); }
+.bib-key  { color:var(--accent2); }
+.bib-field{ color:var(--text-dim); }
+.bib-val  { color:var(--accent); }
+
+/* footer */
+.page-footer {
+  margin-top:3.5rem; padding-top:1.5rem;
+  border-top:1px solid var(--border);
+  display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem;
+  font-family:'DM Mono',monospace; font-size:.63rem; color:var(--text-dim);
+  letter-spacing:.08em;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- lang -->
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+  </div>
+
+  <!-- header -->
+  <div class="status-pill">
+    <span class="status-dot"></span>
+    <span data-i18n="status">Preprint — bírálat alatt</span>
+  </div>
+
+  <h1 class="paper-title" data-i18n="title">
+    Vektoriális Mátrixszorzat (VMP) —<br>
+    <em>Torzított terek</em> &amp; megmaradó törvények
+  </h1>
+
+  <div class="paper-meta">
+    <span>Bódis Tamás</span>
+    <span>·</span>
+    <a href="https://orcid.org/0009-0004-6349-712X" target="_blank">ORCID 0009-0004-6349-712X</a>
+    <span>·</span>
+    <span>Óbudai Egyetem, KVK</span>
+  </div>
+
+  <!-- abstract -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.abstract">Összefoglalás</div>
+    <div class="abstract-box" data-i18n="abstract.text">
+      Bevezetjük a Vektoriális Mátrixszorzatot (VMP), egy háromváltozós hibrid szorzatműveletet,
+      amely egy $M$ mátrix és két vektor geometriai kapcsolatát írja le, és természetes általánosítása
+      a klasszikus keresztszorzatnak torzított koordináta-rendszerekben. Megmutatjuk, hogy a VMP
+      lehetővé teszi egy visszatorzításos integráltétel felállítását: ha a tér és az összes
+      mezőstruktúra ($M$, $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$) konzisztensen torzul a pullback-szabály
+      szerint, az integrál értéke invariáns marad — még akkor is, ha az integrandus önmagában nem
+      invariáns a koordinátatranszformációra. A tétel két változatát bizonyítjuk (gyengébb és erősebb),
+      és fizikai alkalmazásokat mutatunk be: Gauss-törvény ellipszoid felett, Lagrange-sűrűség
+      invarianciája, energia-integrál megmaradása. Az invariancia itt nem feltétel, hanem
+      <em>aktívan teremtett struktúra</em>.
+    </div>
+  </div>
+
+  <!-- key results -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.results">Főbb eredmények</div>
+    <div class="results-grid">
+
+      <div class="result-card">
+        <div class="result-tag" data-i18n="r1.tag">Definíció</div>
+        <div class="result-title" data-i18n="r1.title">A VMP-szorzat</div>
+        <div class="result-body" data-i18n="r1.body">
+          A VMP egy torzított paralelepipedon orientált térfogatát számítja: az $M$ mátrix
+          oszlopait keresztszorozzuk $\mathbf{a}$-val, majd $\mathbf{b}$ komponenseivel
+          súlyozzuk. Ha $M = I$, visszakapjuk a klasszikus keresztszorzatot.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag" data-i18n="r2.tag">Tétel 1 — Gyengébb változat</div>
+        <div class="result-title" data-i18n="r2.title">Visszatorzításos integráltétel</div>
+        <div class="result-body" data-i18n="r2.body">
+          Ha az integrandus invariáns a $T$ transzformációra, az integrál értéke
+          a Jacobi-determináns $|\det T|$ mértéktényezővel skálázódik.
+          Homogén fokszámú és dimenziótlan kvociens típusú függvényekre érvényes.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag" data-i18n="r3.tag">Tétel 2 — Erősebb változat</div>
+        <div class="result-title" data-i18n="r3.title">Mezőtorzítással bővített tétel</div>
+        <div class="result-body" data-i18n="r3.body">
+          Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály
+          szerint torzítunk ($M_T$, $\mathbf{a}_T$, $\mathbf{b}_T$, $\mathbf{c}_T$),
+          az integrál mégis invariáns marad. Ez kezeli az $f(x,y,z)=xyz$ típusú,
+          nem skálainvariáns eseteket is.
+        </div>
+      </div>
+
+      <div class="result-card">
+        <div class="result-tag" data-i18n="r4.tag">Fizikai alkalmazások</div>
+        <div class="result-title" data-i18n="r4.title">Gauss, Lagrange, energia</div>
+        <div class="result-body" data-i18n="r4.body">
+          A VMP-tétel megőrzi a fluxust torzított térben (Gauss-törvény ellipszoid felett),
+          konzisztens akciót ad Lagrange-sűrűségekben, és helyes energiát számol
+          olyan mezőkre is, amelyekre a klasszikus változócsere-tétel nem működik.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- core equations -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.eqs">Alapegyenletek</div>
+
+    <div class="eq-label" data-i18n="eq1.label">A VMP definíciója</div>
+    <div class="eq-block">
+      $$[\mathbf{a} \otimes_M \mathbf{b}]_r
+        := \sum_{i,l,s} \varepsilon_{ils}\, a_i\, b_l\, M_{sr},
+      \qquad \mathbf{a} \otimes_M \mathbf{b}
+        = \bigl[\mathbf{a}\times\mathbf{m}_1,\;
+                \mathbf{a}\times\mathbf{m}_2,\;
+                \mathbf{a}\times\mathbf{m}_3\bigr]\cdot\mathbf{b}$$
+    </div>
+
+    <div class="eq-label" data-i18n="eq2.label">Visszaállás keresztszorzatra ($M=I$)</div>
+    <div class="eq-block">
+      $$\mathbf{a} \otimes_I \mathbf{b} = \mathbf{a} \times \mathbf{b}$$
+    </div>
+
+    <div class="eq-label" data-i18n="eq3.label">Erősebb tétel — pullback-transzformációk</div>
+    <div class="eq-block">
+      $$\iiint_\Omega f(\mathbf{x})\,d\mathbf{x}
+        = \iiint_{\tilde\Omega}
+          \bigl(\mathbf{a}_T \otimes_{M_T} \mathbf{b}_T\bigr)\cdot\mathbf{c}_T
+          \cdot|\det T|\,d\tilde{\mathbf{x}}$$
+      $$M_T(\tilde{\mathbf{x}}) = T^{-1}M(T\tilde{\mathbf{x}})T^{-\top},\quad
+        \mathbf{a}_T = T^{-1}\mathbf{a}(T\tilde{\mathbf{x}}),\quad
+        \mathbf{b}_T = T^{-1}\mathbf{b}(T\tilde{\mathbf{x}}),\quad
+        \mathbf{c}_T = T^{-1}\mathbf{c}(T\tilde{\mathbf{x}})$$
+    </div>
+
+    <div class="eq-label" data-i18n="eq4.label">Aktív vs. passzív invariancia</div>
+    <div class="eq-block" style="display:grid;grid-template-columns:1fr auto 1fr;gap:.6rem 1.2rem;align-items:center">
+      <div style="text-align:center">
+        $$f(T\tilde{\mathbf{x}}) = f(\tilde{\mathbf{x}})$$
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent2);margin-top:.2rem;letter-spacing:.06em" data-i18n="eq4.passive">passzív — előfeltétel</div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;color:var(--text-dim);font-size:.9rem;text-align:center">vs.</div>
+      <div style="text-align:center">
+        $$f_T(\tilde{\mathbf{x}}) = |\det T|^{-1}\, f(\mathbf{x})$$
+        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--purple);margin-top:.2rem;letter-spacing:.06em" data-i18n="eq4.active">aktív — mezőpullback eredménye</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Piola-Nanson -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.piola">Piola–Nanson transzformáció — kapcsolat a VMP-vel</div>
+
+    <div class="abstract-box" style="border-left-color:var(--purple);margin-bottom:.8rem" data-i18n="piola.desc">
+      A Piola–Nanson-formula a kontinuummechanika alapidentitása: megmutatja, hogyan
+      transzformálódik egy felületi normalvektor és a felületelem $F$ deformációs gradiens alatt.
+      A VMP pullback-szabálya — $M_T = T^{-1}M\,T^{-\top}$ — pontosan a Piola–Nanson
+      típusú transzformációja az $M$ mátrixmezőnek: a kontravariáns és kovariáns indexek
+      szétválasztása azonos logikát követ, mint a fluxusvektor átírása a torzított térben.
+    </div>
+
+    <div class="eq-label" data-i18n="eq.pn1.label">Piola–Nanson-formula (kontinuummechanika)</div>
+    <div class="eq-block">
+      $$\mathbf{n}\,da = J\,F^{-\top}\,\mathbf{N}\,dA, \qquad J = \det F$$
+    </div>
+
+    <div class="eq-label" data-i18n="eq.pn2.label">VMP mezőtorzítás — Piola–Nanson analógia</div>
+    <div class="eq-block">
+      $$M_T(\tilde{\mathbf{x}}) = \underbrace{T^{-1}}_{\text{bal pullback}}\;
+        M(T\tilde{\mathbf{x}})\;
+        \underbrace{T^{-\top}}_{\text{jobb pullback}}
+        \;\longleftrightarrow\;
+        \mathbf{n}\,da = J\underbrace{F^{-\top}}_{\text{Nanson-tag}}\mathbf{N}\,dA$$
+    </div>
+
+    <div class="eq-label" data-i18n="eq.pn3.label">Fluxus-invariancia — Gauss-törvény torzított térben</div>
+    <div class="eq-block">
+      $$\oiint_{S} \mathbf{E}\cdot d\mathbf{A}
+        = \oiint_{\tilde{S}} \mathbf{E}_T(\tilde{\mathbf{x}})\cdot d\tilde{\mathbf{A}}_T
+        = \frac{q}{\varepsilon_0},
+      \qquad d\tilde{\mathbf{A}}_T = |\det T|\,T^{-\top}\,d\mathbf{A}$$
+    </div>
+
+    <div style="background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--purple);
+                padding:1rem 1.4rem;border-radius:2px;font-size:.86rem;color:var(--text-dim);line-height:1.8;margin-top:.4rem">
+      <span style="color:var(--purple);font-family:'DM Mono',monospace;font-size:.6rem;
+                   letter-spacing:.14em;text-transform:uppercase;display:block;margin-bottom:.4rem"
+            data-i18n="piola.note.label">Összefüggés</span>
+      <span data-i18n="piola.note.body">
+        A $\sqrt{|g|}$ metrikavolumen-forma — amelyet a Covariant Conservation cikkben tárgyalunk —
+        pontosan a $|\det T| = \sqrt{|\det g|}$ faktort állítja elő. A Piola–Nanson-formula,
+        a VMP pullback-szabálya és a kovariáns megmaradás-azonosság így egy közös geometriai
+        gyökérből fakad: a tér torzulásának konzisztens követése a mezőstruktúrákban.
+      </span>
+    </div>
+  </div>
+
+  <!-- interactive: parallelpiped distortion -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.viz1">Interaktív — torzított paralelepipedon</div>
+    <div class="viz-wrap">
+      <div class="viz-title" data-i18n="viz1.subtitle">A VMP geometriai értelme: $M$ oszlopai torzítják a bázist — húzd a csúszkákat</div>
+      <canvas id="parallelepiped-canvas" height="280"></canvas>
+      <div class="viz-controls">
+        <label class="ctrl-label">
+          $M_{11}$ <input type="range" id="m11" min="20" max="180" value="100">
+          <span class="ctrl-val" id="m11-val">1.00</span>
+        </label>
+        <label class="ctrl-label">
+          $M_{12}$ <input type="range" id="m12" min="-100" max="100" value="0">
+          <span class="ctrl-val" id="m12-val">0.00</span>
+        </label>
+        <label class="ctrl-label">
+          $M_{22}$ <input type="range" id="m22" min="20" max="180" value="100">
+          <span class="ctrl-val" id="m22-val">1.00</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- interactive: invariance demo -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.viz2">Interaktív — integrál-invariancia demonstráció</div>
+    <div class="viz-wrap">
+      <div class="viz-title" data-i18n="viz2.subtitle">$f(x,y,z)=xyz$ integrál torzítás előtt és után — $T=\lambda I$, $\lambda$ változtatható</div>
+      <canvas id="invariance-canvas" height="220"></canvas>
+      <div class="viz-controls">
+        <label class="ctrl-label">
+          $\lambda$ (torzítás) <input type="range" id="lambda-sl" min="30" max="300" value="100">
+          <span class="ctrl-val" id="lambda-val">1.00</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- theorem boxes -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.theorems">Tételek összefoglalása</div>
+
+    <div class="theorem-box" style="margin-bottom:.8rem">
+      <div class="theorem-label" data-i18n="thm1.label">Gyengébb tétel (4. fejezet)</div>
+      <div class="theorem-body" data-i18n="thm1.body">
+        Ha $f(T\tilde{\mathbf{x}}) = f(\tilde{\mathbf{x}})$ (skálainvariáns), akkor:
+        $\iiint_\Omega f\,d\mathbf{x} = \iiint_{\tilde\Omega} f\cdot|\det T|\,d\tilde{\mathbf{x}}$.
+        Teljesül: homogén fokszámú, dimenziótlan kvociens típusú függvényekre.
+      </div>
+    </div>
+
+    <div class="theorem-box">
+      <div class="theorem-label" data-i18n="thm2.label">Erősebb tétel (6. fejezet)</div>
+      <div class="theorem-body" data-i18n="thm2.body">
+        Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint
+        torzítunk — $M_T = T^{-1}M(T\tilde{\mathbf{x}})T^{-\top}$,
+        $\mathbf{a}_T = T^{-1}\mathbf{a}(T\tilde{\mathbf{x}})$ stb. —, akkor az integrál
+        értéke invariáns marad. Az invariancia itt nem feltétel, hanem a konzisztens
+        mezőtorzítás következménye.
+      </div>
+    </div>
+  </div>
+
+  <!-- invariance table -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.inv">Passzív vs. aktív invariancia</div>
+    <table class="inv-table">
+      <thead>
+        <tr>
+          <th data-i18n="inv.th.type">Típus</th>
+          <th data-i18n="inv.th.cond">Feltétel</th>
+          <th data-i18n="inv.th.mech">Mechanizmus</th>
+          <th data-i18n="inv.th.ex">Példa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--accent2)" data-i18n="inv.passive.type">Passzív</td>
+          <td data-i18n="inv.passive.cond">$f(T\tilde{\mathbf{x}})=f(\tilde{\mathbf{x}})$ teljesül előre</td>
+          <td data-i18n="inv.passive.mech">Jacobi-determináns kompenzálja a mértéket</td>
+          <td data-i18n="inv.passive.ex">$f=(x^2+y^2)/z^2$</td>
+        </tr>
+        <tr>
+          <td style="color:var(--purple)" data-i18n="inv.active.type">Aktív</td>
+          <td data-i18n="inv.active.cond">$f$ nem invariáns, de mezőpullback végrehajtva</td>
+          <td data-i18n="inv.active.mech">$M_T$, $\mathbf{a}_T$, $\mathbf{b}_T$, $\mathbf{c}_T$ konzisztens torzítása</td>
+          <td data-i18n="inv.active.ex">$f=xyz$, nem diag. $M$</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BibTeX -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.bib">Hivatkozás / BibTeX</div>
+    <div style="position:relative">
+      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@article</span>{bodis2025vmp,
+  <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
+  <span class="bib-field">title</span>   = {<span class="bib-val">Vektoriális Mátrixszorzat (VMP):
+            torzított terek és megmaradó törvények</span>},
+  <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
+  <span class="bib-field">note</span>    = {<span class="bib-val">Preprint, bírálat alatt</span>},
+  <span class="bib-field">institution</span> = {<span class="bib-val">Óbudai Egyetem, Kandó Kálmán
+               Villamosmérnöki Kar</span>},
+  <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
+}</pre>
+      <button class="copy-btn" id="copy-btn" onclick="copyBib()">Copy</button>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>VMP — Torzított terek &amp; megmaradó törvények</span>
+  </div>
+
+</div>
+
+<script>
+// ════════════════════════════════════════
+// i18n
+// ════════════════════════════════════════
+const T = {
+  hu: {
+    "status": "Preprint — bírálat alatt",
+    "title": "Vektoriális Mátrixszorzat (VMP) —<br><em>Torzított terek</em> &amp; megmaradó törvények",
+    "sec.abstract": "Összefoglalás",
+    "abstract.text": "Bevezetjük a Vektoriális Mátrixszorzatot (VMP), egy háromváltozós hibrid szorzatműveletet, amely egy $M$ mátrix és két vektor geometriai kapcsolatát írja le, és természetes általánosítása a klasszikus keresztszorzatnak torzított koordináta-rendszerekben. Megmutatjuk, hogy a VMP lehetővé teszi egy visszatorzításos integrállétel felállítását: ha a tér és az összes mezőstruktúra konzisztensen torzul a pullback-szabály szerint, az integrál értéke invariáns marad — még akkor is, ha az integrandus önmagában nem invariáns. Az invariancia itt nem feltétel, hanem <em>aktívan teremtett struktúra</em>.",
+    "sec.results": "Főbb eredmények",
+    "r1.tag": "Definíció", "r1.title": "A VMP-szorzat",
+    "r1.body": "A VMP egy torzított paralelepipedon orientált térfogatát számítja: az $M$ mátrix oszlopait keresztszorozzuk $\\mathbf{a}$-val, majd $\\mathbf{b}$ komponenseivel súlyozzuk. Ha $M = I$, visszakapjuk a klasszikus keresztszorzatot.",
+    "r2.tag": "Tétel 1 — Gyengébb változat", "r2.title": "Visszatorzításos integrállétel",
+    "r2.body": "Ha az integrandus invariáns a $T$ transzformációra, az integrál értéke a Jacobi-determináns $|\\det T|$ mértéktényezővel skálázódik. Homogén fokszámú és dimenziótlan kvociens típusú függvényekre érvényes.",
+    "r3.tag": "Tétel 2 — Erősebb változat", "r3.title": "Mezőtorzítással bővített tétel",
+    "r3.body": "Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint torzítunk ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), az integrál mégis invariáns marad.",
+    "r4.tag": "Fizikai alkalmazások", "r4.title": "Gauss, Lagrange, energia",
+    "r4.body": "A VMP-tétel megőrzi a fluxust torzított térben, konzisztens akciót ad Lagrange-sűrűségekben, és helyes energiát számol olyan mezőkre is, amelyekre a klasszikus változócsere-tétel nem működik.",
+    "sec.eqs": "Alapegyenletek",
+    "eq1.label": "A VMP definíciója",
+    "eq2.label": "Visszaállás keresztszorzatra ($M=I$)",
+    "eq3.label": "Erősebb tétel — pullback-transzformációk",
+    "eq4.label": "Aktív vs. passzív invariancia",
+    "sec.viz1": "Interaktív — torzított paralelepipedon",
+    "viz1.subtitle": "A VMP geometriai értelme: $M$ oszlopai torzítják a bázist — húzd a csúszkákat",
+    "sec.viz2": "Interaktív — integrál-invariancia demonstráció",
+    "viz2.subtitle": "$f(x,y,z)=xyz$ integrál torzítás előtt és után — $T=\\lambda I$, $\\lambda$ változtatható",
+    "sec.theorems": "Tételek összefoglalása",
+    "thm1.label": "Gyengébb tétel (4. fejezet)",
+    "thm1.body": "Ha $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (skálainvariáns), akkor: $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$. Teljesül: homogén fokszámú, dimenziótlan kvociens típusú függvényekre.",
+    "thm2.label": "Erősebb tétel (6. fejezet)",
+    "thm2.body": "Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint torzítunk, az integrál értéke invariáns marad. Az invariancia itt nem feltétel, hanem a konzisztens mezőtorzítás következménye.",
+    "sec.inv": "Passzív vs. aktív invariancia",
+    "inv.th.type": "Típus", "inv.th.cond": "Feltétel", "inv.th.mech": "Mechanizmus", "inv.th.ex": "Példa",
+    "inv.passive.type": "Passzív", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ teljesül előre",
+    "inv.passive.mech": "Jacobi-determináns kompenzálja a mértéket", "inv.passive.ex": "$f=(x^2+y^2)/z^2$",
+    "inv.active.type": "Aktív", "inv.active.cond": "$f$ nem invariáns, mezőpullback végrehajtva",
+    "inv.active.mech": "$M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$ konzisztens torzítása",
+    "inv.active.ex": "$f=xyz$, nem diag. $M$",
+    "sec.bib": "Hivatkozás / BibTeX",
+    "sec.piola": "Piola–Nanson transzformáció — kapcsolat a VMP-vel",
+    "piola.desc": "A Piola–Nanson-formula a kontinuummechanika alapidentitása: megmutatja, hogyan transzformálódik egy felületi normalvektor és a felületelem $F$ deformációs gradiens alatt. A VMP pullback-szabálya — $M_T = T^{-1}M\\,T^{-\\top}$ — pontosan a Piola–Nanson típusú transzformációja az $M$ mátrixmezőnek: a kontravariáns és kovariáns indexek szétválasztása azonos logikát követ, mint a fluxusvektor átírása a torzított térben.",
+    "eq.pn1.label": "Piola–Nanson-formula (kontinuummechanika)",
+    "eq.pn2.label": "VMP mezőtorzítás — Piola–Nanson analógia",
+    "eq.pn3.label": "Fluxus-invariancia — Gauss-törvény torzított térben",
+    "piola.note.label": "Összefüggés",
+    "piola.note.body": "A $\\sqrt{|g|}$ metrikavolumen-forma — amelyet a Covariant Conservation cikkben tárgyalunk — pontosan a $|\\det T| = \\sqrt{|\\det g|}$ faktort állítja elő. A Piola–Nanson-formula, a VMP pullback-szabálya és a kovariáns megmaradás-azonosság így egy közös geometriai gyökérből fakad: a tér torzulásának konzisztens követése a mezőstruktúrákban.",
+    "eq4.passive": "passzív — előfeltétel",
+    "eq4.active": "aktív — mezőpullback eredménye",
+  },
+  en: {
+    "status": "Preprint — under review",
+    "title": "Vectorial Matrix Product (VMP) —<br><em>Distorted fields</em> &amp; conservation laws",
+    "sec.abstract": "Abstract",
+    "abstract.text": "We introduce the Vectorial Matrix Product (VMP), a three-variable hybrid multiplication that describes the geometric relationship between a matrix $M$ and two vectors, forming a natural generalisation of the cross product to distorted coordinate systems. We show that the VMP enables a retraction integral theorem: if the space and all field structures transform consistently via the pullback rule, the integral remains invariant — even when the integrand is not itself invariant under the coordinate transformation. Invariance here is not a precondition but an <em>actively constructed structure</em>.",
+    "sec.results": "Key results",
+    "r1.tag": "Definition", "r1.title": "The VMP operation",
+    "r1.body": "The VMP computes the oriented volume of a distorted parallelepiped: the columns of $M$ are crossed with $\\mathbf{a}$, then weighted by the components of $\\mathbf{b}$. Setting $M=I$ recovers the classical cross product.",
+    "r2.tag": "Theorem 1 — Weaker form", "r2.title": "Retraction integral theorem",
+    "r2.body": "When the integrand is invariant under $T$, the integral scales by the Jacobian $|\\det T|$. Applies to homogeneous-degree and dimensionless-quotient type functions.",
+    "r3.tag": "Theorem 2 — Stronger form", "r3.title": "Theorem with field distortion",
+    "r3.body": "When $f$ is not invariant under $T$, but all field structures are distorted via the pullback rule ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), the integral remains invariant.",
+    "r4.tag": "Physical applications", "r4.title": "Gauss, Lagrange, energy",
+    "r4.body": "The VMP theorem preserves flux in distorted space (Gauss's law over an ellipsoid), gives a consistent action in Lagrangian field theory, and yields correct energies for fields where the classical substitution theorem fails.",
+    "sec.eqs": "Core equations",
+    "eq1.label": "Definition of the VMP",
+    "eq2.label": "Reduction to cross product ($M=I$)",
+    "eq3.label": "Stronger theorem — pullback transformations",
+    "eq4.label": "Active vs. passive invariance",
+    "sec.viz1": "Interactive — distorted parallelepiped",
+    "viz1.subtitle": "Geometric meaning of VMP: columns of $M$ distort the basis — drag the sliders",
+    "sec.viz2": "Interactive — integral invariance demonstration",
+    "viz2.subtitle": "Integral of $f(x,y,z)=xyz$ before and after distortion — $T=\\lambda I$, $\\lambda$ adjustable",
+    "sec.theorems": "Theorem summary",
+    "thm1.label": "Weaker theorem (§4)",
+    "thm1.body": "If $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (scale-invariant), then $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$. Holds for homogeneous-degree and dimensionless-quotient functions.",
+    "thm2.label": "Stronger theorem (§6)",
+    "thm2.body": "If $f$ is not invariant under $T$, but all field structures are consistently distorted via the pullback rule, the integral remains invariant. Invariance is a consequence of consistent field distortion, not a precondition.",
+    "sec.inv": "Passive vs. active invariance",
+    "inv.th.type": "Type", "inv.th.cond": "Condition", "inv.th.mech": "Mechanism", "inv.th.ex": "Example",
+    "inv.passive.type": "Passive", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ holds a priori",
+    "inv.passive.mech": "Jacobian compensates the measure", "inv.passive.ex": "$f=(x^2+y^2)/z^2$",
+    "inv.active.type": "Active", "inv.active.cond": "$f$ not invariant, field pullback applied",
+    "inv.active.mech": "Consistent distortion of $M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$",
+    "inv.active.ex": "$f=xyz$, non-diagonal $M$",
+    "sec.bib": "Citation / BibTeX",
+    "sec.piola": "Piola–Nanson transformation — connection to VMP",
+    "piola.desc": "The Piola–Nanson formula is a foundational identity of continuum mechanics: it describes how a surface normal vector and area element transform under a deformation gradient $F$. The VMP pullback rule — $M_T = T^{-1}M\\,T^{-\\top}$ — is precisely a Piola–Nanson-type transformation of the matrix field $M$: the separation of contravariant and covariant indices follows the same logic as rewriting the flux vector in a distorted space.",
+    "eq.pn1.label": "Piola–Nanson formula (continuum mechanics)",
+    "eq.pn2.label": "VMP field distortion — Piola–Nanson analogy",
+    "eq.pn3.label": "Flux invariance — Gauss's law in distorted space",
+    "piola.note.label": "Connection",
+    "piola.note.body": "The $\\sqrt{|g|}$ metric volume form — discussed in the Covariant Conservation paper — produces exactly the $|\\det T| = \\sqrt{|\\det g|}$ factor. The Piola–Nanson formula, the VMP pullback rule, and the covariant conservation identity thus share a common geometric root: the consistent tracking of spatial distortion across field structures.",
+    "eq4.passive": "passive — precondition",
+    "eq4.active": "active — result of field pullback",
+    "status": "Preprint — unter Begutachtung",
+    "title": "Vektorielles Matrixprodukt (VMP) —<br><em>Verzerrte Felder</em> &amp; Erhaltungssätze",
+    "sec.abstract": "Zusammenfassung",
+    "abstract.text": "Wir führen das Vektorielle Matrixprodukt (VMP) ein, eine dreistellige hybride Multiplikation, die die geometrische Beziehung zwischen einer Matrix $M$ und zwei Vektoren beschreibt und das Kreuzprodukt auf verzerrte Koordinatensysteme verallgemeinert. Wir zeigen, dass das VMP einen Rücktorsions-Integralsatz ermöglicht: Wenn der Raum und alle Feldstrukturen konsistent gemäß der Pullback-Regel transformieren, bleibt das Integral invariant — auch wenn der Integrand selbst nicht invariant ist. Invarianz ist hier keine Voraussetzung, sondern eine <em>aktiv konstruierte Struktur</em>.",
+    "sec.results": "Hauptergebnisse",
+    "r1.tag": "Definition", "r1.title": "Das VMP-Produkt",
+    "r1.body": "Das VMP berechnet das orientierte Volumen eines verzerrten Parallelepipeds: Die Spalten von $M$ werden mit $\\mathbf{a}$ gekreuzt, dann mit den Komponenten von $\\mathbf{b}$ gewichtet. Für $M=I$ erhält man das klassische Kreuzprodukt.",
+    "r2.tag": "Satz 1 — Schwächere Form", "r2.title": "Rücktorsions-Integralsatz",
+    "r2.body": "Wenn der Integrand unter $T$ invariant ist, skaliert das Integral mit der Jacobi-Determinante $|\\det T|$. Gilt für homogen-gradige und dimensionslose Quotienten-Funktionen.",
+    "r3.tag": "Satz 2 — Stärkere Form", "r3.title": "Satz mit Feldverzerrung",
+    "r3.body": "Wenn $f$ nicht unter $T$ invariant ist, aber alle Feldstrukturen gemäß der Pullback-Regel verzerrt werden ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), bleibt das Integral dennoch invariant.",
+    "r4.tag": "Physikalische Anwendungen", "r4.title": "Gauß, Lagrange, Energie",
+    "r4.body": "Der VMP-Satz erhält den Fluss im verzerrten Raum, liefert eine konsistente Wirkung in Lagrangeschen Feldtheorien und korrekte Energien für Felder, bei denen der klassische Substitutionssatz versagt.",
+    "sec.eqs": "Grundgleichungen",
+    "eq1.label": "Definition des VMP",
+    "eq2.label": "Rückführung auf Kreuzprodukt ($M=I$)",
+    "eq3.label": "Stärkerer Satz — Pullback-Transformationen",
+    "eq4.label": "Aktive vs. passive Invarianz",
+    "sec.viz1": "Interaktiv — verzerrtes Parallelepiped",
+    "viz1.subtitle": "Geometrische Bedeutung des VMP: Spalten von $M$ verzerren die Basis — Schieberegler ziehen",
+    "sec.viz2": "Interaktiv — Integral-Invarianz-Demonstration",
+    "viz2.subtitle": "Integral von $f(x,y,z)=xyz$ vor und nach Verzerrung — $T=\\lambda I$, $\\lambda$ einstellbar",
+    "sec.theorems": "Satz-Zusammenfassung",
+    "thm1.label": "Schwächerer Satz (§4)",
+    "thm1.body": "Wenn $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (skaleninvariant), dann $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$.",
+    "thm2.label": "Stärkerer Satz (§6)",
+    "thm2.body": "Wenn $f$ nicht unter $T$ invariant ist, aber alle Feldstrukturen konsistent nach der Pullback-Regel verzerrt werden, bleibt das Integral invariant. Invarianz ist eine Konsequenz, keine Voraussetzung.",
+    "sec.inv": "Passive vs. aktive Invarianz",
+    "inv.th.type": "Typ", "inv.th.cond": "Bedingung", "inv.th.mech": "Mechanismus", "inv.th.ex": "Beispiel",
+    "inv.passive.type": "Passiv", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ a priori",
+    "inv.passive.mech": "Jacobi-Determinante kompensiert das Maß", "inv.passive.ex": "$f=(x^2+y^2)/z^2$",
+    "inv.active.type": "Aktiv", "inv.active.cond": "$f$ nicht invariant, Feld-Pullback angewandt",
+    "inv.active.mech": "Konsistente Verzerrung von $M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$",
+    "inv.active.ex": "$f=xyz$, nicht-diag. $M$",
+    "sec.bib": "Zitation / BibTeX",
+    "sec.piola": "Piola–Nanson-Transformation — Verbindung zum VMP",
+    "piola.desc": "Die Piola–Nanson-Formel ist eine grundlegende Identität der Kontinuumsmechanik: Sie beschreibt, wie ein Flächennormalenvektor und das Flächenelement unter einem Deformationsgradienten $F$ transformieren. Die VMP-Pullback-Regel — $M_T = T^{-1}M\\,T^{-\\top}$ — ist genau eine Piola–Nanson-artige Transformation des Matrixfeldes $M$: Die Trennung der kontravarianten und kovarianten Indizes folgt derselben Logik wie das Umschreiben des Flussvektors im verzerrten Raum.",
+    "eq.pn1.label": "Piola–Nanson-Formel (Kontinuumsmechanik)",
+    "eq.pn2.label": "VMP-Feldverzerrung — Piola–Nanson-Analogie",
+    "eq.pn3.label": "Fluss-Invarianz — Gaußsches Gesetz im verzerrten Raum",
+    "piola.note.label": "Zusammenhang",
+    "piola.note.body": "Die $\\sqrt{|g|}$-Metrik-Volumenform — im Covariant-Conservation-Artikel behandelt — erzeugt genau den $|\\det T| = \\sqrt{|\\det g|}$-Faktor. Die Piola–Nanson-Formel, die VMP-Pullback-Regel und die kovariante Erhaltungsidentität haben damit eine gemeinsame geometrische Wurzel: die konsistente Verfolgung der Raumverzerrung in den Feldstrukturen.",
+    "eq4.passive": "passiv — Voraussetzung",
+    "eq4.active": "aktiv — Ergebnis des Feld-Pullbacks",
+
+let lang = 'hu';
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (T[l][k] !== undefined) el.innerHTML = T[l][k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent === l.toUpperCase())
+  );
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ════════════════════════════════════════
+// PARALLELPIPED CANVAS
+// ════════════════════════════════════════
+const ppCanvas = document.getElementById('parallelepiped-canvas');
+const pctx = ppCanvas.getContext('2d');
+
+function iso(x2d, y2d, z2d) {
+  // simple isometric projection
+  return {
+    x: x2d - z2d * 0.5,
+    y: -y2d + z2d * 0.35
+  };
+}
+
+function drawPP() {
+  const W = ppCanvas.offsetWidth;
+  ppCanvas.width  = W * devicePixelRatio;
+  ppCanvas.height = 280 * devicePixelRatio;
+  pctx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 280;
+  pctx.clearRect(0, 0, W, H);
+
+  const m11 = document.getElementById('m11').value / 100;
+  const m12 = document.getElementById('m12').value / 100;
+  const m22 = document.getElementById('m22').value / 100;
+
+  // 2D projection center
+  const cx = W * 0.5, cy = H * 0.55;
+  const scale = Math.min(W, H) * 0.22;
+
+  // basis vectors of the parallelepiped (2D, ignore z for simplicity)
+  // a = (1,0), b = (0,1), M distorts
+  const e1 = { x: m11 * scale, y: -m12 * scale * 0.5 };
+  const e2 = { x: m12 * scale * 0.5, y: -m22 * scale };
+  const e3 = { x: -scale * 0.4, y: -scale * 0.28 }; // depth
+
+  const origin = { x: cx, y: cy };
+
+  function pt(a, b, c) {
+    return {
+      x: origin.x + a * e1.x + b * e2.x + c * e3.x,
+      y: origin.y + a * e1.y + b * e2.y + c * e3.y
+    };
+  }
+
+  // draw 8 corners
+  const corners = [
+    pt(0,0,0), pt(1,0,0), pt(0,1,0), pt(1,1,0),
+    pt(0,0,1), pt(1,0,1), pt(0,1,1), pt(1,1,1)
+  ];
+
+  const faces = [
+    { verts:[0,1,3,2], col:'rgba(40,200,152,0.06)', stroke:'rgba(40,200,152,0.35)' },
+    { verts:[4,5,7,6], col:'rgba(40,200,152,0.04)', stroke:'rgba(40,200,152,0.2)' },
+    { verts:[0,1,5,4], col:'rgba(200,169,110,0.05)', stroke:'rgba(200,169,110,0.25)' },
+    { verts:[2,3,7,6], col:'rgba(200,169,110,0.04)', stroke:'rgba(200,169,110,0.18)' },
+    { verts:[0,2,6,4], col:'rgba(136,120,200,0.05)', stroke:'rgba(136,120,200,0.25)' },
+    { verts:[1,3,7,5], col:'rgba(136,120,200,0.04)', stroke:'rgba(136,120,200,0.18)' },
+  ];
+
+  faces.forEach(f => {
+    pctx.beginPath();
+    f.verts.forEach((vi, i) => {
+      const p = corners[vi];
+      i === 0 ? pctx.moveTo(p.x, p.y) : pctx.lineTo(p.x, p.y);
+    });
+    pctx.closePath();
+    pctx.fillStyle = f.col; pctx.fill();
+    pctx.strokeStyle = f.stroke; pctx.lineWidth = 1; pctx.stroke();
+  });
+
+  // basis vectors with arrows
+  const arrowVecs = [
+    { to: pt(1,0,0), col: '#28c898', label: 'm₁' },
+    { to: pt(0,1,0), col: '#c8a96e', label: 'm₂' },
+    { to: pt(0,0,1), col: '#8878c8', label: 'm₃' },
+  ];
+  arrowVecs.forEach(av => {
+    pctx.strokeStyle = av.col; pctx.lineWidth = 2;
+    pctx.beginPath();
+    pctx.moveTo(origin.x, origin.y);
+    pctx.lineTo(av.to.x, av.to.y);
+    pctx.stroke();
+    // arrowhead
+    const dx = av.to.x - origin.x, dy = av.to.y - origin.y;
+    const len = Math.sqrt(dx*dx+dy*dy);
+    if (len > 5) {
+      const ux = dx/len, uy = dy/len;
+      pctx.beginPath();
+      pctx.moveTo(av.to.x, av.to.y);
+      pctx.lineTo(av.to.x - ux*10 + uy*5, av.to.y - uy*10 - ux*5);
+      pctx.lineTo(av.to.x - ux*10 - uy*5, av.to.y - uy*10 + ux*5);
+      pctx.closePath();
+      pctx.fillStyle = av.col; pctx.fill();
+    }
+    pctx.fillStyle = av.col;
+    pctx.font = '12px DM Mono, monospace';
+    pctx.textAlign = 'center';
+    pctx.fillText(av.label, av.to.x + (av.to.x-origin.x)*0.12, av.to.y + (av.to.y-origin.y)*0.12);
+  });
+
+  // det annotation
+  const detM = m11 * m22 - m12 * m12;
+  pctx.fillStyle = 'rgba(200,169,110,0.7)';
+  pctx.font = '11px DM Mono, monospace';
+  pctx.textAlign = 'left';
+  pctx.fillText(`det M ≈ ${detM.toFixed(2)}   |det T| = ${Math.abs(detM).toFixed(2)}`, 14, H - 12);
+
+  // reference (undistorted) outline
+  const ref_e1 = { x: scale, y: 0 };
+  const ref_e2 = { x: 0, y: -scale };
+  const ref_e3 = { x: -scale * 0.4, y: -scale * 0.28 };
+  function rpt(a,b,c){ return {
+    x: origin.x + a*ref_e1.x + b*ref_e2.x + c*ref_e3.x,
+    y: origin.y + a*ref_e1.y + b*ref_e2.y + c*ref_e3.y
+  };}
+  const refCorners = [rpt(0,0,0),rpt(1,0,0),rpt(0,1,0),rpt(1,1,0),rpt(0,0,1),rpt(1,0,1),rpt(0,1,1),rpt(1,1,1)];
+  [[0,1],[2,3],[4,5],[6,7],[0,2],[1,3],[4,6],[5,7],[0,4],[1,5],[2,6],[3,7]].forEach(([a,b]) => {
+    pctx.beginPath();
+    pctx.moveTo(refCorners[a].x, refCorners[a].y);
+    pctx.lineTo(refCorners[b].x, refCorners[b].y);
+    pctx.setLineDash([3,4]);
+    pctx.strokeStyle = 'rgba(200,169,110,0.18)'; pctx.lineWidth = 1; pctx.stroke();
+    pctx.setLineDash([]);
+  });
+
+  // legend
+  pctx.fillStyle = 'rgba(200,169,110,0.35)'; pctx.font = '10px DM Mono,monospace'; pctx.textAlign='right';
+  pctx.fillText('─ ─  M = I  (referencia)', W - 12, H - 12);
+}
+
+// ════════════════════════════════════════
+// INVARIANCE CANVAS
+// ════════════════════════════════════════
+const invCanvas = document.getElementById('invariance-canvas');
+const ictx = invCanvas.getContext('2d');
+
+function drawInvariance() {
+  const W = invCanvas.offsetWidth;
+  invCanvas.width  = W * devicePixelRatio;
+  invCanvas.height = 220 * devicePixelRatio;
+  ictx.scale(devicePixelRatio, devicePixelRatio);
+  const H = 220;
+  ictx.clearRect(0, 0, W, H);
+
+  const lambda = document.getElementById('lambda-sl').value / 100;
+
+  // f(x,y,z)=xyz integrated over [0,1]^3 = 1/8
+  // after distortion T=λI: integral of fT * |det T| = λ^-3 * xyz * λ^3 = xyz  → same 1/8
+  const origIntegral = 1/8;
+  const detT = lambda * lambda * lambda;
+  const fTscale = Math.pow(lambda, -3);
+  const distIntegral = fTscale * origIntegral * detT; // always 1/8
+
+  const lp = 60, rp = 20, tp = 20, bp = 40;
+  const pw = W - lp - rp, ph = H - tp - bp;
+
+  // axes
+  ictx.strokeStyle = '#2a2e2e'; ictx.lineWidth = 1;
+  ictx.beginPath(); ictx.moveTo(lp, tp); ictx.lineTo(lp, tp+ph); ictx.lineTo(lp+pw, tp+ph); ictx.stroke();
+
+  // x-axis: lambda values 0.3..3.0
+  const lambdaMin = 0.3, lambdaMax = 3.0;
+  const N = 120;
+
+  // original integral line (constant = 1/8)
+  ictx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
+    const x = lp + (i/N) * pw;
+    const y = tp + ph - (origIntegral / 0.2) * ph * 0.85;
+    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
+  }
+  ictx.strokeStyle = 'rgba(90,144,168,0.5)'; ictx.lineWidth = 1.5;
+  ictx.setLineDash([5,4]); ictx.stroke(); ictx.setLineDash([]);
+
+  // distorted f_T * |det T| line (also constant = 1/8 — this IS the invariance)
+  ictx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
+    const val = Math.pow(lv,-3) * origIntegral * Math.pow(lv,3);
+    const x = lp + (i/N) * pw;
+    const y = tp + ph - (val / 0.2) * ph * 0.85;
+    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
+  }
+  ictx.strokeStyle = '#28c898'; ictx.lineWidth = 1.5; ictx.stroke();
+
+  // f_T alone (without det T compensation) — diverges
+  ictx.beginPath();
+  for (let i = 0; i <= N; i++) {
+    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
+    const val = Math.pow(lv,-3) * origIntegral;
+    const x = lp + (i/N) * pw;
+    const y = tp + ph - Math.min((val / 0.2) * ph * 0.85, ph + 10);
+    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
+  }
+  ictx.strokeStyle = 'rgba(200,80,80,0.4)'; ictx.lineWidth = 1; ictx.stroke();
+
+  // current lambda marker
+  const markerX = lp + ((lambda - lambdaMin) / (lambdaMax - lambdaMin)) * pw;
+  const markerY = tp + ph - (origIntegral / 0.2) * ph * 0.85;
+  ictx.beginPath();
+  ictx.arc(markerX, markerY, 5, 0, Math.PI*2);
+  ictx.fillStyle = '#c8a96e'; ictx.fill();
+
+  // λ vertical line
+  ictx.strokeStyle = 'rgba(200,169,110,0.3)'; ictx.lineWidth = 1; ictx.setLineDash([3,3]);
+  ictx.beginPath(); ictx.moveTo(markerX, tp); ictx.lineTo(markerX, tp+ph); ictx.stroke();
+  ictx.setLineDash([]);
+
+  // value annotation
+  ictx.fillStyle = '#c8a96e'; ictx.font = '11px DM Mono, monospace'; ictx.textAlign = 'center';
+  ictx.fillText(`λ=${lambda.toFixed(2)}`, markerX, tp+ph+14);
+  ictx.fillText(`∫fT·|detT| = ${distIntegral.toFixed(4)}`, markerX, tp+16);
+
+  // x-axis ticks
+  [0.5, 1.0, 1.5, 2.0, 2.5].forEach(lv => {
+    const x = lp + ((lv-lambdaMin)/(lambdaMax-lambdaMin))*pw;
+    ictx.fillStyle = '#2e5868'; ictx.font = '10px DM Mono,monospace'; ictx.textAlign = 'center';
+    ictx.fillText(lv.toFixed(1), x, tp+ph+26);
+  });
+
+  // axis labels
+  ictx.fillStyle = '#2e5868'; ictx.textAlign = 'center';
+  ictx.fillText('λ', lp + pw/2, H - 2);
+  ictx.save(); ictx.translate(14, tp+ph/2); ictx.rotate(-Math.PI/2);
+  ictx.fillText('∫ érték', 0, 0); ictx.restore();
+
+  // y-axis ticks
+  [0, 0.125, 0.2].forEach((v,i) => {
+    const y = tp + ph - (v/0.2)*ph*0.85;
+    ictx.fillStyle = '#2e5868'; ictx.textAlign = 'right'; ictx.font = '10px DM Mono,monospace';
+    ictx.fillText(v.toFixed(3), lp-4, y+3);
+  });
+
+  // legend — two rows to avoid overlap
+  ictx.font = '10px DM Mono, monospace'; ictx.textAlign = 'left';
+  const ly1 = tp + 20, ly2 = tp + 36;
+
+  ictx.setLineDash([5,4]); ictx.strokeStyle='rgba(90,144,168,0.6)'; ictx.lineWidth=1.5;
+  ictx.beginPath(); ictx.moveTo(lp+6, ly1-3); ictx.lineTo(lp+22, ly1-3); ictx.stroke();
+  ictx.setLineDash([]);
+  ictx.fillStyle='#5a90a8'; ictx.fillText('∫f dx  (eredeti)', lp+26, ly1);
+
+  ictx.strokeStyle='#28c898'; ictx.lineWidth=1.5;
+  ictx.beginPath(); ictx.moveTo(lp+6, ly2-3); ictx.lineTo(lp+22, ly2-3); ictx.stroke();
+  ictx.fillStyle='#28c898'; ictx.fillText('∫fT·|det T|  (invariáns ✓)', lp+26, ly2);
+
+  ictx.strokeStyle='rgba(200,80,80,0.55)'; ictx.lineWidth=1;
+  ictx.beginPath(); ictx.moveTo(lp + pw*0.52, ly1-3); ictx.lineTo(lp + pw*0.52 + 16, ly1-3); ictx.stroke();
+  ictx.fillStyle='rgba(200,80,80,0.8)'; ictx.fillText('∫fT  (kompenzáció nélkül)', lp + pw*0.52 + 20, ly1);
+}
+
+// ════════════════════════════════════════
+// SLIDERS
+// ════════════════════════════════════════
+function initSliders() {
+  ['m11','m12','m22'].forEach(id => {
+    document.getElementById(id).addEventListener('input', function() {
+      document.getElementById(id+'-val').textContent = (this.value/100).toFixed(2);
+      drawPP();
+    });
+  });
+  document.getElementById('lambda-sl').addEventListener('input', function() {
+    document.getElementById('lambda-val').textContent = (this.value/100).toFixed(2);
+    drawInvariance();
+  });
+}
+
+// ════════════════════════════════════════
+// BibTeX
+// ════════════════════════════════════════
+function copyBib() {
+  const raw = `@article{bodis2025vmp,
+  author      = {Bódis, Tamás},
+  title       = {Vektoriális Mátrixszorzat (VMP): torzított terek és megmaradó törvények},
+  year        = {2025},
+  note        = {Preprint, bírálat alatt},
+  institution = {Óbudai Egyetem, Kandó Kálmán Villamosmérnöki Kar},
+  orcid       = {0009-0004-6349-712X}
+}`;
+  navigator.clipboard.writeText(raw).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+function init() {
+  initSliders();
+  drawPP();
+  drawInvariance();
+}
+window.addEventListener('load', init);
+window.addEventListener('resize', () => { drawPP(); drawInvariance(); });
+</script>
+</body>
+</html>
