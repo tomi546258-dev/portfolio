@@ -1241,19 +1241,24 @@ R_μν − ½Rg_μν = 8πGT_μν
       if (e.target === this) closeSudoku();
     });
 
-    // ── Látogatásszámláló (countapi.xyz) ──
+    // ── Látogatásszámláló (hits.seeyoufarm.com) ──
     (async function() {
       const el = document.getElementById('visit-count');
       try {
-        const res = await fetch('https://api.countapi.xyz/hit/tomi546258-dev.github.io/visits');
+        const res = await fetch(
+          'https://hits.seeyoufarm.com/api/count/incr/badge.json?url=tomi546258-dev.github.io%2Fportfolio&count_bg=%2328c898&title_bg=%23151717&icon=&title=&edge_flat=true'
+        );
         if (!res.ok) throw new Error();
         const data = await res.json();
-        if (data && data.value) {
-          el.textContent = data.value.toLocaleString('hu-HU');
-        }
+        // today / total
+        const total = data.total_count ?? data.totalCount;
+        if (total !== undefined) {
+          el.textContent = Number(total).toLocaleString('hu-HU');
+        } else throw new Error();
       } catch {
-        el.style.display = 'none';
-        el.previousElementSibling && (el.previousElementSibling.style.display = 'none');
+        // fallback: hide gracefully
+        const wrap = el.closest('span[style]');
+        if (wrap) wrap.style.display = 'none';
       }
     })();
   </script>
