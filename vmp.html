@@ -399,17 +399,27 @@ canvas { display:block; width:100%; border-radius:2px; }
 
     <div class="eq-label" data-i18n="eq.pn2.label">VMP mezőtorzítás — Piola–Nanson analógia</div>
     <div class="eq-block">
-      $$M_T(\tilde{\mathbf{x}}) = \underbrace{T^{-1}}_{\text{bal pullback}}\;
-        M(T\tilde{\mathbf{x}})\;
-        \underbrace{T^{-\top}}_{\text{jobb pullback}}
+      $$M_T(\tilde{\mathbf{x}}) = T^{-1}\, M(T\tilde{\mathbf{x}})\, T^{-\top}
         \;\longleftrightarrow\;
-        \mathbf{n}\,da = J\underbrace{F^{-\top}}_{\text{Nanson-tag}}\mathbf{N}\,dA$$
+        \mathbf{n}\,da = J\, F^{-\top}\,\mathbf{N}\,dA$$
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;
+                font-family:'DM Mono',monospace;font-size:.62rem;
+                color:var(--text-dim);padding:.1rem .2rem .6rem;letter-spacing:.05em">
+      <div style="text-align:center">
+        <span style="color:var(--accent2)">T⁻¹ · M · T⁻ᵀ</span>
+        &nbsp;— bal + jobb pullback (VMP)
+      </div>
+      <div style="text-align:center">
+        <span style="color:var(--purple)">J F⁻ᵀ</span>
+        &nbsp;— Nanson-tag (kontinuummechanika)
+      </div>
     </div>
 
     <div class="eq-label" data-i18n="eq.pn3.label">Fluxus-invariancia — Gauss-törvény torzított térben</div>
     <div class="eq-block">
-      $$\oiint_{S} \mathbf{E}\cdot d\mathbf{A}
-        = \oiint_{\tilde{S}} \mathbf{E}_T(\tilde{\mathbf{x}})\cdot d\tilde{\mathbf{A}}_T
+      $$\unicode{x222F}_{S} \mathbf{E}\cdot d\mathbf{A}
+        = \unicode{x222F}_{\tilde{S}} \mathbf{E}_T(\tilde{\mathbf{x}})\cdot d\tilde{\mathbf{A}}_T
         = \frac{q}{\varepsilon_0},
       \qquad d\tilde{\mathbf{A}}_T = |\det T|\,T^{-\top}\,d\mathbf{A}$$
     </div>
@@ -685,6 +695,8 @@ const T = {
     "piola.note.body": "Die $\\sqrt{|g|}$-Metrik-Volumenform — im Covariant-Conservation-Artikel behandelt — erzeugt genau den $|\\det T| = \\sqrt{|\\det g|}$-Faktor. Die Piola–Nanson-Formel, die VMP-Pullback-Regel und die kovariante Erhaltungsidentität haben damit eine gemeinsame geometrische Wurzel: die konsistente Verfolgung der Raumverzerrung in den Feldstrukturen.",
     "eq4.passive": "passiv — Voraussetzung",
     "eq4.active": "aktiv — Ergebnis des Feld-Pullbacks",
+  }
+};
 
 let lang = 'hu';
 function setLang(l) {
