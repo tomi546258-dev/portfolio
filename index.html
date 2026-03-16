@@ -1,700 +1,1287 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CCI — Corner-Corrected Integral · Bódis Tamás</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
-<script>
-MathJax = {
-  tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], tags:'ams' },
-  options: { skipHtmlTags:['script','noscript','style','textarea'] }
-};
-</script>
-<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<style>
-:root {
-  --bg:          #0e0f0f;
-  --bg2:         #151717;
-  --bg3:         #1c1f1f;
-  --border:      #2a2e2e;
-  --accent:      #c8a96e;
-  --accent2:     #7eb8a4;
-  --text:        #d8d4cc;
-  --text-dim:    #7a7870;
-  --text-bright: #eeeae2;
-  --orange:      #d4703a;
-  --purple:      #8878c8;
-}
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-body {
-  background:var(--bg); color:var(--text);
-  font-family:'Literata',Georgia,serif; font-size:16px; line-height:1.75;
-  overflow-x:hidden;
-}
-body::before {
-  content:''; position:fixed; inset:0;
-  background-image:
-    linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),
-    linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);
-  background-size:60px 60px; pointer-events:none; z-index:0;
-}
-.page { max-width:880px; margin:0 auto; padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px); position:relative; z-index:1; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bódis Tamás – Mérőmérnök, Kutató & BT Tech | Budapest</title>
 
-/* lang */
-.lang-bar { display:flex; justify-content:flex-end; gap:.3rem; margin-bottom:1.6rem; }
-.lang-btn { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; background:none; border:1px solid transparent; color:var(--text-dim); padding:.28rem .6rem; border-radius:2px; cursor:pointer; transition:all .18s; }
-.lang-btn:hover  { color:var(--accent); border-color:var(--border); }
-.lang-btn.active { color:var(--accent); border-color:var(--accent); }
+  <!-- ── SEO alapok ── -->
+  <meta name="description" content="Bódis Tamás – mérőmérnök, MSc hallgató az Óbudai Egyetemen, BT Tech alapítója. Szakterület: mérésautomatizálás, RF kalibráció, VMP keretrendszer, geometriai mechanika, FPGA fejlesztés, LabVIEW, Python, VBA.">
+  <meta name="author" content="Bódis Tamás">
+  <meta name="robots" content="index, follow">
+  <meta name="keywords" content="
+    Bódis Tamás, BT Tech, mérőmérnök, mérésautomatizálás, RF kalibráció,
+    Vektoriális Mátrixszorzat, VMP, Vectorial Matrix Product,
+    geometriai mechanika, covariant conservation, matematikai fizika,
+    Óbudai Egyetem, Kandó Kálmán, MSc hallgató,
+    FPGA fejlesztés, Spartan-6, Xilinx ISE,
+    LabVIEW, Python, VBA, SCPI, VISA, GPIB,
+    Fluke 5520A, Keysight, R&S FSV, NI PXIe,
+    mérési bizonytalanság, GUM, kalibrálás,
+    numerikus módszerek, CCI módszer, Arduino,
+    Budapest, Magyarország, mérnök, kutató,
+    measurement automation, calibration engineer, Budapest
+  ">
+  <meta name="google-site-verification" content="3TMgm3xzWUwdEpUjX2rWMtgyLPFWzP-AsHQ8cekOESg">
+  <link rel="canonical" href="https://tomi546258-dev.github.io/portfolio/">
 
-/* status */
-.status-pill { display:inline-flex; align-items:center; gap:6px; font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--accent2); color:var(--accent2); padding:.28rem .8rem; border-radius:2px; margin-bottom:1.4rem; }
-.status-dot { width:6px; height:6px; border-radius:50%; background:var(--accent2); animation:blink 2s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.25} }
+  <!-- ── Open Graph (közösségi megosztáshoz) ── -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Bódis Tamás – Mérőmérnök & Kutató | BT Tech">
+  <meta property="og:description" content="Mérésautomatizálás, RF kalibráció és elméleti fizika metszéspontján. VMP keretrendszer, geometriai mechanika, FPGA, Python/VBA automatizálás.">
+  <meta property="og:url" content="https://tomi546258-dev.github.io/portfolio/">
+  <meta property="og:locale" content="hu_HU">
 
-/* header */
-.paper-title { font-family:'DM Serif Display',serif; font-size:clamp(1.5rem,4vw,2.4rem); color:var(--text-bright); line-height:1.1; margin-bottom:.6rem; }
-.paper-title em { font-style:italic; color:var(--accent); }
-.paper-meta { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-dim); letter-spacing:.08em; margin-bottom:2rem; display:flex; flex-wrap:wrap; gap:.5rem 1.4rem; }
-.paper-meta a { color:var(--accent2); text-decoration:none; }
-.paper-meta a:hover { color:var(--accent); }
+  <!-- ── JSON-LD strukturált adat (Google-nek) ── -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Bódis Tamás",
+    "alternateName": "Tamas Bodis",
+    "url": "https://tomi546258-dev.github.io/portfolio/",
+    "email": "tomi546258@gmail.com",
+    "sameAs": [
+      "https://orcid.org/0009-0004-6349-712X",
+      "https://github.com/tomi546258-dev",
+      "https://www.linkedin.com/in/tam%C3%A1s-b%C3%B3dis-aa41581b2"
+    ],
+    "jobTitle": "Mérőmérnök, MSc hallgató",
+    "worksFor": {
+      "@type": "Organization",
+      "name": "BT Tech"
+    },
+    "alumniOf": {
+      "@type": "CollegeOrUniversity",
+      "name": "Óbudai Egyetem, Kandó Kálmán Villamosmérnöki Kar"
+    },
+    "knowsAbout": [
+      "Mérésautomatizálás", "RF kalibráció", "Vektoriális Mátrixszorzat",
+      "Geometriai mechanika", "FPGA fejlesztés", "LabVIEW", "Python", "VBA",
+      "Mérési bizonytalanság", "Numerikus módszerek"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Budapest",
+      "addressCountry": "HU"
+    }
+  }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0e0f0f;
+      --bg2: #151717;
+      --bg3: #1c1f1f;
+      --border: #2a2e2e;
+      --accent: #c8a96e;
+      --accent2: #7eb8a4;
+      --text: #d8d4cc;
+      --text-dim: #7a7870;
+      --text-bright: #eeeae2;
+    }
 
-/* section */
-.section { margin-top:2.8rem; }
-.section-label { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin-bottom:.8rem; display:flex; align-items:center; gap:.7rem; }
-.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
 
-/* abstract */
-.abstract-box { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--accent); padding:1.4rem 1.6rem; border-radius:2px; font-size:.97rem; line-height:1.8; color:var(--text); }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Literata', Georgia, serif;
+      font-size: 17px;
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
 
-/* result cards */
-.results-grid { display:grid; grid-template-columns:1fr 1fr; gap:.8rem; margin-top:.8rem; }
-@media(max-width:580px){ .results-grid{grid-template-columns:1fr;} }
-.result-card { background:var(--bg2); border:1px solid var(--border); padding:1.2rem 1.4rem; border-radius:2px; transition:border-color .2s; position:relative; overflow:hidden; }
-.result-card::before { content:''; position:absolute; top:0; left:0; width:3px; height:0; background:var(--accent); transition:height .3s; }
-.result-card:hover::before { height:100%; }
-.result-card:hover { border-color:var(--accent); }
-.result-tag { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent2); margin-bottom:.5rem; }
-.result-title { font-family:'DM Serif Display',serif; font-size:1rem; color:var(--text-bright); margin-bottom:.4rem; }
-.result-body { font-size:.87rem; color:var(--text-dim); line-height:1.7; }
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
 
-/* eq */
-.eq-block { background:var(--bg3); border:1px solid var(--border); padding:1rem 1.4rem; border-radius:2px; margin:.8rem 0; overflow-x:auto; font-size:.95rem; }
-.eq-label { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:.1em; margin-bottom:.3rem; }
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 3rem;
+      background: rgba(14,15,15,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      gap: 1rem;
+    }
 
-/* comparison table */
-.comp-table { width:100%; border-collapse:collapse; font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.6rem; }
-.comp-table th { padding:.5rem .9rem; text-align:left; border-bottom:1px solid var(--border); color:var(--accent); font-weight:500; letter-spacing:.08em; }
-.comp-table td { padding:.55rem .9rem; border-bottom:1px solid var(--bg3); color:var(--text-dim); vertical-align:middle; }
-.comp-table tr.cci td { color:var(--accent2); border:1px solid rgba(126,184,164,.25); background:rgba(126,184,164,.04); }
-.comp-table tr:hover td { color:var(--text); background:var(--bg3); }
+    .nav-logo {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
 
-/* viz */
-.viz-wrap { background:var(--bg2); border:1px solid var(--border); border-radius:2px; padding:1.2rem; margin-top:.8rem; }
-.viz-title { font-family:'DM Mono',monospace; font-size:.63rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:.8rem; }
-canvas { display:block; width:100%; border-radius:2px; }
-.viz-controls { display:flex; gap:1rem; flex-wrap:wrap; margin-top:.9rem; align-items:center; }
-.ctrl-label { font-family:'DM Mono',monospace; font-size:.64rem; color:var(--text-dim); letter-spacing:.08em; display:flex; align-items:center; gap:.5rem; flex:1; min-width:140px; }
-.ctrl-label input[type=range] { flex:1; accent-color:var(--accent); }
-.ctrl-val { font-family:'DM Mono',monospace; font-size:.64rem; color:var(--accent); min-width:38px; text-align:right; }
+    .nav-center {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
 
-/* theorem */
-.theorem-box { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--purple); padding:1.2rem 1.5rem; border-radius:2px; margin-top:.8rem; }
-.theorem-label { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.18em; text-transform:uppercase; color:var(--purple); margin-bottom:.6rem; }
-.theorem-body { font-size:.9rem; color:var(--text); line-height:1.8; }
+    .nav-center a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
 
-/* code block */
-.code-box { background:#0d1a1a; border:1px solid var(--border); border-radius:2px; padding:1rem 1.2rem; margin-top:.6rem; overflow-x:auto; }
-.code-box pre { font-family:'DM Mono',monospace; font-size:.7rem; line-height:1.8; color:#7eb8a4; margin:0; }
-.code-label { font-family:'DM Mono',monospace; font-size:.58rem; letter-spacing:.14em; text-transform:uppercase; color:var(--text-dim); margin-bottom:.4rem; }
+    .nav-center a:hover { color: var(--accent); }
 
-/* bibtex */
-.bibtex-box { background:var(--bg3); border:1px solid var(--border); border-radius:2px; padding:1rem 1.4rem; font-family:'DM Mono',monospace; font-size:.72rem; color:var(--text-dim); line-height:1.9; overflow-x:auto; white-space:pre; position:relative; }
-.copy-btn { position:absolute; top:.7rem; right:.8rem; font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; text-transform:uppercase; background:none; border:1px solid var(--border); color:var(--text-dim); padding:.25rem .65rem; border-radius:2px; cursor:pointer; transition:all .15s; }
-.copy-btn:hover { color:var(--accent); border-color:var(--accent); }
-.copy-btn.copied { color:var(--accent2); border-color:var(--accent2); }
-.bib-key { color:var(--accent2); } .bib-field { color:var(--text-dim); } .bib-val { color:var(--accent); }
+    .lang-switcher {
+      display: flex;
+      gap: 0.3rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
 
-.page-footer { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font-family:'DM Mono',monospace; font-size:.63rem; color:var(--text-dim); letter-spacing:.08em; }
-</style>
+    .lang-btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid transparent;
+      padding: 0.3rem 0.55rem;
+      border-radius: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover { color: var(--accent); border-color: var(--border); }
+    .lang-btn.active { color: var(--accent); border-color: var(--accent); }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger span {
+      display: block;
+      width: 22px;
+      height: 1px;
+      background: var(--text-dim);
+      transition: all 0.3s;
+    }
+
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(4px, 4px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(4px, -4px); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 58px; left: 0; right: 0;
+      background: rgba(14,15,15,0.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 1.5rem 2rem;
+      z-index: 99;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .mobile-lang {
+      display: flex;
+      gap: 0.5rem;
+      padding-top: 0.5rem;
+    }
+
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 3rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-content {
+      max-width: 780px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .hero-label::before {
+      content: '';
+      display: inline-block;
+      width: 2rem;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.4rem, 6vw, 5rem);
+      color: var(--text-bright);
+      line-height: 1.05;
+      margin-bottom: 0.3rem;
+    }
+
+    h1 em { font-style: italic; color: var(--accent); }
+
+    .hero-sub {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      margin-bottom: 2.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .hero-desc {
+      font-size: 1.05rem;
+      color: var(--text);
+      max-width: 560px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .tag {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.8rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .tag:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 0.7rem 1.6rem;
+      border-radius: 2px;
+      transition: all 0.25s;
+      cursor: pointer;
+    }
+
+    .btn-primary { background: var(--accent); color: #0e0f0f; border: 1px solid var(--accent); }
+    .btn-primary:hover { background: transparent; color: var(--accent); }
+    .btn-outline { background: transparent; color: var(--text-dim); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    .hero-deco {
+      position: absolute;
+      right: -80px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 500px;
+      height: 500px;
+      opacity: 0.035;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      line-height: 1.6;
+      color: var(--accent);
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    section {
+      padding: 5rem 3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .section-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      flex-shrink: 0;
+    }
+
+    h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      color: var(--text-bright);
+      white-space: nowrap;
+    }
+
+    .divider { flex: 1; height: 1px; background: var(--border); min-width: 20px; }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      align-items: start;
+      max-width: 1050px;
+    }
+
+    .about-text p { margin-bottom: 1.2rem; color: var(--text); font-size: 1rem; }
+
+    .about-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      border-left: 1px solid var(--border);
+      padding-left: 2.5rem;
+    }
+
+    .stat-item { padding-bottom: 1.2rem; border-bottom: 1px solid var(--border); }
+    .stat-item:last-child { border-bottom: none; }
+
+    .stat-num {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.2rem;
+      color: var(--accent);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 0.3rem;
+    }
+
+    .pubs-section { background: var(--bg2); }
+
+    .pub-list {
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .pub-item {
+      border: 1px solid var(--border);
+      background: var(--bg3);
+      padding: 1.6rem 1.8rem;
+      border-radius: 2px;
+      transition: border-color 0.2s;
+      display: grid;
+      grid-template-columns: 60px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+    }
+
+    .pub-item:hover { border-color: var(--accent); }
+
+    .pub-year {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      padding-top: 0.3rem;
+    }
+
+    .pub-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem;
+      color: var(--text-bright);
+      margin-bottom: 0.35rem;
+    }
+
+    .pub-journal {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      letter-spacing: 0.08em;
+    }
+
+    .pub-tags { display: flex; gap: 0.5rem; margin-top: 0.8rem; flex-wrap: wrap; }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1rem;
+      max-width: 1100px;
+    }
+
+    .project-card {
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.8rem;
+      border-radius: 2px;
+      transition: all 0.25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px;
+      height: 0;
+      background: var(--accent);
+      transition: height 0.3s;
+    }
+
+    .project-card:hover::before { height: 100%; }
+    .project-card:hover { transform: translateY(-2px); }
+
+    .project-icon { font-size: 1.6rem; margin-bottom: 0.8rem; display: block; }
+
+    .project-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.08rem;
+      color: var(--text-bright);
+      margin-bottom: 0.5rem;
+    }
+
+    .project-desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.65; }
+
+    .project-tech { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 1rem; }
+
+    .tech-badge {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--accent2);
+      border: 1px solid rgba(126,184,164,0.3);
+      padding: 0.2rem 0.55rem;
+      border-radius: 1px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Sudoku project card ── */
+    .project-card.sudoku-card { cursor: pointer; }
+    .project-card.sudoku-card .launch-hint {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.65rem;
+      color: var(--accent);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 1rem;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .project-card.sudoku-card:hover .launch-hint { opacity: 1; }
+
+    /* ── Sudoku modal ── */
+    #sudoku-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    #sudoku-modal.open { display: flex; }
+
+    .sudoku-modal-inner {
+      position: relative;
+      width: 100%;
+      max-width: 980px;
+    }
+
+    .sudoku-modal-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .sudoku-modal-title {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+    }
+
+    .sudoku-modal-close {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.9rem;
+      border-radius: 2px;
+      cursor: pointer;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+    .sudoku-modal-close:hover { color: var(--accent); border-color: var(--accent); }
+
+    #sudoku-iframe {
+      width: 100%;
+      height: 80vh;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      background: #07111a;
+      display: block;
+    }
+
+    .blog-section { background: var(--bg2); }
+
+    .blog-list { max-width: 800px; display: flex; flex-direction: column; }
+
+    .blog-item {
+      display: grid;
+      grid-template-columns: 70px 1fr;
+      gap: 1.5rem;
+      align-items: start;
+      padding: 1.8rem 0;
+      border-bottom: 1px solid var(--border);
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .blog-item:hover .blog-title { color: var(--accent); }
+
+    .blog-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+      padding-top: 0.35rem;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    .blog-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.12rem;
+      color: var(--text-bright);
+      margin-bottom: 0.35rem;
+      transition: color 0.2s;
+    }
+
+    .blog-excerpt { font-size: 0.86rem; color: var(--text-dim); line-height: 1.65; }
+
+    .contact-inner { max-width: 580px; }
+    .contact-inner p { font-size: 1rem; color: var(--text); margin-bottom: 2rem; line-height: 1.8; }
+
+    .contact-links { display: flex; flex-direction: column; gap: 0.8rem; }
+
+    .contact-link {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.9rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 2px;
+      transition: all 0.2s;
+      word-break: break-all;
+    }
+
+    .contact-link:hover { border-color: var(--accent); color: var(--accent); }
+
+    .contact-link-label {
+      font-size: 0.68rem;
+      color: var(--accent2);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      min-width: 70px;
+      flex-shrink: 0;
+    }
+
+    footer {
+      padding: 1.8rem 3rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .footer-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--text-dim);
+      letter-spacing: 0.1em;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero-label { animation: fadeUp 0.6s ease both; }
+    h1 { animation: fadeUp 0.7s 0.1s ease both; }
+    .hero-sub { animation: fadeUp 0.7s 0.2s ease both; }
+    .hero-desc { animation: fadeUp 0.7s 0.3s ease both; }
+    .hero-tags { animation: fadeUp 0.7s 0.4s ease both; }
+    .hero-cta { animation: fadeUp 0.7s 0.5s ease both; }
+
+    @media (max-width: 900px) {
+      nav { padding: 1rem 1.5rem; }
+      .nav-center { display: none; }
+      .hamburger { display: flex; }
+      .hero { padding: 6rem 1.5rem 3rem; }
+      section { padding: 3.5rem 1.5rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-stats {
+        border-left: none; padding-left: 0;
+        border-top: 1px solid var(--border); padding-top: 1.5rem;
+        display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+      }
+      .stat-item { padding-bottom: 1rem; }
+      .pub-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .pub-year { padding-top: 0; }
+      .blog-item { grid-template-columns: 55px 1fr; gap: 1rem; }
+      footer { padding: 1.5rem; }
+      #sudoku-iframe { height: 70vh; }
+      #sudoku-modal { padding: 1rem; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2.2rem; }
+      .hero-deco { display: none; }
+      .about-stats { grid-template-columns: 1fr; }
+      .section-header { flex-wrap: wrap; }
+      .divider { display: none; }
+      .blog-item { grid-template-columns: 1fr; }
+      .blog-date { text-align: left; }
+      #sudoku-iframe { height: 60vh; }
+    }
+  </style>
 </head>
 <body>
-<div class="page">
 
-  <div class="lang-bar">
-    <button class="lang-btn active" onclick="setLang('hu')">HU</button>
-    <button class="lang-btn" onclick="setLang('en')">EN</button>
-    <button class="lang-btn" onclick="setLang('de')">DE</button>
-  </div>
+  <nav>
+    <div class="nav-logo">Bódis Tamás // BT Tech</div>
+    <ul class="nav-center">
+      <li><a href="#rolam" data-i18n="nav.about">Rólam</a></li>
+      <li><a href="#publikaciok" data-i18n="nav.pubs">Publikációk</a></li>
+      <li><a href="#projektek" data-i18n="nav.projects">Projektek</a></li>
+      <li><a href="#blog">Blog</a></li>
+      <li><a href="#kapcsolat" data-i18n="nav.contact">Kapcsolat</a></li>
+    </ul>
+    <div class="lang-switcher">
+      <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
+    </div>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
 
-  <div class="status-pill"><span class="status-dot"></span><span data-i18n="status">Konferencia közlemény — bírálat alatt</span></div>
-
-  <h1 class="paper-title" data-i18n="title">Corner-Corrected Integral (CCI) —<br><em>Kvantált jelekre</em> optimalizált numerikus integrátor</h1>
-  <div class="paper-meta">
-    <span>Bódis Tamás</span>
-    <span>·</span>
-    <a href="https://orcid.org/0009-0004-6349-712X" target="_blank">ORCID 0009-0004-6349-712X</a>
-    <span>·</span>
-    <span>Óbudai Egyetem, KVK</span>
-    <span>·</span>
-    <span data-i18n="meta.venue">MDPI Electronics / Sensors</span>
-  </div>
-
-  <!-- abstract -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.abstract">Összefoglalás</div>
-    <div class="abstract-box" data-i18n="abstract.text">
-      A Corner-Corrected Integral (CCI) egy egyszerű, egész-aritmetikán alapuló numerikus integrálási módszer,
-      amely a klasszikus téglalap-szabályt egy <em>kvadratikus sarokkorrekciós taggal</em> egészíti ki.
-      A korrekció egy geometriai azonosságból fakad: $(n-1)(n+1) = n^2 - 1$, amelynek átlaga $n^2 - \tfrac{1}{2}$.
-      Az eredmény $O(h^3)$ globális hibakorlát — egy renddel jobb a téglalap- és trapézszabálynál lépcsős jeleknél.
-      Szintetikus teszteken (szinusz, PWM, kvantált Gauss) a CCI az RMS hibát 30–60%-kal csökkenti
-      a klasszikus szabályokhoz képest, és 15%-kal jobb Simpson-módszernél is — miközben
-      lebegőpontos egység nélkül, $O(1)$ memóriával futtatható mikrovezérlőkön.
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#rolam" data-i18n="nav.about" onclick="closeMenu()">Rólam</a>
+    <a href="#publikaciok" data-i18n="nav.pubs" onclick="closeMenu()">Publikációk</a>
+    <a href="#projektek" data-i18n="nav.projects" onclick="closeMenu()">Projektek</a>
+    <a href="#blog" onclick="closeMenu()">Blog</a>
+    <a href="#kapcsolat" data-i18n="nav.contact" onclick="closeMenu()">Kapcsolat</a>
+    <div class="mobile-lang">
+      <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+      <button class="lang-btn" onclick="setLang('de')">DE</button>
+      <button class="lang-btn" onclick="setLang('en')">EN</button>
     </div>
   </div>
 
-  <!-- key results -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.results">Főbb eredmények</div>
-    <div class="results-grid">
-      <div class="result-card">
-        <div class="result-tag" data-i18n="r1.tag">Geometriai motiváció</div>
-        <div class="result-title" data-i18n="r1.title">Lakásablakok ihletése</div>
-        <div class="result-body" data-i18n="r1.body">Az alaptétel egy lakótömb ablakrácsának megfigyeléséből ered: egy $n\times n$ négyzetből $(n-1)\times(n+1)$ téglalapba lépve az area pontosan 1-gyel csökken. Az átlag adja a $-\tfrac{1}{2}$ korrekciót.</div>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-deco">
+∇·E = ρ/ε₀   ∇×B = μ₀J + μ₀ε₀∂E/∂t
+∮E·dA = Q/ε₀   ∮B·dl = μ₀I
+ψ(x,t) = Ae^(i(kx−ωt))   ĤΨ = EΨ
+∂²ψ/∂t² = c²∇²ψ   δS = 0
+d/dt(∂L/∂q̇) − ∂L/∂q = 0
+R_μν − ½Rg_μν = 8πGT_μν
+    </div>
+    <div class="hero-content">
+      <p class="hero-label" data-i18n="hero.label">Mérnök & Kutató</p>
+      <h1 data-i18n="hero.h1">Precizitás<br>a <em>mérésben</em><br>és elméletben.</h1>
+      <p class="hero-sub">BT Tech · Óbudai Egyetem · Budapest</p>
+      <p class="hero-desc" data-i18n="hero.desc">
+        Mérésautomatizálás, precíziós kalibrálás és elméleti fizika metszéspontján dolgozom.
+        RF rendszerek, kvantummechanikai keretek és numerikus módszerek – ahol a matematika találkozik a valósággal.
+      </p>
+      <div class="hero-tags">
+        <span class="tag">Mérésautomatizálás</span>
+        <span class="tag">RF Kalibráció</span>
+        <span class="tag">Matematikai fizika</span>
+        <span class="tag">FPGA</span>
+        <span class="tag">VBA / Python</span>
+        <span class="tag">Geometriai mechanika</span>
       </div>
-      <div class="result-card">
-        <div class="result-tag" data-i18n="r2.tag">Pontosság</div>
-        <div class="result-title" data-i18n="r2.title">1.8% RMS hiba (Q=8)</div>
-        <div class="result-body" data-i18n="r2.body">Téglalap: 8.2%, trapéz: 5.7%, Simpson: 3.1%, CCI: <strong style="color:var(--accent2)">1.8%</strong> — azonos számítási komplexitás mellett, lebegőpontos egység nélkül.</div>
+      <div class="hero-cta">
+        <a href="#publikaciok" class="btn btn-primary" data-i18n="hero.cta1">Publikációk</a>
+        <a href="#kapcsolat" class="btn btn-outline" data-i18n="hero.cta2">Kapcsolat</a>
       </div>
-      <div class="result-card">
-        <div class="result-tag" data-i18n="r3.tag">Automatikus n-hangolás</div>
-        <div class="result-title" data-i18n="r3.title">Skála/fázis-invariancia</div>
-        <div class="result-body" data-i18n="r3.body">Az $n$ korrekciós paramétert decimálással és félmintás eltolással határozza meg az algoritmus — ground truth nélkül, $O(N)$ időben, $O(1)$ memóriával.</div>
+    </div>
+  </section>
+
+  <!-- RÓLAM -->
+  <section id="rolam">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 data-i18n="nav.about">Rólam</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="about-text">
+        <p data-i18n="about.p1">
+          Mérőmérnökként precíziós kalibrálással és mérésautomatizálással
+          foglalkozom. Napi szinten dolgozom Fluke kalibrátorokkal, Keysight multiméterekkel
+          és RF tesztberendezésekkel, melyekhez VBA-alapú automatizálási rendszereket fejlesztek.
+        </p>
+        <p data-i18n="about.p2">
+          Az Óbudai Egyetem Kandó Kálmán Karán MSc hallgatóként önállóan folytatok kutatásokat
+          a matematikai fizika területén – különösen a kvantummechanika és hidrodinamikai
+          reprezentációk kapcsolatát vizsgálom geometriai módszerekkel.
+        </p>
+        <p data-i18n="about.p3">
+          A mérnöki precizitás és az elméleti mélység kettőssége vezérel: fontosnak tartom,
+          hogy az elméletek mérhetők, a mérések pedig matematikailag megalapozottak legyenek.
+        </p>
       </div>
-      <div class="result-card">
-        <div class="result-tag" data-i18n="r4.tag">Implementáció</div>
-        <div class="result-title" data-i18n="r4.title">AVR, ARM, PIC, MSP430</div>
-        <div class="result-body" data-i18n="r4.body">Csak egész szorzás és összeadás kell. $10^6$ mintán $<0.1\%$ integrálhiba fixpontos aritmetikával. Drop-in csere a hagyományos accumulate-and-sum megoldások helyett.</div>
+      <div class="about-stats">
+        <div class="stat-item">
+          <div class="stat-num">5+</div>
+          <div class="stat-label" data-i18n="about.stat1">Év szakmai tapasztalat</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">3</div>
+          <div class="stat-label" data-i18n="about.stat2">Elfogadott publikáció</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">RF · DC · LF</div>
+          <div class="stat-label" data-i18n="about.stat3">Kalibrálási területek</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">MSc</div>
+          <div class="stat-label" data-i18n="about.stat4">Óbudai Egyetem</div>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- PUBLIKÁCIÓK -->
+  <section id="publikaciok" class="pubs-section">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 data-i18n="nav.pubs">Publikációk</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="pub-list">
+      <div class="pub-item">
+        <span class="pub-year">2024</span>
+        <div>
+          <div class="pub-title">Covariant Conservation Laws in Geometric Mechanics</div>
+          <div class="pub-journal">Journal of Geometric Mechanics</div>
+          <div class="pub-tags">
+            <span class="tag">geometriai mechanika</span>
+            <span class="tag">megmaradási tételek</span>
+          </div>
+          <div style="margin-top:.8rem">
+            <button onclick="openModal('covariant-conservation.html','Covariant Conservation — Bódis Tamás')"
+              style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                     background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                     border-radius:2px;cursor:pointer;transition:all .2s;"
+              onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+              ▸ Részletek &amp; vizualizáció
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="pub-item">
+        <span class="pub-year">2024</span>
+        <div>
+          <div class="pub-title">Vectorial Matrix Product (VMP) — Torzított terek &amp; megmaradó törvények</div>
+          <div class="pub-journal" data-i18n="pub.review">Preprint – bírálat alatt</div>
+          <div class="pub-tags">
+            <span class="tag">kvantummechanika</span>
+            <span class="tag">VMP keretrendszer</span>
+          </div>
+          <div style="margin-top:.8rem">
+            <button onclick="openModal('vmp.html','VMP — Torzított terek &amp; megmaradó törvények')"
+              style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                     background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                     border-radius:2px;cursor:pointer;transition:all .2s;"
+              onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+              ▸ Részletek &amp; vizualizáció
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="pub-item">
+        <span class="pub-year">2023</span>
+        <div>
+          <div class="pub-title">Corner-Corrected Integral Method for Embedded Numerical Computation</div>
+          <div class="pub-journal" data-i18n="pub.conf">Konferencia közlemény</div>
+          <div class="pub-tags">
+            <span class="tag">numerikus módszerek</span>
+            <span class="tag">CCI módszer</span>
+          </div>
+          <div style="margin-top:.8rem">
+            <button onclick="openModal('cci.html','CCI — Corner-Corrected Integral')"
+              style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                     background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                     border-radius:2px;cursor:pointer;transition:all .2s;"
+              onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+              onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+              ▸ Részletek &amp; vizualizáció
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJEKTEK -->
+  <section id="projektek">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 data-i18n="nav.projects">Projektek</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="projects-grid">
+      <div class="project-card">
+        <span class="project-icon">⚡</span>
+        <div class="project-title" data-i18n="proj.rf.title">RF Mérőrendszer Automatizálás</div>
+        <p class="project-desc" data-i18n="proj.rf.desc">NRP-Z teljesítménymérők, FSV spektrumanalizátorok és Pendulum frekvenciamérők integrált vezérlése szignálgenerátorok komplex karakterizálásához.</p>
+        <div class="project-tech">
+          <span class="tech-badge">VBA</span><span class="tech-badge">VISA</span><span class="tech-badge">SCPI</span><span class="tech-badge">RF</span>
+        </div>
+        <div style="margin-top:1rem">
+          <button onclick="openModal('rf-automation.html','RF Mérőrendszer Automatizálás')"
+            style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                   background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                   border-radius:2px;cursor:pointer;transition:all .2s;"
+            onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+            onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+            ▸ Részletek
+          </button>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">∫</span>
+        <div class="project-title">Corner-Corrected Integral (CCI)</div>
+        <p class="project-desc" data-i18n="proj.cci.desc">Numerikus integrálási módszer mikrokontrollerekre optimalizálva. MATLAB implementáció és teljes tesztkészlet kidolgozása.</p>
+        <div class="project-tech">
+          <span class="tech-badge">MATLAB</span><span class="tech-badge">C</span><span class="tech-badge">Arduino</span>
+        </div>
+        <div style="margin-top:1rem">
+          <button onclick="openModal('cci.html','CCI — Corner-Corrected Integral')"
+            style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                   background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                   border-radius:2px;cursor:pointer;transition:all .2s;"
+            onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+            onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+            ▸ Részletek &amp; vizualizáció
+          </button>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">⊞</span>
+        <div class="project-title" data-i18n="proj.fpga.title">FPGA Fejlesztés – Spartan-6</div>
+        <p class="project-desc" data-i18n="proj.fpga.desc">Képfeldolgozási architektúrák vizsgálata Xilinx ISE 14.7 környezetben. Tórus-alapú adatfeldolgozás innovatív alkalmazásai.</p>
+        <div class="project-tech">
+          <span class="tech-badge">VHDL</span><span class="tech-badge">Xilinx ISE</span><span class="tech-badge">Spartan-6</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">🐍</span>
+        <div class="project-title">SFE100 Python Parser</div>
+        <p class="project-desc" data-i18n="proj.sfe.desc">Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Python</span><span class="tech-badge">Pandas</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">Ψ</span>
+        <div class="project-title" data-i18n="proj.qm.title">Kvantum-hidrodinamikai Keretek</div>
+        <p class="project-desc" data-i18n="proj.qm.desc">A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Matematikai fizika</span><span class="tech-badge">MATLAB</span>
+        </div>
+      </div>
+      <div class="project-card">
+        <span class="project-icon">🔧</span>
+        <div class="project-title" data-i18n="proj.sc.title">SmartClone – Arduino Diagnosztika</div>
+        <p class="project-desc" data-i18n="proj.sc.desc">Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Arduino</span><span class="tech-badge">C++</span><span class="tech-badge">PCB</span>
+        </div>
+      </div>
+
+      <!-- ── Sudoku ILP kártya ── -->
+      <div class="project-card sudoku-card" onclick="openSudoku()">
+        <span class="project-icon">⊡</span>
+        <div class="project-title" data-i18n="proj.sudoku.title">Sudoku – ILP Megoldó</div>
+        <p class="project-desc" data-i18n="proj.sudoku.desc">A rejtvény visszavezetése 729 bináris változós Ax = b lineáris egyenletrendszerre. Branch-and-bound megoldó, interaktív mátrix-sparsity vizualizációval.</p>
+        <div class="project-tech">
+          <span class="tech-badge">ILP</span>
+          <span class="tech-badge">Exact Cover</span>
+          <span class="tech-badge">Branch &amp; Bound</span>
+        </div>
+        <div class="launch-hint">▸ Megnyitás</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section id="blog" class="blog-section">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 data-i18n="nav.blog">Blog & Írások</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="blog-list">
+      <a href="#" class="blog-item">
+        <div class="blog-date">2025<br>JAN</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.1.title">A mérési bizonytalanság geometriai értelmezéséről</div>
+          <p class="blog-excerpt" data-i18n="blog.1.desc">Hogyan látjuk másképp a kalibrálási hibákat, ha differenciálgeometriai szemüvegen át nézzük a mérési teret.</p>
+        </div>
+      </a>
+      <a href="#" class="blog-item">
+        <div class="blog-date">2024<br>NOV</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.2.title">FPGA-alapú képfeldolgozás: a tórusz mint adatstruktúra</div>
+          <p class="blog-excerpt" data-i18n="blog.2.desc">Miért lehet előnyös toroidális geometriában gondolkodni párhuzamos adatfeldolgozás tervezésekor Spartan-6-on.</p>
+        </div>
+      </a>
+      <a href="#" class="blog-item">
+        <div class="blog-date">2024<br>OKT</div>
+        <div>
+          <div class="blog-title" data-i18n="blog.3.title">RF kalibráció a gyakorlatban</div>
+          <p class="blog-excerpt" data-i18n="blog.3.desc">Egy precíziós jelgenerátor-karakterizálási munkamenet tapasztalatai, és amit a linearitásmérés valójában jelent.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- KAPCSOLAT -->
+  <section id="kapcsolat">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 data-i18n="nav.contact">Kapcsolat</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-inner">
+      <p data-i18n="contact.desc">
+        Kutatási együttműködések, mérésautomatizálási projektek vagy elméleti fizikai kérdések
+        kapcsán szívesen veszem a megkereséseket.
+      </p>
+      <div class="contact-links">
+        <a href="mailto:tomi546258@gmail.com" class="contact-link">
+          <span class="contact-link-label">E-mail</span>
+          tomi546258@gmail.com
+        </a>
+        <a href="https://orcid.org/0009-0004-6349-712X" class="contact-link">
+          <span class="contact-link-label">ORCID</span>
+          0009-0004-6349-712X
+        </a>
+        <a href="https://github.com/tomi546258-dev" class="contact-link">
+          <span class="contact-link-label">GitHub</span>
+          github.com/tomi546258-dev
+        </a>
+        <a href="https://www.linkedin.com/in/tam%C3%A1s-b%C3%B3dis-aa41581b2" class="contact-link">
+          <span class="contact-link-label">LinkedIn</span>
+          linkedin.com/in/tamás-bódis
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-text">© 2025 Bódis Tamás — Budapest</div>
+    <div class="footer-text" style="display:flex;align-items:center;gap:.6rem">
+      <span data-i18n="footer.tagline">Mérés · Elmélet · Alkotás</span>
+      <span style="color:var(--border)">·</span>
+      <span style="display:inline-flex;align-items:center;gap:.35rem">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" style="opacity:.5">
+          <circle cx="5" cy="5" r="4" stroke="var(--accent2)" stroke-width="1"/>
+          <circle cx="5" cy="5" r="1.5" fill="var(--accent2)"/>
+        </svg>
+        <span id="visit-count" style="color:var(--text-dim)">—</span>
+        <span style="color:var(--text-dim)" data-i18n="footer.visits">látogatás</span>
+      </span>
+    </div>
+  </footer>
+
+  <!-- ══ SUDOKU MODAL ══ -->
+  <div id="sudoku-modal" role="dialog" aria-modal="true" aria-label="Sudoku ILP megoldó">
+    <div class="sudoku-modal-inner">
+      <div class="sudoku-modal-bar">
+        <span class="sudoku-modal-title" id="modal-title">Sudoku — ILP visszavezetés</span>
+        <button class="sudoku-modal-close" onclick="closeSudoku()">✕ Bezár</button>
+      </div>
+      <iframe
+        id="sudoku-iframe"
+        src=""
+        title="Sudoku ILP megoldó"
+        loading="lazy">
+      </iframe>
     </div>
   </div>
 
-  <!-- equations -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.eqs">Alapegyenletek</div>
+  <script>
+    // ── i18n ──
+    const translations = {
+      hu: {
+        "nav.about": "Rólam", "nav.pubs": "Publikációk", "nav.projects": "Projektek",
+        "nav.blog": "Blog & Írások", "nav.contact": "Kapcsolat",
+        "hero.label": "Mérnök & Kutató",
+        "hero.h1": "Precizitás<br>a <em>mérésben</em><br>és elméletben.",
+        "hero.desc": "Mérésautomatizálás, precíziós kalibrálás és elméleti fizika metszéspontján dolgozom. RF rendszerek, kvantummechanikai keretek és numerikus módszerek – ahol a matematika találkozik a valósággal.",
+        "hero.cta1": "Publikációk", "hero.cta2": "Kapcsolat",
+        "about.p1": "Mérőmérnökként precíziós kalibrálással és mérésautomatizálással foglalkozom. Napi szinten dolgozom Fluke kalibrátorokkal, Keysight multiméterekkel és RF tesztberendezésekkel, melyekhez VBA-alapú automatizálási rendszereket fejlesztek.",
+        "about.p2": "Az Óbudai Egyetem Kandó Kálmán Karán MSc hallgatóként önállóan folytatok kutatásokat a matematikai fizika területén – különösen a kvantummechanika és hidrodinamikai reprezentációk kapcsolatát vizsgálom geometriai módszerekkel.",
+        "about.p3": "A mérnöki precizitás és az elméleti mélység kettőssége vezérel: fontosnak tartom, hogy az elméletek mérhetők, a mérések pedig matematikailag megalapozottak legyenek.",
+        "about.stat1": "Év szakmai tapasztalat", "about.stat2": "Elfogadott publikáció",
+        "about.stat3": "Kalibrálási területek", "about.stat4": "Óbudai Egyetem",
+        "pub.review": "Preprint – bírálat alatt", "pub.conf": "Konferencia közlemény",
+        "proj.rf.title": "RF Mérőrendszer Automatizálás",
+        "proj.rf.desc": "NRP-Z teljesítménymérők, FSV spektrumanalizátorok és Pendulum frekvenciamérők integrált vezérlése szignálgenerátorok komplex karakterizálásához.",
+        "proj.cci.desc": "Numerikus integrálási módszer mikrokontrollerekre optimalizálva. MATLAB implementáció és teljes tesztkészlet kidolgozása.",
+        "proj.fpga.title": "FPGA Fejlesztés – Spartan-6",
+        "proj.fpga.desc": "Képfeldolgozási architektúrák vizsgálata Xilinx ISE 14.7 környezetben. Tórus-alapú adatfeldolgozás innovatív alkalmazásai.",
+        "proj.sfe.desc": "Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.",
+        "proj.qm.title": "Kvantum-hidrodinamikai Keretek",
+        "proj.qm.desc": "A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.",
+        "proj.sc.title": "SmartClone – Arduino Diagnosztika",
+        "proj.sc.desc": "Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.",
+        "proj.sudoku.title": "Sudoku – ILP Megoldó",
+        "proj.sudoku.desc": "A rejtvény visszavezetése 729 bináris változós Ax = b lineáris egyenletrendszerre. Branch-and-bound megoldó, interaktív mátrix-sparsity vizualizációval.",
+        "blog.1.title": "A mérési bizonytalanság geometriai értelmezéséről",
+        "blog.1.desc": "Hogyan látjuk másképp a kalibrálási hibákat, ha differenciálgeometriai szemüvegen át nézzük a mérési teret.",
+        "blog.2.title": "FPGA-alapú képfeldolgozás: a tórusz mint adatstruktúra",
+        "blog.2.desc": "Miért lehet előnyös toroidális geometriában gondolkodni párhuzamos adatfeldolgozás tervezésekor Spartan-6-on.",
+        "blog.3.title": "RF kalibráció a gyakorlatban",
+        "blog.3.desc": "Egy precíziós jelgenerátor-karakterizálási munkamenet tapasztalatai, és amit a linearitásmérés valójában jelent.",
+        "contact.desc": "Kutatási együttműködések, mérésautomatizálási projektek vagy elméleti fizikai kérdések kapcsán szívesen veszem a megkereséseket.",
+        "footer.tagline": "Mérés · Elmélet · Alkotás",
+        "footer.visits": "látogatás"
+      },
+      de: {
+        "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
+        "nav.blog": "Blog & Texte", "nav.contact": "Kontakt",
+        "hero.label": "Ingenieur & Forscher",
+        "hero.h1": "Präzision<br>in der <em>Messung</em><br>und Theorie.",
+        "hero.desc": "Ich arbeite an der Schnittstelle von Messautomatisierung, Präzisionskalibrierung und theoretischer Physik. RF-Systeme, quantenmechanische Rahmenwerke und numerische Methoden – dort, wo Mathematik auf Realität trifft.",
+        "hero.cta1": "Publikationen", "hero.cta2": "Kontakt",
+        "about.p1": "Als Messingenieur beschäftige ich mich mit Präzisionskalibrierung und Messautomatisierung. Ich arbeite täglich mit Fluke-Kalibratoren, Keysight-Multimetern und HF-Testgeräten, für die ich VBA-basierte Automatisierungssysteme entwickle.",
+        "about.p2": "Als MSc-Student an der Óbuda-Universität betreibe ich eigenständige Forschung im Bereich der mathematischen Physik – insbesondere untersuche ich die Verbindung zwischen Quantenmechanik und hydrodynamischen Darstellungen mit geometrischen Methoden.",
+        "about.p3": "Mich antreibt die Dualität von ingenieurmäßiger Präzision und theoretischer Tiefe: Ich halte es für wichtig, dass Theorien messbar und Messungen mathematisch fundiert sind.",
+        "about.stat1": "Jahre Berufserfahrung", "about.stat2": "Angenommene Publikationen",
+        "about.stat3": "Kalibrierungsbereiche", "about.stat4": "Óbuda-Universität",
+        "pub.review": "Preprint – unter Begutachtung", "pub.conf": "Konferenzbeitrag",
+        "proj.rf.title": "HF-Messsystem Automatisierung",
+        "proj.rf.desc": "Integrierte Steuerung von NRP-Z-Leistungsmessgeräten, FSV-Spektrumanalysatoren und Pendulum-Frequenzzählern zur umfassenden Charakterisierung von Signalgeneratoren.",
+        "proj.cci.desc": "Numerisches Integrationsverfahren für Mikrocontroller optimiert. MATLAB-Implementierung und vollständige Testsammlung.",
+        "proj.fpga.title": "FPGA-Entwicklung – Spartan-6",
+        "proj.fpga.desc": "Untersuchung von Bildverarbeitungsarchitekturen in der Xilinx ISE 14.7-Umgebung. Innovative Anwendungen torusbasierter Datenverarbeitung.",
+        "proj.sfe.desc": "Automatisierte Verarbeitung und Analyse von Messdateien. Komplexe Messworkflows mit adaptivem Mittelungssystem.",
+        "proj.qm.title": "Quanten-hydrodynamische Rahmenwerke",
+        "proj.qm.desc": "Geometrische Untersuchung der Verbindung zwischen Quantenmechanik und Hydrodynamik. Eigenständige Forschung zur kovarianten Erhaltungstheorie.",
+        "proj.sc.title": "SmartClone – Arduino Diagnostik",
+        "proj.sc.desc": "Eingebettetes Diagnosesystem auf Arduino-Plattform. Entwicklung innovativer PCB-Spulen-Transformatoren.",
+        "proj.sudoku.title": "Sudoku – ILP-Löser",
+        "proj.sudoku.desc": "Das Rätsel wird auf ein lineares Gleichungssystem Ax = b mit 729 binären Variablen zurückgeführt. Branch-and-Bound-Löser mit interaktiver Matrix-Sparsity-Visualisierung.",
+        "blog.1.title": "Zur geometrischen Interpretation der Messunsicherheit",
+        "blog.1.desc": "Wie wir Kalibrierungsfehler anders sehen, wenn wir den Messraum durch die Brille der Differentialgeometrie betrachten.",
+        "blog.2.title": "FPGA-basierte Bildverarbeitung: der Torus als Datenstruktur",
+        "blog.2.desc": "Warum es vorteilhaft sein kann, bei der Planung paralleler Datenverarbeitung auf dem Spartan-6 in toroidaler Geometrie zu denken.",
+        "blog.3.title": "HF-Kalibrierung in der Praxis",
+        "blog.3.desc": "Erfahrungen aus einer Präzisions-Signalgenerator-Charakterisierungssitzung und was Linearitätsmessung wirklich bedeutet.",
+        "contact.desc": "Ich freue mich über Anfragen bezüglich Forschungskooperationen, Messautomatisierungsprojekte oder theoretisch-physikalische Fragestellungen.",
+        "footer.tagline": "Messung · Theorie · Schöpfung",
+        "footer.visits": "Besuche"
+      },
+      en: {
+        "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
+        "nav.blog": "Blog & Writing", "nav.contact": "Contact",
+        "hero.label": "Engineer & Researcher",
+        "hero.h1": "Precision<br>in <em>measurement</em><br>and theory.",
+        "hero.desc": "I work at the intersection of measurement automation, precision calibration, and theoretical physics. RF systems, quantum mechanical frameworks, and numerical methods – where mathematics meets reality.",
+        "hero.cta1": "Publications", "hero.cta2": "Contact",
+        "about.p1": "As a measurement engineer, I specialise in precision calibration and measurement automation. I work daily with Fluke calibrators, Keysight multimeters, and RF test equipment, developing VBA-based automation systems for their control.",
+        "about.p2": "As an MSc student at Óbuda University, I conduct independent research in mathematical physics – particularly investigating the connection between quantum mechanics and hydrodynamic representations using geometric methods.",
+        "about.p3": "I am driven by the duality of engineering precision and theoretical depth: I believe theories should be measurable, and measurements should be mathematically grounded.",
+        "about.stat1": "Years of experience", "about.stat2": "Accepted publications",
+        "about.stat3": "Calibration domains", "about.stat4": "Óbuda University",
+        "pub.review": "Preprint – under review", "pub.conf": "Conference proceedings",
+        "proj.rf.title": "RF Measurement System Automation",
+        "proj.rf.desc": "Integrated control of NRP-Z power meters, FSV spectrum analysers and Pendulum frequency counters for comprehensive signal generator characterisation.",
+        "proj.cci.desc": "Numerical integration method optimised for microcontrollers. MATLAB implementation with a complete test suite.",
+        "proj.fpga.title": "FPGA Development – Spartan-6",
+        "proj.fpga.desc": "Investigation of image processing architectures in the Xilinx ISE 14.7 environment. Novel applications of torus-based data processing.",
+        "proj.sfe.desc": "Automated processing and analysis of measurement files. Complex measurement workflows with an adaptive averaging system.",
+        "proj.qm.title": "Quantum-Hydrodynamic Frameworks",
+        "proj.qm.desc": "Geometric investigation of the connection between quantum mechanics and hydrodynamics. Independent research in covariant conservation theory.",
+        "proj.sc.title": "SmartClone – Arduino Diagnostics",
+        "proj.sc.desc": "Embedded diagnostic system on the Arduino platform. Development of innovative PCB-coil transformer designs.",
+        "proj.sudoku.title": "Sudoku – ILP Solver",
+        "proj.sudoku.desc": "The puzzle reduced to an Ax = b system with 729 binary variables. Branch-and-bound solver with interactive matrix sparsity visualisation.",
+        "blog.1.title": "On the geometric interpretation of measurement uncertainty",
+        "blog.1.desc": "How calibration errors look different when viewed through the lens of differential geometry applied to measurement space.",
+        "blog.2.title": "FPGA-based image processing: the torus as a data structure",
+        "blog.2.desc": "Why thinking in toroidal geometry can be advantageous when designing parallel data processing on a Spartan-6.",
+        "blog.3.title": "RF calibration in practice",
+        "blog.3.desc": "Lessons from a precision signal generator characterisation session, and what linearity measurement really means.",
+        "contact.desc": "I welcome enquiries regarding research collaborations, measurement automation projects, or theoretical physics questions.",
+        "footer.tagline": "Measurement · Theory · Creation",
+        "footer.visits": "visits"
+      }
+    };
 
-    <div class="eq-label" data-i18n="eq1.label">Geometriai identitás — a korrekció eredete</div>
-    <div class="eq-block">
-      $$(n-1)(n+1) = n^2 - 1, \qquad \frac{n^2 + (n^2-1)}{2} = n^2 - \frac{1}{2}$$
-    </div>
+    let currentLang = 'hu';
 
-    <div class="eq-label" data-i18n="eq2.label">Sarokindikátor és sarokszám</div>
-    <div class="eq-block">
-      $$\delta_k = \begin{cases} 1, & k=1 \\ 1, & k\ge 2 \text{ és } y[k]\neq y[k-1] \\ 0, & \text{egyébként} \end{cases}, \qquad K(y) = \sum_{k=1}^N \delta_k$$
-    </div>
-
-    <div class="eq-label" data-i18n="eq3.label">A CCI-formula</div>
-    <div class="eq-block">
-      $$I_\text{CCI} = \sum_{k=1}^N y[k]\,\Delta t \;+\; K(y)\cdot\Delta t\cdot\!\left(n^2 - \frac{1}{2}\right)$$
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.4rem;
-                font-family:'DM Mono',monospace;font-size:.62rem;
-                color:var(--text-dim);padding:.1rem .2rem .6rem;letter-spacing:.05em">
-      <div style="text-align:center">
-        <span style="color:var(--accent2)">∑ y[k]·Δt</span>
-        &nbsp;— téglalap-összeg $I_\text{rect}$
-      </div>
-      <div style="text-align:center">
-        <span style="color:var(--accent)">K(y)·Δt·(n²−½)</span>
-        &nbsp;— sarokkorrekció
-      </div>
-    </div>
-
-    <div class="eq-label" data-i18n="eq4.label">Automatikus n-hangolás — skálainvariancia-egyenlet</div>
-    <div class="eq-block">
-      $$m^{(s,p)} = \frac{1}{2} + \frac{I_\text{rect}^{(s,p)} - I_\text{rect}^f}{\Delta t\,(K_f - s\,K_c)}, \qquad n^\star = \sqrt{\operatorname{clip}(m^\star;\,0,1)}$$
-    </div>
-
-    <div class="eq-label" data-i18n="eq5.label">Globális hibakorlát</div>
-    <div class="eq-block">
-      $$E_\text{CCI} = O(h^3) \quad\text{lépcsős jelek esetén} \qquad \text{vs.}\qquad E_\text{rect} = O(h^2), \quad E_\text{trap} = O(h^2)$$
-    </div>
-  </div>
-
-  <!-- geometric viz -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.geom">Interaktív — geometriai motiváció</div>
-    <div class="viz-wrap">
-      <div class="viz-title" data-i18n="geom.subtitle">$n \times n$ négyzet vs. $(n-1)\times(n+1)$ téglalap — a $-\tfrac{1}{2}$ korrekció vizuálisan</div>
-      <canvas id="geom-canvas" height="220"></canvas>
-      <div class="viz-controls">
-        <label class="ctrl-label">
-          $n$ <input type="range" id="n-geom" min="2" max="9" value="4" step="1">
-          <span class="ctrl-val" id="n-geom-val">4</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <!-- signal viz -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.signal">Interaktív — CCI vs. téglalap kvantált szinuszon</div>
-    <div class="viz-wrap">
-      <div class="viz-title" data-i18n="signal.subtitle">Integrálási hiba összehasonlítás — kvantálási szint és módszer szerint</div>
-      <canvas id="signal-canvas" height="240"></canvas>
-      <div class="viz-controls">
-        <label class="ctrl-label">
-          <span data-i18n="ctrl.Q">Kvantálási szint Q</span>
-          <input type="range" id="Q-slider" min="2" max="32" value="8">
-          <span class="ctrl-val" id="Q-val">8</span>
-        </label>
-        <label class="ctrl-label">
-          <span data-i18n="ctrl.N">Minták száma N</span>
-          <input type="range" id="N-slider" min="20" max="200" value="80" step="10">
-          <span class="ctrl-val" id="N-val">80</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
-  <!-- comparison table -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.table">Módszer-összehasonlítás (Q=8, N=1000)</div>
-    <table class="comp-table">
-      <thead>
-        <tr>
-          <th data-i18n="th.method">Módszer</th>
-          <th data-i18n="th.rms">RMS hiba</th>
-          <th data-i18n="th.ops">Műveletek/minta</th>
-          <th data-i18n="th.mem">Memória</th>
-          <th data-i18n="th.fpu">FPU szükséges?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td data-i18n="m.rect">Téglalap</td><td>8.2%</td><td>1 összeadás</td><td>O(1)</td><td data-i18n="no">Nem</td></tr>
-        <tr><td data-i18n="m.trap">Trapéz</td><td>5.7%</td><td>2 összeadás, 1 osztás</td><td>O(1)</td><td data-i18n="opt">Opcionális</td></tr>
-        <tr><td data-i18n="m.simp">Simpson</td><td>3.1%</td><td>4 összeadás, 2 szorzás</td><td>O(3)</td><td data-i18n="opt">Opcionális</td></tr>
-        <tr class="cci"><td><strong>CCI (javasolt)</strong></td><td><strong>1.8%</strong></td><td>2 szorzás, 2 összeadás</td><td>O(1)</td><td data-i18n="no"><strong>Nem</strong></td></tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- pseudocode -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.code">Implementáció — pszeudokód</div>
-    <div class="code-label" data-i18n="code1.label">Mikrovezérlő (8-bit, egész aritmetika)</div>
-    <div class="code-box"><pre>uint16_t sum = 0;
-uint8_t prev = sample[0];
-sum += (prev * prev * 2 - 1) / 2;   // első sarok
-
-for (uint8_t i = 1; i &lt; N; i++) {
-    uint8_t n = sample[i];
-    sum += n * dt;                   // téglalap tag
-    if (n != prev) {
-        sum += (n*n*2 - 1) / 2;     // sarokkorrekció
-        prev = n;
+    function setLang(lang) {
+      currentLang = lang;
+      document.documentElement.lang = lang;
+      const t = translations[lang];
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[key] !== undefined) el.innerHTML = t[key];
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === lang.toUpperCase());
+      });
     }
-}
-// I_CCI = sum</pre></div>
 
-    <div class="code-label" style="margin-top:1rem" data-i18n="code2.label">MATLAB — kompakt verzió</div>
-    <div class="code-box"><pre>function I = cci_integrate(y, dt, n)
-    if nargin &lt; 3, n = mean(y)/2; end
-    y = y(:); N = numel(y);
-    I_rect = sum(y) * dt;
-    tol = max(1e-12, 1e-6*(max(y)-min(y)+eps));
-    K = 1 + sum(abs(diff(y)) > tol);
-    I = I_rect + K * dt * (n^2 - 0.5);
-end</pre></div>
-  </div>
-
-  <!-- theorem -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.theorem">Hibakorlát</div>
-    <div class="theorem-box">
-      <div class="theorem-label" data-i18n="thm.label">Maximális hiba szegmensenként</div>
-      <div class="theorem-body" data-i18n="thm.body">
-        Legyen $f(x) = n + \delta$, ahol $\delta \in [0,1)$ a kvantálási maradék.
-        A CCI becslés: $n^2 - \tfrac{1}{2}$.
-        A valódi érték $(n+\delta)^2 = n^2 + 2n\delta + \delta^2$.
-        A hiba tehát: $E = 2n\delta + \delta^2 + \tfrac{1}{2}$,
-        maximuma ($\delta \to 1$): $E_\max = 2n + 1.5$.
-        A CCI <em>mindig kissé felülbecsli</em> az integrált,
-        de konzisztensen közelebb marad az igaz értékhez, mint a téglalap-szabály.
-      </div>
-    </div>
-  </div>
-
-  <!-- BibTeX -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.bib">Hivatkozás / BibTeX</div>
-    <div style="position:relative">
-      <pre class="bibtex-box"><span class="bib-key">@article</span>{bodis2025cci,
-  <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
-  <span class="bib-field">title</span>   = {<span class="bib-val">The Corner-Corrected Integral (CCI) Method:
-            A Quadratic Correction-Based Numerical
-            Integration Technique for Quantized Functions</span>},
-  <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
-  <span class="bib-field">note</span>    = {<span class="bib-val">Manuscript under review</span>},
-  <span class="bib-field">institution</span> = {<span class="bib-val">Óbuda University, Kandó Kálmán
-               Faculty of Electrical Engineering</span>},
-  <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
-}</pre>
-      <button class="copy-btn" id="copy-btn" onclick="copyBib()">Copy</button>
-    </div>
-  </div>
-
-  <div class="page-footer">
-    <span>Bódis Tamás · BT Tech · Budapest</span>
-    <span>CCI — Corner-Corrected Integral Method</span>
-  </div>
-</div>
-
-<script>
-// ════════════════════════════════════════
-// i18n
-// ════════════════════════════════════════
-const T = {
-  hu: {
-    "status": "Konferencia közlemény — bírálat alatt",
-    "title": "Corner-Corrected Integral (CCI) —<br><em>Kvantált jelekre</em> optimalizált numerikus integrátor",
-    "meta.venue": "MDPI Electronics / Sensors",
-    "sec.abstract": "Összefoglalás",
-    "abstract.text": "A Corner-Corrected Integral (CCI) egy egyszerű, egész-aritmetikán alapuló numerikus integrálási módszer, amely a klasszikus téglalap-szabályt egy <em>kvadratikus sarokkorrekciós taggal</em> egészíti ki. A korrekció egy geometriai azonosságból fakad: $(n-1)(n+1)=n^2-1$, amelynek átlaga $n^2-\\tfrac{1}{2}$. Az eredmény $O(h^3)$ globális hibakorlát — egy renddel jobb a téglalap- és trapézszabálynál lépcsős jeleknél.",
-    "sec.results": "Főbb eredmények",
-    "r1.tag":"Geometriai motiváció","r1.title":"Lakásablakok ihletése","r1.body":"Az alaptétel egy lakótömb ablakrácsának megfigyeléséből ered: egy $n\\times n$ négyzetből $(n-1)\\times(n+1)$ téglalapba lépve az area pontosan 1-gyel csökken. Az átlag adja a $-\\tfrac{1}{2}$ korrekciót.",
-    "r2.tag":"Pontosság","r2.title":"1.8% RMS hiba (Q=8)","r2.body":"Téglalap: 8.2%, trapéz: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — azonos komplexitás mellett, lebegőpontos egység nélkül.",
-    "r3.tag":"Automatikus n-hangolás","r3.title":"Skála/fázis-invariancia","r3.body":"Az $n$ korrekciós paramétert decimálással és félmintás eltolással határozza meg az algoritmus — ground truth nélkül, $O(N)$ időben, $O(1)$ memóriával.",
-    "r4.tag":"Implementáció","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Csak egész szorzás és összeadás kell. $10^6$ mintán $<0.1\\%$ integrálhiba fixpontos aritmetikával. Drop-in csere a hagyományos accumulate-and-sum megoldások helyett.",
-    "sec.eqs":"Alapegyenletek",
-    "eq1.label":"Geometriai identitás — a korrekció eredete",
-    "eq2.label":"Sarokindikátor és sarokszám",
-    "eq3.label":"A CCI-formula",
-    "eq4.label":"Automatikus n-hangolás — skálainvariancia-egyenlet",
-    "eq5.label":"Globális hibakorlát",
-    "sec.geom":"Interaktív — geometriai motiváció",
-    "geom.subtitle":"$n\\times n$ négyzet vs. $(n-1)\\times(n+1)$ téglalap — a $-\\tfrac{1}{2}$ korrekció vizuálisan",
-    "sec.signal":"Interaktív — CCI vs. téglalap kvantált szinuszon",
-    "signal.subtitle":"Integrálási hiba összehasonlítás — kvantálási szint és módszer szerint",
-    "ctrl.Q":"Kvantálási szint Q","ctrl.N":"Minták száma N",
-    "sec.table":"Módszer-összehasonlítás (Q=8, N=1000)",
-    "th.method":"Módszer","th.rms":"RMS hiba","th.ops":"Műveletek/minta","th.mem":"Memória","th.fpu":"FPU szükséges?",
-    "m.rect":"Téglalap","m.trap":"Trapéz","m.simp":"Simpson","no":"Nem","opt":"Opcionális",
-    "sec.code":"Implementáció — pszeudokód",
-    "code1.label":"Mikrovezérlő (8-bit, egész aritmetika)",
-    "code2.label":"MATLAB — kompakt verzió",
-    "sec.theorem":"Hibakorlát",
-    "thm.label":"Maximális hiba szegmensenként",
-    "thm.body":"Legyen $f(x)=n+\\delta$, ahol $\\delta\\in[0,1)$ a kvantálási maradék. A CCI becslés: $n^2-\\tfrac{1}{2}$. A valódi érték $(n+\\delta)^2=n^2+2n\\delta+\\delta^2$. A hiba: $E=2n\\delta+\\delta^2+\\tfrac{1}{2}$, maximuma ($\\delta\\to 1$): $E_{\\max}=2n+1.5$. A CCI <em>mindig kissé felülbecsli</em> az integrált.",
-    "sec.bib":"Hivatkozás / BibTeX",
-  },
-  en: {
-    "status": "Conference paper — under review",
-    "title": "Corner-Corrected Integral (CCI) —<br>Numerical integrator optimised for <em>quantised signals</em>",
-    "meta.venue": "MDPI Electronics / Sensors",
-    "sec.abstract": "Abstract",
-    "abstract.text": "The Corner-Corrected Integral (CCI) is a lightweight, integer-arithmetic numerical integration method that augments the classical rectangular rule with a <em>quadratic corner-correction term</em>. The correction follows from a geometric identity: $(n-1)(n+1)=n^2-1$, whose average yields $n^2-\\tfrac{1}{2}$. The result is an $O(h^3)$ global error bound — one order better than the rectangle or trapezoid rules for step signals.",
-    "sec.results": "Key results",
-    "r1.tag":"Geometric motivation","r1.title":"Inspired by apartment windows","r1.body":"The core insight comes from observing an apartment building's window grid: stepping from an $n\\times n$ square to an $(n-1)\\times(n+1)$ rectangle reduces the area by exactly 1. The average gives the $-\\tfrac{1}{2}$ correction.",
-    "r2.tag":"Accuracy","r2.title":"1.8% RMS error (Q=8)","r2.body":"Rectangle: 8.2%, trapezoid: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — at equal computational complexity, without floating-point unit.",
-    "r3.tag":"Auto-tuning of n","r3.title":"Scale/phase invariance","r3.body":"The correction parameter $n$ is determined via decimation and half-sample shifting — without ground truth, in $O(N)$ time with $O(1)$ memory.",
-    "r4.tag":"Implementation","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Only integer multiplication and addition required. $<0.1\\%$ integral error over $10^6$ samples in fixed-point arithmetic. Drop-in replacement for accumulate-and-sum loops.",
-    "sec.eqs":"Core equations",
-    "eq1.label":"Geometric identity — origin of the correction",
-    "eq2.label":"Corner indicator and corner count",
-    "eq3.label":"The CCI formula",
-    "eq4.label":"Auto-tuning of n — scale invariance equation",
-    "eq5.label":"Global error bound",
-    "sec.geom":"Interactive — geometric motivation",
-    "geom.subtitle":"$n\\times n$ square vs. $(n-1)\\times(n+1)$ rectangle — the $-\\tfrac{1}{2}$ correction visualised",
-    "sec.signal":"Interactive — CCI vs. rectangle on quantised sine",
-    "signal.subtitle":"Integration error comparison — by quantisation level and method",
-    "ctrl.Q":"Quantisation level Q","ctrl.N":"Sample count N",
-    "sec.table":"Method comparison (Q=8, N=1000)",
-    "th.method":"Method","th.rms":"RMS error","th.ops":"Ops/sample","th.mem":"Memory","th.fpu":"FPU required?",
-    "m.rect":"Rectangle","m.trap":"Trapezoid","m.simp":"Simpson","no":"No","opt":"Optional",
-    "sec.code":"Implementation — pseudocode",
-    "code1.label":"Microcontroller (8-bit, integer arithmetic)",
-    "code2.label":"MATLAB — compact version",
-    "sec.theorem":"Error bound",
-    "thm.label":"Maximum error per segment",
-    "thm.body":"Let $f(x)=n+\\delta$ where $\\delta\\in[0,1)$ is the quantisation remainder. CCI estimate: $n^2-\\tfrac{1}{2}$. True value: $(n+\\delta)^2=n^2+2n\\delta+\\delta^2$. Error: $E=2n\\delta+\\delta^2+\\tfrac{1}{2}$, maximum ($\\delta\\to 1$): $E_{\\max}=2n+1.5$. CCI <em>always slightly overestimates</em> the integral.",
-    "sec.bib":"Citation / BibTeX",
-  },
-  de: {
-    "status": "Konferenzbeitrag — unter Begutachtung",
-    "title": "Corner-Corrected Integral (CCI) —<br>Numerischer Integrator für <em>quantisierte Signale</em>",
-    "meta.venue": "MDPI Electronics / Sensors",
-    "sec.abstract": "Zusammenfassung",
-    "abstract.text": "Das Corner-Corrected Integral (CCI) ist eine einfache, ganzzahlarithmetische Methode zur numerischen Integration, die die klassische Rechteckregel um einen <em>quadratischen Ecken-Korrekturterm</em> erweitert. Die Korrektur folgt aus einer geometrischen Identität: $(n-1)(n+1)=n^2-1$, deren Mittelwert $n^2-\\tfrac{1}{2}$ ergibt. Das Resultat ist eine $O(h^3)$ globale Fehlerschranke — eine Ordnung besser als Rechteck- und Trapezregel für Treppensignale.",
-    "sec.results": "Hauptergebnisse",
-    "r1.tag":"Geometrische Motivation","r1.title":"Inspiration: Apartmentfenster","r1.body":"Die Grundidee stammt aus der Beobachtung eines Gebäude-Fenstergitters: Von einem $n\\times n$ Quadrat zu einem $(n-1)\\times(n+1)$ Rechteck verringert sich die Fläche um genau 1. Der Mittelwert ergibt die $-\\tfrac{1}{2}$ Korrektur.",
-    "r2.tag":"Genauigkeit","r2.title":"1.8% RMS-Fehler (Q=8)","r2.body":"Rechteck: 8.2%, Trapez: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — bei gleicher Komplexität, ohne Gleitkommaeinheit.",
-    "r3.tag":"Auto-Abstimmung von n","r3.title":"Skalen/Phasen-Invarianz","r3.body":"Der Korrekturparameter $n$ wird durch Dezimierung und Halbproben-Verschiebung bestimmt — ohne Ground Truth, in $O(N)$ Zeit mit $O(1)$ Speicher.",
-    "r4.tag":"Implementierung","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Nur Ganzzahlmultiplikation und -addition erforderlich. $<0.1\\%$ Integralfehler über $10^6$ Samples in Festkomma-Arithmetik.",
-    "sec.eqs":"Grundgleichungen",
-    "eq1.label":"Geometrische Identität — Ursprung der Korrektur",
-    "eq2.label":"Eckenindikator und Eckenanzahl",
-    "eq3.label":"Die CCI-Formel",
-    "eq4.label":"Auto-Abstimmung von n — Skaleninvarianz-Gleichung",
-    "eq5.label":"Globale Fehlerschranke",
-    "sec.geom":"Interaktiv — Geometrische Motivation",
-    "geom.subtitle":"$n\\times n$ Quadrat vs. $(n-1)\\times(n+1)$ Rechteck — die $-\\tfrac{1}{2}$ Korrektur visualisiert",
-    "sec.signal":"Interaktiv — CCI vs. Rechteck auf quantisiertem Sinus",
-    "signal.subtitle":"Integrationsfehler-Vergleich — nach Quantisierungsstufe und Methode",
-    "ctrl.Q":"Quantisierungsstufe Q","ctrl.N":"Anzahl Samples N",
-    "sec.table":"Methodenvergleich (Q=8, N=1000)",
-    "th.method":"Methode","th.rms":"RMS-Fehler","th.ops":"Ops/Sample","th.mem":"Speicher","th.fpu":"FPU nötig?",
-    "m.rect":"Rechteck","m.trap":"Trapez","m.simp":"Simpson","no":"Nein","opt":"Optional",
-    "sec.code":"Implementierung — Pseudocode",
-    "code1.label":"Mikrocontroller (8-Bit, Ganzzahlarithmetik)",
-    "code2.label":"MATLAB — kompakte Version",
-    "sec.theorem":"Fehlerschranke",
-    "thm.label":"Maximaler Fehler pro Segment",
-    "thm.body":"Sei $f(x)=n+\\delta$, $\\delta\\in[0,1)$ der Quantisierungsrest. CCI-Schätzung: $n^2-\\tfrac{1}{2}$. Wahrer Wert: $(n+\\delta)^2=n^2+2n\\delta+\\delta^2$. Fehler: $E=2n\\delta+\\delta^2+\\tfrac{1}{2}$, Maximum ($\\delta\\to 1$): $E_{\\max}=2n+1.5$. CCI <em>überschätzt immer leicht</em>.",
-    "sec.bib":"Zitation / BibTeX",
-  }
-};
-
-let lang='hu';
-function setLang(l){
-  lang=l; document.documentElement.lang=l;
-  const t=T[l];
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const k=el.getAttribute('data-i18n');
-    if(t[k]!==undefined) el.innerHTML=t[k];
-  });
-  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
-  if(window.MathJax) MathJax.typesetPromise();
-}
-
-// ════════════════════════════════════════
-// GEOMETRIC CANVAS
-// ════════════════════════════════════════
-const geomCanvas = document.getElementById('geom-canvas');
-const gctx = geomCanvas.getContext('2d');
-
-function drawGeom(){
-  const W = geomCanvas.offsetWidth;
-  geomCanvas.width  = W * devicePixelRatio;
-  geomCanvas.height = 220 * devicePixelRatio;
-  gctx.scale(devicePixelRatio, devicePixelRatio);
-  const H = 220;
-  gctx.clearRect(0,0,W,H);
-
-  const n = parseInt(document.getElementById('n-geom').value);
-
-  const cellSize = Math.min(Math.floor((W*0.38) / (n+1)), 28);
-  const pad = 16;
-
-  // draw n×n square (left)
-  const sqX = pad + 20, sqY = (H - n*cellSize)/2;
-
-  for(let r=0;r<n;r++){
-    for(let c=0;c<n;c++){
-      const x = sqX + c*cellSize, y = sqY + r*cellSize;
-      gctx.fillStyle = 'rgba(40,200,152,0.10)';
-      gctx.fillRect(x,y,cellSize,cellSize);
-      gctx.strokeStyle = 'rgba(40,200,152,0.35)';
-      gctx.lineWidth = .7;
-      gctx.strokeRect(x,y,cellSize,cellSize);
+    function toggleMenu() {
+      const menu = document.getElementById('mobileMenu');
+      const hamburger = document.getElementById('hamburger');
+      menu.classList.toggle('open');
+      hamburger.classList.toggle('open');
     }
-  }
-  // label
-  gctx.fillStyle = '#28c898'; gctx.font='bold 12px DM Mono,monospace'; gctx.textAlign='center';
-  gctx.fillText(`${n}×${n} = ${n*n}`, sqX + n*cellSize/2, sqY + n*cellSize + 18);
-  gctx.fillStyle='#2e5868'; gctx.font='10px DM Mono,monospace';
-  gctx.fillText('négyzet', sqX + n*cellSize/2, sqY + n*cellSize + 32);
 
-  // vs arrow
-  const midX = W/2;
-  gctx.fillStyle='#5a90a8'; gctx.font='13px DM Mono,monospace'; gctx.textAlign='center';
-  gctx.fillText('vs.', midX, H/2+4);
-  gctx.fillStyle='#c8a96e'; gctx.font='11px DM Mono,monospace';
-  gctx.fillText(`Δ = ${n*n} - ${(n-1)*(n+1)} = 1`, midX, H/2+22);
-  gctx.fillText(`Átlag = ${n*n} - 0.5`, midX, H/2+38);
-
-  // draw (n-1)×(n+1) rectangle (right)
-  const rows = n-1, cols = n+1;
-  const rectX = W - pad - 20 - cols*cellSize;
-  const rectY = (H - rows*cellSize)/2;
-
-  for(let r=0;r<rows;r++){
-    for(let c=0;c<cols;c++){
-      const x = rectX+c*cellSize, y = rectY+r*cellSize;
-      // highlight the "missing" corner area
-      const isMissing = (c >= n) || (r >= n-1 && c >= n-1);
-      gctx.fillStyle = isMissing ? 'rgba(200,169,110,0.18)' : 'rgba(200,169,110,0.08)';
-      gctx.fillRect(x,y,cellSize,cellSize);
-      gctx.strokeStyle = isMissing ? 'rgba(200,169,110,0.6)' : 'rgba(200,169,110,0.3)';
-      gctx.lineWidth = .7;
-      gctx.strokeRect(x,y,cellSize,cellSize);
+    function closeMenu() {
+      document.getElementById('mobileMenu').classList.remove('open');
+      document.getElementById('hamburger').classList.remove('open');
     }
-  }
-  gctx.fillStyle='#c8a96e'; gctx.font='bold 12px DM Mono,monospace'; gctx.textAlign='center';
-  gctx.fillText(`${n-1}×${n+1} = ${(n-1)*(n+1)}`, rectX + cols*cellSize/2, rectY + rows*cellSize + 18);
-  gctx.fillStyle='#2e5868'; gctx.font='10px DM Mono,monospace';
-  gctx.fillText('téglalap', rectX + cols*cellSize/2, rectY + rows*cellSize + 32);
-}
 
-// ════════════════════════════════════════
-// SIGNAL CANVAS
-// ════════════════════════════════════════
-const sigCanvas = document.getElementById('signal-canvas');
-const sctx = sigCanvas.getContext('2d');
+    // ── Általános modal ──
+    function openModal(src, title) {
+      const modal = document.getElementById('sudoku-modal');
+      const iframe = document.getElementById('sudoku-iframe');
+      const titleEl = document.getElementById('modal-title');
+      if (titleEl) titleEl.textContent = title || src;
+      iframe.src = src;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
 
-function cciIntegrate(y, dt, n_param){
-  const N=y.length;
-  let I_rect=0; y.forEach(v=>I_rect+=v*dt);
-  const rng=Math.max(...y)-Math.min(...y)+1e-12;
-  const tol=1e-6*rng;
-  let K=1;
-  for(let i=1;i<N;i++) if(Math.abs(y[i]-y[i-1])>tol) K++;
-  const n=n_param!==undefined?n_param:y.reduce((a,b)=>a+b,0)/y.length/2;
-  return I_rect + K*dt*(n*n-0.5);
-}
+    // visszafelé kompatibilis alias
+    function openSudoku() { openModal('sudoku-ilp.html', 'Sudoku — ILP visszavezetés'); }
 
-function trapIntegrate(y,dt){
-  let s=0;
-  for(let i=0;i<y.length-1;i++) s+=(y[i]+y[i+1])*0.5*dt;
-  return s;
-}
+    function closeSudoku() {
+      document.getElementById('sudoku-modal').classList.remove('open');
+      document.body.style.overflow = '';
+      // iframe src ürítése hogy ne fusson a háttérben
+      setTimeout(() => { document.getElementById('sudoku-iframe').src = ''; }, 300);
+    }
 
-function drawSignal(){
-  const W=sigCanvas.offsetWidth;
-  sigCanvas.width=W*devicePixelRatio;
-  sigCanvas.height=240*devicePixelRatio;
-  sctx.scale(devicePixelRatio,devicePixelRatio);
-  const H=240;
-  sctx.clearRect(0,0,W,H);
+    // ESC billentyűre bezár
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeSudoku();
+    });
 
-  const Q=parseInt(document.getElementById('Q-slider').value);
-  const N=parseInt(document.getElementById('N-slider').value);
+    // Modal háttérre kattintva bezár
+    document.getElementById('sudoku-modal').addEventListener('click', function(e) {
+      if (e.target === this) closeSudoku();
+    });
 
-  // generate quantised sine over [0,π]
-  const dt=Math.PI/N;
-  const y_true=[], y_q=[];
-  for(let i=0;i<N;i++){
-    const x=i*dt;
-    const v=Math.sin(x);
-    y_true.push(v);
-    y_q.push(Math.round(v*Q)/Q);
-  }
-  const I_true=2; // ∫sin(x)dx from 0 to π = 2
-
-  // compute integrals
-  const I_rect = y_q.reduce((a,b)=>a+b,0)*dt;
-  const I_trap = trapIntegrate(y_q,dt);
-  const I_cci  = cciIntegrate(y_q,dt);
-
-  // top panel: show quantised signal
-  const lp=52, rp=18, tp=14, midH=130, botH=90;
-  const pw=W-lp-rp, ph=midH-tp-8;
-
-  // signal plot
-  sctx.strokeStyle='#2a2e2e'; sctx.lineWidth=1;
-  sctx.beginPath(); sctx.moveTo(lp,tp); sctx.lineTo(lp,tp+ph); sctx.lineTo(lp+pw,tp+ph); sctx.stroke();
-
-  // true sine
-  sctx.beginPath();
-  y_true.forEach((v,i)=>{
-    const x=lp+(i/N)*pw, y=tp+ph-(v/1.05)*ph*0.9;
-    i===0?sctx.moveTo(x,y):sctx.lineTo(x,y);
-  });
-  sctx.strokeStyle='rgba(90,144,168,0.35)'; sctx.lineWidth=1; sctx.setLineDash([3,3]); sctx.stroke(); sctx.setLineDash([]);
-
-  // quantised
-  sctx.beginPath();
-  y_q.forEach((v,i)=>{
-    const x=lp+(i/N)*pw, y=tp+ph-(v/1.05)*ph*0.9;
-    i===0?sctx.moveTo(x,y):sctx.lineTo(x,y);
-  });
-  sctx.strokeStyle='#c8a96e'; sctx.lineWidth=1.5; sctx.stroke();
-
-  sctx.fillStyle='#5a90a8'; sctx.font='10px DM Mono,monospace'; sctx.textAlign='left';
-  sctx.fillText('sin(x)', lp+6, tp+14);
-  sctx.fillStyle='#c8a96e';
-  sctx.fillText(`Q=${Q} kvantált`, lp+60, tp+14);
-
-  // bottom: error bars
-  const methods=[
-    {name:'Téglalap', val:I_rect, col:'#5a90a8'},
-    {name:'Trapéz',   val:I_trap, col:'#8878c8'},
-    {name:'CCI',      val:I_cci,  col:'#28c898'},
-  ];
-  const barY=midH+12, barH_area=botH-24;
-  const maxErr=0.25;
-
-  sctx.fillStyle='#2e5868'; sctx.font='10px DM Mono,monospace'; sctx.textAlign='center';
-  sctx.fillText(`Valódi integrál: ${I_true.toFixed(4)}   ─────`, lp+pw/2, midH+8);
-
-  const bw=(pw-20)/methods.length, gap=10;
-  methods.forEach((m,i)=>{
-    const err=Math.abs(m.val-I_true);
-    const pct=(err/I_true*100);
-    const barH=Math.min((err/maxErr)*barH_area, barH_area);
-    const bx=lp+10+i*(bw+gap);
-    const by=barY+barH_area-barH;
-
-    sctx.fillStyle=m.col+'22';
-    sctx.fillRect(bx,by,bw,barH);
-    sctx.strokeStyle=m.col; sctx.lineWidth=1.5;
-    sctx.strokeRect(bx,by,bw,barH);
-
-    sctx.fillStyle=m.col; sctx.font='bold 11px DM Mono,monospace'; sctx.textAlign='center';
-    sctx.fillText(`${pct.toFixed(1)}%`, bx+bw/2, by-5);
-    sctx.fillStyle='#5a90a8'; sctx.font='10px DM Mono,monospace';
-    sctx.fillText(m.name, bx+bw/2, barY+barH_area+14);
-    sctx.fillStyle='#2e5868'; sctx.font='9px DM Mono,monospace';
-    sctx.fillText(m.val.toFixed(4), bx+bw/2, barY+barH_area+26);
-  });
-}
-
-// ════════════════════════════════════════
-// SLIDERS
-// ════════════════════════════════════════
-function initSliders(){
-  document.getElementById('n-geom').addEventListener('input',function(){
-    document.getElementById('n-geom-val').textContent=this.value;
-    drawGeom();
-  });
-  document.getElementById('Q-slider').addEventListener('input',function(){
-    document.getElementById('Q-val').textContent=this.value; drawSignal();
-  });
-  document.getElementById('N-slider').addEventListener('input',function(){
-    document.getElementById('N-val').textContent=this.value; drawSignal();
-  });
-}
-
-// ════════════════════════════════════════
-// BibTeX
-// ════════════════════════════════════════
-function copyBib(){
-  const raw=`@article{bodis2025cci,
-  author      = {Bódis, Tamás},
-  title       = {The Corner-Corrected Integral (CCI) Method: A Quadratic Correction-Based Numerical Integration Technique for Quantized Functions},
-  year        = {2025},
-  note        = {Manuscript under review},
-  institution = {Óbuda University, Kandó Kálmán Faculty of Electrical Engineering},
-  orcid       = {0009-0004-6349-712X}
-}`;
-  navigator.clipboard.writeText(raw).then(()=>{
-    const btn=document.getElementById('copy-btn');
-    btn.textContent='✓ Copied'; btn.classList.add('copied');
-    setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);
-  });
-}
-
-// ════════════════════════════════════════
-// INIT
-// ════════════════════════════════════════
-function init(){ initSliders(); drawGeom(); drawSignal(); }
-window.addEventListener('load',init);
-window.addEventListener('resize',()=>{drawGeom();drawSignal();});
-</script>
+    // ── Látogatásszámláló (hits.seeyoufarm.com) ──
+    (async function() {
+      const el = document.getElementById('visit-count');
+      try {
+        const res = await fetch(
+          'https://hits.seeyoufarm.com/api/count/incr/badge.json?url=tomi546258-dev.github.io%2Fportfolio&count_bg=%2328c898&title_bg=%23151717&icon=&title=&edge_flat=true'
+        );
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        // today / total
+        const total = data.total_count ?? data.totalCount;
+        if (total !== undefined) {
+          el.textContent = Number(total).toLocaleString('hu-HU');
+        } else throw new Error();
+      } catch {
+        // fallback: hide gracefully
+        const wrap = el.closest('span[style]');
+        if (wrap) wrap.style.display = 'none';
+      }
+    })();
+  </script>
 </body>
 </html>
