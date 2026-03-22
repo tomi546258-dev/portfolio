@@ -69,6 +69,29 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+
+  <!-- Modal functions defined early so inline onclick handlers always find them -->
+  <script>
+    function openModal(src, title) {
+      const modal = document.getElementById('sudoku-modal');
+      const iframe = document.getElementById('sudoku-iframe');
+      const titleEl = document.getElementById('modal-title');
+      if (titleEl) titleEl.textContent = title || src;
+      iframe.src = src;
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function openSudoku() { openModal('sudoku-ilp.html', 'Sudoku — ILP visszavezetés'); }
+    function closeSudoku() {
+      const modal = document.getElementById('sudoku-modal');
+      if (modal) modal.classList.remove('open');
+      document.body.style.overflow = '';
+      setTimeout(() => {
+        const iframe = document.getElementById('sudoku-iframe');
+        if (iframe) iframe.src = '';
+      }, 300);
+    }
+  </script>
   <style>
     :root {
       --bg: #0e0f0f;
