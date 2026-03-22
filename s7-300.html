@@ -71,7 +71,7 @@ body::before {
 .spec-table th { padding:.5rem .9rem; text-align:left; border-bottom:1px solid var(--border); color:var(--accent); font-weight:500; letter-spacing:.08em; }
 .spec-table td { padding:.5rem .9rem; border-bottom:1px solid var(--bg3); color:var(--text-dim); vertical-align:top; line-height:1.6; }
 .spec-table td:first-child { color:var(--accent2); white-space:nowrap; }
-.spec-table tr:hover td { color:var(--text); background:var(--bg3); }
+.spec-table tr:hover td { color:var(--text); }
 
 /* pro/con grid */
 .procon-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
@@ -89,8 +89,7 @@ body::before {
 
 /* use case cards */
 .usecase-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.8rem; margin-top:.8rem; }
-.usecase-card { background:var(--bg2); border:1px solid var(--border); padding:1.1rem 1.3rem; border-radius:2px; transition:border-color .2s; }
-.usecase-card:hover { border-color:var(--accent2); }
+.usecase-card { background:var(--bg2); border:1px solid var(--border); padding:1.1rem 1.3rem; border-radius:2px; }
 .usecase-icon { font-size:1.3rem; margin-bottom:.5rem; display:block; }
 .usecase-title { font-family:'DM Serif Display',serif; font-size:.98rem; color:var(--text-bright); margin-bottom:.35rem; }
 .usecase-body { font-size:.84rem; color:var(--text-dim); line-height:1.65; }
@@ -99,7 +98,7 @@ body::before {
 .decision-table { width:100%; border-collapse:collapse; font-size:.84rem; margin-top:.6rem; }
 .decision-table th { padding:.6rem .9rem; text-align:left; border-bottom:2px solid var(--border); color:var(--accent); font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; font-weight:500; }
 .decision-table td { padding:.6rem .9rem; border-bottom:1px solid var(--bg3); vertical-align:top; line-height:1.6; color:var(--text-dim); }
-.decision-table tr:hover td { background:var(--bg3); color:var(--text); }
+.decision-table tr:hover td { color:var(--text); }
 .badge { display:inline-block; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; padding:.15rem .55rem; border-radius:2px; }
 .badge-green { background:rgba(74,144,112,.15); color:var(--accent2); border:1px solid rgba(74,144,112,.3); }
 .badge-red   { background:rgba(192,80,80,.12);  color:#d08080; border:1px solid rgba(192,80,80,.25); }
@@ -110,8 +109,7 @@ body::before {
 .experience-box strong { color:var(--accent); font-style:normal; }
 
 /* replacement section */
-.replace-row { display:flex; align-items:center; gap:1rem; background:var(--bg2); border:1px solid var(--border); padding:1rem 1.2rem; border-radius:2px; margin-bottom:.5rem; transition:border-color .2s; }
-.replace-row:hover { border-color:var(--accent); }
+.replace-row { display:flex; align-items:center; gap:1rem; background:var(--bg2); border:1px solid var(--border); padding:1rem 1.2rem; border-radius:2px; margin-bottom:.5rem; }
 .replace-from { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--red); min-width:90px; }
 .replace-arrow { color:var(--text-dim); font-size:1.1rem; }
 .replace-to { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent2); min-width:100px; }
