@@ -970,11 +970,24 @@ R_μν − ½Rg_μν = 8πGT_μν
         </div>
       </div>
       <div class="project-card">
-        <span class="project-icon">🐍</span>
-        <div class="project-title">SFE100 Python Parser</div>
-        <p class="project-desc" data-i18n="proj.sfe.desc">Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.</p>
+        <span class="project-icon">∇</span>
+        <div class="project-title" data-i18n="proj.opt.title">Optimumszámítás a hétköznapokban</div>
+        <p class="project-desc" data-i18n="proj.opt.desc">Bojlertől az Euler–Lagrange egyenletig. Interaktív szimulációk, Python kód, variációszámítás — kinyitható mély matematikával.</p>
         <div class="project-tech">
-          <span class="tech-badge">Python</span><span class="tech-badge">Pandas</span>
+          <span class="tech-badge">Python</span>
+          <span class="tech-badge">Variációszámítás</span>
+          <span class="tech-badge">Euler–Lagrange</span>
+          <span class="tech-badge">Nelder–Mead</span>
+        </div>
+        <div style="margin-top:1rem">
+          <button onclick="openModal('optimization.html','Optimumszámítás a hétköznapokban')"
+            style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                   background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                   border-radius:2px;cursor:pointer;transition:all .2s;"
+            onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+            onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+            ▸ Részletek &amp; szimulációk
+          </button>
         </div>
       </div>
       <div class="project-card">
@@ -1055,9 +1068,9 @@ R_μν − ½Rg_μν = 8πGT_μν
         kapcsán szívesen veszem a megkereséseket.
       </p>
       <div class="contact-links">
-        <a href="mailto:tomi546258@gmail.com" class="contact-link">
+        <a href="/cdn-cgi/l/email-protection#ccb8a3a1a5f9f8fafef9f48caba1ada5a0e2afa3a1" class="contact-link">
           <span class="contact-link-label">E-mail</span>
-          tomi546258@gmail.com
+          <span class="__cf_email__" data-cfemail="b4c0dbd9dd81808286818cf4d3d9d5ddd89ad7dbd9">[email&#160;protected]</span>
         </a>
         <a href="https://orcid.org/0009-0004-6349-712X" class="contact-link">
           <span class="contact-link-label">ORCID</span>
@@ -1107,7 +1120,7 @@ R_μν − ½Rg_μν = 8πGT_μν
     </div>
   </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
     // ── i18n ──
     const translations = {
       hu: {
@@ -1128,7 +1141,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.cci.desc": "Numerikus integrálási módszer mikrokontrollerekre optimalizálva. MATLAB implementáció és teljes tesztkészlet kidolgozása.",
         "proj.s7.title": "Siemens S7-300 — Ipari tapasztalatok",
         "proj.fpga.desc": "Képfeldolgozási architektúrák vizsgálata Xilinx ISE 14.7 környezetben. Tórus-alapú adatfeldolgozás innovatív alkalmazásai.",
-        "proj.sfe.desc": "Mérési fájlok automatizált feldolgozása és elemzése. Komplex mérési munkafolyamatok adaptív átlagoló rendszerrel.",
+        "proj.opt.title": "Optimumszámítás a hétköznapokban",
+        "proj.opt.desc": "Bojlertől az Euler–Lagrange egyenletig. Interaktív szimulációk, Python kód, variációszámítás.",
         "proj.qm.title": "Kvantum-hidrodinamikai Keretek",
         "proj.qm.desc": "A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.",
         "proj.sc.title": "SmartClone – Arduino Diagnosztika",
@@ -1162,6 +1176,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.rf.desc": "Integrierte Steuerung von NRP-Z-Leistungsmessgeräten, FSV-Spektrumanalysatoren und Pendulum-Frequenzzählern zur umfassenden Charakterisierung von Signalgeneratoren.",
         "proj.cci.desc": "Numerisches Integrationsverfahren für Mikrocontroller optimiert. MATLAB-Implementierung und vollständige Testsammlung.",
         "proj.s7.title": "Siemens S7-300 — Industrielle Erfahrungen",
+        "proj.opt.title": "Optimierung im Alltag",
+        "proj.opt.desc": "Vom Boiler zur Euler-Lagrange-Gleichung. Interaktive Simulationen, Python-Code, Variationsrechnung.",
         "proj.fpga.desc": "Untersuchung von Bildverarbeitungsarchitekturen in der Xilinx ISE 14.7-Umgebung. Innovative Anwendungen torusbasierter Datenverarbeitung.",
         "proj.sfe.desc": "Automatisierte Verarbeitung und Analyse von Messdateien. Komplexe Messworkflows mit adaptivem Mittelungssystem.",
         "proj.qm.title": "Quanten-hydrodynamische Rahmenwerke",
@@ -1197,6 +1213,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.rf.desc": "Integrated control of NRP-Z power meters, FSV spectrum analysers and Pendulum frequency counters for comprehensive signal generator characterisation.",
         "proj.cci.desc": "Numerical integration method optimised for microcontrollers. MATLAB implementation with a complete test suite.",
         "proj.s7.title": "Siemens S7-300 — Industrial experience",
+        "proj.opt.title": "Everyday optimisation",
+        "proj.opt.desc": "From boilers to Euler-Lagrange. Interactive simulations, Python code, calculus of variations.",
         "proj.fpga.desc": "Investigation of image processing architectures in the Xilinx ISE 14.7 environment. Novel applications of torus-based data processing.",
         "proj.sfe.desc": "Automated processing and analysis of measurement files. Complex measurement workflows with an adaptive averaging system.",
         "proj.qm.title": "Quantum-Hydrodynamic Frameworks",
@@ -1287,14 +1305,4 @@ R_μν − ½Rg_μν = 8πGT_μν
         // today / total
         const total = data.total_count ?? data.totalCount;
         if (total !== undefined) {
-          el.textContent = Number(total).toLocaleString('hu-HU');
-        } else throw new Error();
-      } catch {
-        // fallback: hide gracefully
-        const wrap = el.closest('span[style]');
-        if (wrap) wrap.style.display = 'none';
-      }
-    })();
-  </script>
-</body>
-</html>
+          el.textContent = Number(total).toLocale

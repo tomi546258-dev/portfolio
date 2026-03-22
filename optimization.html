@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Optimumszámítás — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<script>
+MathJax = {
+  tex: { inlineMath:[['$','$'],['\\(','\\)']], displayMath:[['$$','$$'],['\\[','\\]']], tags:'ams' },
+  options: { skipHtmlTags:['script','noscript','style','textarea'] }
+};
+</script>
+<script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<style>
+:root {
+  --bg:#0e0f0f; --bg2:#151717; --bg3:#1c1f1f; --border:#2a2e2e;
+  --accent:#c8a96e; --accent2:#7eb8a4; --text:#d8d4cc;
+  --text-dim:#7a7870; --text-bright:#eeeae2;
+  --purple:#8878c8; --orange:#d4703a; --red:#c05050; --green:#4a9070;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),
+  linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:900px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+
+/* lang */
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+
+/* header */
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.6rem,4vw,2.6rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--accent);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:1.6rem;}
+
+/* section */
+.section{margin-top:2.8rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* pattern box */
+.pattern-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;margin-bottom:1rem;}
+.pattern-box strong{color:var(--accent);}
+
+/* problem tabs */
+.prob-tabs{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.8rem;}
+.prob-tab{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;padding:.4rem 1rem;border-radius:2px;border:1px solid var(--border);background:var(--bg2);color:var(--text-dim);cursor:pointer;transition:all .18s;}
+.prob-tab:hover{color:var(--accent);border-color:var(--accent);}
+.prob-tab.active{color:var(--bg);background:var(--accent);border-color:var(--accent);}
+.prob-panel{display:none;}
+.prob-panel.active{display:block;}
+
+/* problem card */
+.prob-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.4rem 1.6rem;margin-bottom:.8rem;}
+.prob-desc{font-size:.9rem;color:var(--text-dim);line-height:1.75;margin-bottom:1rem;}
+.prob-result{font-family:'DM Mono',monospace;font-size:.78rem;color:var(--accent2);margin-top:.6rem;padding:.6rem .9rem;background:var(--bg3);border-radius:2px;border-left:2px solid var(--accent2);}
+
+/* viz */
+.viz-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1rem;margin:.8rem 0;}
+canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
+.prob-panel canvas{width:100%!important;}
+.viz-controls{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+.ctrl-label{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--text-dim);letter-spacing:.08em;display:flex;align-items:center;gap:.5rem;flex:1;min-width:140px;}
+.ctrl-label input[type=range]{flex:1;accent-color:var(--accent);}
+.ctrl-val{font-family:'DM Mono',monospace;font-size:.64rem;color:var(--accent);min-width:52px;text-align:right;}
+
+/* expandable math */
+.expand-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:none;border:1px solid var(--border);color:var(--text-dim);padding:.35rem .9rem;border-radius:2px;cursor:pointer;transition:all .18s;margin-top:.8rem;display:flex;align-items:center;gap:.5rem;}
+.expand-btn:hover{color:var(--purple);border-color:var(--purple);}
+.expand-btn.open{color:var(--purple);border-color:var(--purple);}
+.expand-content{display:none;margin-top:.8rem;padding:1.2rem 1.4rem;background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);border-radius:2px;font-size:.9rem;line-height:1.8;}
+.expand-content.open{display:block;}
+
+/* eq */
+.eq-block{background:var(--bg3);border:1px solid var(--border);padding:.9rem 1.2rem;border-radius:2px;margin:.7rem 0;overflow-x:auto;font-size:.95rem;}
+.eq-label{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:.25rem;}
+
+/* code */
+.code-box{background:#0d1a1a;border:1px solid var(--border);border-radius:2px;padding:1rem 1.2rem;margin:.7rem 0;overflow-x:auto;}
+.code-box pre{font-family:'DM Mono',monospace;font-size:.7rem;line-height:1.85;color:#7eb8a4;margin:0;white-space:pre;}
+.code-label{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.4rem;}
+
+/* table */
+.opt-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.72rem;margin-top:.6rem;}
+.opt-table th{padding:.5rem .8rem;text-align:left;border-bottom:1px solid var(--border);color:var(--accent);font-weight:500;letter-spacing:.08em;}
+.opt-table td{padding:.5rem .8rem;border-bottom:1px solid var(--bg3);color:var(--text-dim);vertical-align:top;line-height:1.6;}
+.opt-table td:first-child{color:var(--accent2);}
+
+/* page footer */
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);letter-spacing:.08em;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">Optimumszámítás a <em>hétköznapokban</em></h1>
+<div class="proj-sub" data-i18n="sub">Bojlertől az Euler–Lagrange egyenletig · Interaktív szimulációk · Kód</div>
+
+<!-- ══ ABSTRACT PATTERN ══ -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.pattern">Közös minta</div>
+
+  <div class="pattern-box" data-i18n="pattern.intro">
+    Első ránézésre a bojler, a villanykörte, az erősítő és az étterem teljesen különböző problémák.
+    Mégis mind ugyanolyan szerkezetű kérdést tesznek fel: <strong>meddig érdemes menni?</strong>
+    Mikor kezd el több kárt okozni valami, mint hasznot?
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.9rem 0">
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:1rem 1.2rem;border-radius:2px">
+      <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent2);letter-spacing:.12em;margin-bottom:.5rem">HÉTKÖZNAPI INTUÍCIÓ</div>
+      <div style="font-size:.88rem;color:var(--text-dim);line-height:1.7">
+        Ha egy napig sem járok haza, felesleges a bojler — de ha két hetet leszek távol, már nagyon megéri lekapcsolni.
+        <em>Valahol a kettő között van az optimum.</em>
+      </div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);padding:1rem 1.2rem;border-radius:2px">
+      <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent);letter-spacing:.12em;margin-bottom:.5rem">MATEMATIKAI SZERKEZET</div>
+      <div style="font-size:.88rem;color:var(--text-dim);line-height:1.7">
+        Minden ilyen problémában van egy <strong style="color:var(--accent2)">nyereség</strong> (amit maximalizálunk)
+        és egy <strong style="color:var(--red,#c05050)">költség</strong> (amit minimalizálunk).
+        Az optimum ott van, ahol a kettő <em>határon egyensúlyban van.</em>
+      </div>
+    </div>
+  </div>
+
+  <div class="pattern-box" style="margin-bottom:.8rem" data-i18n="pattern.lambda">
+    A <strong>λ (lambda)</strong> paraméter azt fejezi ki, hogy számodra <em>mennyit ér</em> az egyik szempont a másikhoz képest.
+    Ha az étteremben a vendégek élményét fontosabbnak tartod a bevételnél, nagy λ-t választasz — és az optimális telítettség alacsonyabb lesz.
+    Ha a bevétel az elsődleges, kis λ-val dolgozol — és zsúfoltabb éttermet tolerálsz.
+    <strong>Nincs egyetlen helyes λ — ez értékítélet.</strong>
+  </div>
+
+  <div class="pattern-box" data-i18n="pattern.text">
+    Formálisan minden probléma leírható így:
+    <strong>max(nyereség − λ · költség)</strong>.
+    Az optimum feltétele: a két hatás deriváltja egyenlő — vagyis a <em>marginálisnál</em>
+    (a következő kis lépésnél) a nyereség és a költség éppen egyforma mértékben változik.
+    Ha a nyereség gyorsabban nő, érdemes továbblépni. Ha a költség nő gyorsabban, vissza kell lépni.
+  </div>
+
+  <div class="eq-label" data-i18n="eq.pattern.label">Általános alak</div>
+  <div class="eq-block" style="text-align:center;padding:1.2rem">
+    <div style="display:inline-flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:center">
+      <div>$$\max_{x}$$</div>
+      <div style="display:inline-flex;align-items:flex-start;gap:.3rem">
+        <span style="font-size:1.4rem;color:var(--text-dim)">[</span>
+        <div style="text-align:center">
+          <div>$\text{Gain}(x)$</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--accent2);margin-top:.15rem">nyereség</div>
+        </div>
+        <div style="padding-top:.1rem">$\;-\;\lambda\;\cdot\;$</div>
+        <div style="text-align:center">
+          <div>$\text{Cost}(x)$</div>
+          <div style="font-family:'DM Mono',monospace;font-size:.58rem;color:var(--red,#c05050);margin-top:.15rem">költség</div>
+        </div>
+        <span style="font-size:1.4rem;color:var(--text-dim)">]</span>
+      </div>
+      <div>$\;\Longrightarrow\;$</div>
+      <div>$$\frac{d(\text{Gain})}{dx} = \lambda\cdot\frac{d(\text{Cost})}{dx}$$</div>
+    </div>
+  </div>
+
+  <div style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);
+              padding:.7rem 1rem;border:1px solid var(--border);border-radius:2px;
+              background:var(--bg2);line-height:1.8;margin-top:.4rem">
+    <span style="color:var(--accent2)">Bojler:</span> nyereség = megtakarított energia, költség = újramelegítés &nbsp;·&nbsp;
+    <span style="color:var(--accent2)">Izzó:</span> nyereség = spórolt áram, költség = rövidebb élettartam<br>
+    <span style="color:var(--accent2)">Erősítő:</span> nyereség = erősítés (Av), költség = torzítás (THD) &nbsp;·&nbsp;
+    <span style="color:var(--accent2)">Étterem:</span> nyereség = bevétel, költség = vendégelégedetlenség
+  </div>
+</div>
+
+<!-- ══ PROBLEMS ══ -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.problems">Interaktív problémák</div>
+  <div class="prob-tabs">
+    <button class="prob-tab active" onclick="showProb('boiler')" data-i18n="tab.boiler">🔥 Bojler</button>
+    <button class="prob-tab" onclick="showProb('bulb')" data-i18n="tab.bulb">💡 Izzó</button>
+    <button class="prob-tab" onclick="showProb('amp')" data-i18n="tab.amp">📡 Erősítő</button>
+    <button class="prob-tab" onclick="showProb('rest')" data-i18n="tab.rest">🍽️ Étterem</button>
+  </div>
+
+  <!-- BOILER -->
+  <div class="prob-panel active" id="panel-boiler">
+    <div class="prob-card">
+      <div class="prob-desc" data-i18n="boiler.desc">
+        Lakásban villanybojler napi 3 órát fűt. Ha ritkán járunk be, érdemes lekapcsolni — de az
+        újraforrósítás egyszeri költség. Mikortól éri meg?
+      </div>
+      <div class="eq-label" data-i18n="boiler.eq.label">Megtérülési feltétel</div>
+      <div class="eq-block" style="text-align:center;padding:1.2rem">
+        <div style="display:inline-flex;align-items:center;gap:.8rem;flex-wrap:wrap;justify-content:center;font-size:.9rem">
+          <div style="text-align:center">
+            <div>$P \cdot t_{\text{heat}} \cdot c \cdot N$</div>
+            <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">napi cost × N nap</div>
+          </div>
+          <div style="color:var(--text-dim)">$\;\geq\;$</div>
+          <div style="text-align:center">
+            <div>$P \cdot t_{\text{reheat}} \cdot c$</div>
+            <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem">újramelegítés (egyszeri)</div>
+          </div>
+          <div style="color:var(--text-dim)">$\;\Rightarrow\;$</div>
+          <div>$$N^* = \dfrac{t_{\text{reheat}}}{t_{\text{heat}}}$$</div>
+        </div>
+      </div>
+      <div class="viz-wrap">
+        <canvas id="boiler-canvas" height="180"></canvas>
+        <div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent2);
+                    padding:.4rem .2rem;letter-spacing:.06em;">
+          ℹ︎ N* = t_reheat / t_heat — független P-től és c-től (kiesnek az egyenletből)
+        </div>
+        <div class="viz-controls">
+          <label class="ctrl-label">P (kW)
+            <input type="range" id="b-power" min="5" max="30" value="15">
+            <span class="ctrl-val" id="b-power-v">1.5 kW</span>
+          </label>
+        </div>
+        <div class="viz-controls">
+          <label class="ctrl-label">c (Ft/kWh)
+            <input type="range" id="b-price" min="10" max="80" value="30">
+            <span class="ctrl-val" id="b-price-v">30 Ft</span>
+          </label>
+        </div>
+        <div class="viz-controls">
+          <label class="ctrl-label">t_reheat (h)
+            <input type="range" id="b-reheat" min="2" max="10" value="5">
+            <span class="ctrl-val" id="b-reheat-v">5 h</span>
+          </label>
+        </div>
+      </div>
+      <div class="prob-result" id="boiler-result">⟶ Eredmény itt jelenik meg</div>
+    </div>
+    <button class="expand-btn" onclick="toggleExpand('boiler-math')" data-i18n="btn.deepmath">▸ Mélyebb matematika</button>
+    <div class="expand-content" id="boiler-math">
+      <p data-i18n="boiler.math.p1">A probléma diszkrét esemény + folytonos költség típusú. A "kapcsolás" egy Dirac-delta jellegű egyszeri költség, míg a napi fűtés folytonos.</p>
+      <div class="eq-block">
+        $$J(N) = N\cdot P\cdot t_h\cdot c - P\cdot t_r\cdot c \;\;\Rightarrow\;\; J(N^*)=0
+        \;\;\Rightarrow\;\; N^* = \frac{t_r}{t_h}$$
+      </div>
+      <p data-i18n="boiler.math.p2">Ez nem funkcionál-variáció, hanem egyszerű törésponti egyenlet. Az optimum ott van, ahol a kumulatív megtakarítás éppen fedezi az újramelegítési költséget. Nincs szükség deriváltra — a függvény lineáris $N$-ben.</p>
+    </div>
+  </div>
+
+  <!-- BULB -->
+  <div class="prob-panel" id="panel-bulb">
+    <div class="prob-card">
+      <div class="prob-desc" data-i18n="bulb.desc">
+        Egy bekapcsolás az izzó élettartamát csökkenti. Az energiaköltség idő szerint folytonos.
+        Az optimum az az idő, ahol a két költség egyenlő.
+      </div>
+      <div class="eq-label" data-i18n="bulb.eq.label">Optimális kikapcsolási idő</div>
+      <div class="eq-block">
+        $$t^* = \frac{C_{switch}}{P \cdot c_{kWh}} = \frac{C_{bulb}/L_{hours}}{P \cdot c_{kWh}}$$
+      </div>
+      <div class="viz-wrap">
+        <canvas id="bulb-canvas" height="180"></canvas>
+        <div class="viz-controls">
+          <label class="ctrl-label">P (W)
+            <input type="range" id="bl-power" min="5" max="200" value="100">
+            <span class="ctrl-val" id="bl-power-v">100 W</span>
+          </label>
+          <label class="ctrl-label">c (Ft/kWh)
+            <input type="range" id="bl-price" min="10" max="100" value="50">
+            <span class="ctrl-val" id="bl-price-v">50 Ft</span>
+          </label>
+        </div>
+        <div class="viz-controls">
+          <label class="ctrl-label">Izzó ára (Ft)
+            <input type="range" id="bl-bulbprice" min="100" max="3000" value="500" step="50">
+            <span class="ctrl-val" id="bl-bulbprice-v">500 Ft</span>
+          </label>
+          <label class="ctrl-label">Élettartam (h)
+            <input type="range" id="bl-life" min="1000" max="25000" value="10000" step="500">
+            <span class="ctrl-val" id="bl-life-v">10000 h</span>
+          </label>
+        </div>
+      </div>
+      <div class="prob-result" id="bulb-result">⟶ Eredmény itt jelenik meg</div>
+    </div>
+    <button class="expand-btn" onclick="toggleExpand('bulb-math')" data-i18n="btn.deepmath">▸ Mélyebb matematika</button>
+    <div class="expand-content" id="bulb-math">
+      <p data-i18n="bulb.math.p1">A célfüggvény minimalizálja az összes "élettartam-egységnyi" költséget:</p>
+      <div class="eq-block">
+        $$C_{total}(t) = \underbrace{P\cdot c \cdot t}_{\text{energiaköltség}} + \underbrace{\frac{C_{bulb}}{L}}_{\text{kapcsolási élettartam-veszteség}}$$
+      </div>
+      <p data-i18n="bulb.math.p2">A $t^*$ az az időküszöb, ahol a fenn tartás marginális energiaköltsége eléri a kapcsolás marginális élettartam-veszteségét. Ez a <strong>határ-elvű optimum</strong> legegyszerűbb formája.</p>
+      <div class="eq-block">
+        $$\frac{dC_{energy}}{dt} = P\cdot c \;\;\geq\;\; \frac{C_{bulb}}{L} = C_{switch}
+        \quad\Rightarrow\quad t \;\geq\; t^*$$
+      </div>
+    </div>
+  </div>
+
+  <!-- AMPLIFIER -->
+  <div class="prob-panel" id="panel-amp">
+    <div class="prob-card">
+      <div class="prob-desc" data-i18n="amp.desc">
+        Földelt emitteres erősítőnél a kollektorellenállás növelése javítja az erősítést, de
+        rontja a linearitást. Az optimum a Pareto-határon van: max erősítés adott THD-küszöb mellett.
+      </div>
+      <div class="eq-label" data-i18n="amp.eq.label">Célfüggvény</div>
+      <div class="eq-block">
+        $$J(R_C, R_E) = \log(A_v) - \lambda\cdot\text{THD}(R_C,R_E)
+        \quad\Rightarrow\quad \nabla J = 0$$
+      </div>
+      <div class="viz-wrap">
+        <canvas id="amp-canvas" height="220"></canvas>
+        <div class="viz-controls">
+          <label class="ctrl-label">R_C (kΩ)
+            <input type="range" id="a-rc" min="1" max="100" value="47">
+            <span class="ctrl-val" id="a-rc-v">4.7 kΩ</span>
+          </label>
+          <label class="ctrl-label">R_E (Ω)
+            <input type="range" id="a-re" min="0" max="200" value="47">
+            <span class="ctrl-val" id="a-re-v">47 Ω</span>
+          </label>
+        </div>
+        <div class="viz-controls">
+          <label class="ctrl-label">λ (torzítás súly)
+            <input type="range" id="a-lambda" min="1" max="50" value="10">
+            <span class="ctrl-val" id="a-lambda-v">10</span>
+          </label>
+        </div>
+      </div>
+      <div class="prob-result" id="amp-result">⟶ Eredmény itt jelenik meg</div>
+    </div>
+    <button class="expand-btn" onclick="toggleExpand('amp-math')" data-i18n="btn.deepmath">▸ Mélyebb matematika</button>
+    <div class="expand-content" id="amp-math">
+      <p data-i18n="amp.math.p1">Az erősítőoptimum kétdimenziós: a $(R_C, R_E)$ tér felett kell maximumot keresni. Ez már valódi multivariábilis optimum, ahol a gradiens feltétel:</p>
+      <div class="eq-block">
+        $$\frac{\partial J}{\partial R_C} = \frac{1}{A_v}\frac{\partial A_v}{\partial R_C} - \lambda\frac{\partial\text{THD}}{\partial R_C} = 0$$
+      </div>
+      <p data-i18n="amp.math.p2">A Pareto-front megmutatja az összes kompromisszumot: minden λ értékhez más optimális pont tartozik. Az "igazi" optimum a Pareto-határon van, ahol nincs javítás az egyik szempontból a másik rontása nélkül.</p>
+      <p data-i18n="amp.math.p3">Motoros potméterrel ez egy <strong>black-box optimumkeresés</strong>: nem ismerjük a függvény analitikus alakját, csak mérjük. Ekkor koordináta-descent vagy Nelder–Mead módszer alkalmazható.</p>
+    </div>
+  </div>
+
+  <!-- RESTAURANT -->
+  <div class="prob-panel" id="panel-rest">
+    <div class="prob-card">
+      <div class="prob-desc" data-i18n="rest.desc">
+        Sorbanállás-elmélet: az étterem telítettsége (ρ) és a bevétel/élmény kompromisszuma.
+        Telítettség közelében a várakozási idő nemlineárisan robban — ez a M/M/1 sor viselkedése.
+      </div>
+      <div class="eq-label" data-i18n="rest.eq.label">M/M/1 várakozási idő</div>
+      <div class="eq-block">
+        $$W = \frac{1}{\mu - \lambda} = \frac{1}{\mu(1-\rho)},
+        \quad \rho = \frac{\lambda}{\mu} < 1$$
+      </div>
+      <div class="viz-wrap">
+        <canvas id="rest-canvas" height="200"></canvas>
+        <div class="viz-controls">
+          <label class="ctrl-label">λ_cost (élménysúly)
+            <input type="range" id="r-lambda" min="100" max="5000" value="800" step="100">
+            <span class="ctrl-val" id="r-lambda-v">800</span>
+          </label>
+          <label class="ctrl-label">Bevétel/fő (Ft)
+            <input type="range" id="r-rev" min="1000" max="10000" value="3500" step="500">
+            <span class="ctrl-val" id="r-rev-v">3500 Ft</span>
+          </label>
+        </div>
+      </div>
+      <div class="prob-result" id="rest-result">⟶ Eredmény itt jelenik meg</div>
+    </div>
+    <button class="expand-btn" onclick="toggleExpand('rest-math')" data-i18n="btn.deepmath">▸ Mélyebb matematika</button>
+    <div class="expand-content" id="rest-math">
+      <p data-i18n="rest.math.p1">A M/M/1 sor optimuma az a ρ*, ahol a bevétel és az elveszett vendégek (rossz értékelések) miatti veszteség kompenzálják egymást:</p>
+      <div class="eq-block">
+        $$J(\rho) = R\cdot\rho - \lambda\cdot W(\rho) = R\cdot\rho - \frac{\lambda}{\mu(1-\rho)}$$
+      </div>
+      <div class="eq-block">
+        $$\frac{dJ}{d\rho} = R - \frac{\lambda}{\mu(1-\rho)^2} = 0
+        \quad\Rightarrow\quad
+        \rho^* = 1 - \sqrt{\frac{\lambda}{\mu R}}$$
+      </div>
+      <p data-i18n="rest.math.p2">Vegyük észre: a $\rho \to 1$ határnál $W \to \infty$ — a rendszer "szétesik". Ez a variációszámításban az <strong>egyensúly elvesztése</strong>: a funkcionál nem korlátozott felülről ρ=1 közelében.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MATH FOUNDATION ══ -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.math">Matematikai alap</div>
+
+  <div class="pattern-box" data-i18n="math.intro">
+    Az összes fenti probléma egy közös matematikai sémából ered. Az optimum feltétele
+    mindig a <strong>célfüggvény deriváltjának eltűnése</strong> — de ez a derivált
+    sokféle formát ölthet: hely szerinti, funkcionál szerinti, vagy mező szerinti.
+  </div>
+
+  <!-- Level 1: basic -->
+  <div class="eq-label" data-i18n="eq.level1.label">1. szint — Szám → szám optimum</div>
+  <div class="eq-block">
+    $$\frac{dJ(x)}{dx} = 0 \quad\Rightarrow\quad x^*$$
+  </div>
+
+  <div class="eq-label" data-i18n="eq.level2.label">2. szint — Funkcionál optimum (variáció)</div>
+  <div class="eq-block">
+    $$J[u] = \int_\Omega L(x, u, u')\,dx,\qquad
+    \delta J = \frac{d}{d\varepsilon}\bigg|_{\varepsilon=0} J[u+\varepsilon\eta] = 0
+    \;\;\forall\eta$$
+  </div>
+
+  <button class="expand-btn" onclick="toggleExpand('math-deep')" data-i18n="btn.deepmath">▸ Variációszámítás mélységben</button>
+  <div class="expand-content" id="math-deep">
+    <p data-i18n="math.deep.p1">A variáció a funkcionál <strong>Gâteaux-deriváltja</strong>: nem egy számon, hanem egy teljes függvényen értelmezett derivált.</p>
+    <div class="eq-block">
+      $$\delta J[u;\eta] = \lim_{\varepsilon\to 0}\frac{J[u+\varepsilon\eta]-J[u]}{\varepsilon}
+      = \int_\Omega \left(\frac{\partial L}{\partial u}\eta + \frac{\partial L}{\partial u'}\eta'\right)dx$$
+    </div>
+    <p data-i18n="math.deep.p2">Részleges integrálással (ha $\eta$ az elemen eltűnik):</p>
+    <div class="eq-block">
+      $$\delta J = \int_\Omega \underbrace{\left(\frac{\partial L}{\partial u} - \frac{d}{dx}\frac{\partial L}{\partial u'}\right)}_{\text{Euler–Lagrange maradék}} \eta\,dx = 0 \;\;\forall\eta$$
+    </div>
+    <p data-i18n="math.deep.p3">Ha ez minden $\eta$-ra nulla, akkor a maradék maga is nulla — ez az <strong>Euler–Lagrange-egyenlet</strong>:</p>
+    <div class="eq-block">
+      $$\frac{\partial L}{\partial u} - \frac{d}{dx}\frac{\partial L}{\partial u'} = 0$$
+    </div>
+    <p data-i18n="math.deep.p4">Fontos: ez az <em>erős alak</em>. A <em>gyenge alak</em> maga a variációs feltétel — és ez alapja a végeselem módszernek.</p>
+
+    <p style="margin-top:1rem" data-i18n="math.deep.p5">A hierarchikus eset: ha a Lagrange-sűrűség maga is egy másik funkcionál variációs deriváltjára épül:</p>
+    <div class="eq-block">
+      $$F[u] = \int_\Omega \Psi\!\left(\frac{\delta J[u]}{\delta u}\right)dx
+      \quad\Rightarrow\quad \delta F = 0 \;\Rightarrow\; \nabla^4 u = 0\;\text{ (biharmonikus)}$$
+    </div>
+  </div>
+
+  <!-- Optimization types table -->
+  <div style="margin-top:1.2rem">
+    <div class="eq-label" data-i18n="eq.types.label">Optimumtípusok összefoglalása</div>
+    <table class="opt-table">
+      <thead>
+        <tr>
+          <th data-i18n="th.type">Típus</th>
+          <th data-i18n="th.cond">Feltétel</th>
+          <th data-i18n="th.example">Példa</th>
+          <th data-i18n="th.method">Módszer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td data-i18n="ot1.t">Szám</td><td>$dJ/dx=0$</td><td data-i18n="ot1.e">Bojler, izzó</td><td data-i18n="ot1.m">Algebrai</td></tr>
+        <tr><td data-i18n="ot2.t">Vektor</td><td>$\nabla J=0$</td><td data-i18n="ot2.e">Erősítő $(R_C,R_E)$</td><td data-i18n="ot2.m">Gradiens, Newton</td></tr>
+        <tr><td data-i18n="ot3.t">Funkcionál</td><td>$\delta J=0$</td><td data-i18n="ot3.e">Minimális út, energia</td><td data-i18n="ot3.m">Euler–Lagrange</td></tr>
+        <tr><td data-i18n="ot4.t">Black-box</td><td data-i18n="ot4.cond">mérés alapján</td><td data-i18n="ot4.e">Motoros poti</td><td data-i18n="ot4.m">Nelder–Mead, coord-descent</td></tr>
+        <tr><td data-i18n="ot5.t">Stochasztikus</td><td data-i18n="ot5.cond">várható érték</td><td data-i18n="ot5.e">Vizsga, étterem</td><td data-i18n="ot5.m">Valószínűségi</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ CODE ══ -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.code">Kód — Python implementációk</div>
+
+  <div class="code-label" data-i18n="code1.label">Bojler / izzó — analitikus optimum</div>
+  <div class="code-box"><pre>
+def boiler_optimum(P_kW, t_heat_h, t_reheat_h, c_HUF_per_kWh):
+    """Hány nap után érdemes lekapcsolni a bojlert?"""
+    daily_cost = P_kW * t_heat_h * c_HUF_per_kWh      # Ft/nap
+    reheat_cost = P_kW * t_reheat_h * c_HUF_per_kWh   # Ft (egyszeri)
+    N_star = reheat_cost / daily_cost
+    return N_star
+
+def bulb_optimum(P_W, c_HUF_per_kWh, bulb_price_HUF, lifetime_h):
+    """Hány másodperc után éri meg lekapcsolni az izzót?"""
+    C_switch = bulb_price_HUF / lifetime_h          # Ft / kapcsolás
+    P_kW = P_W / 1000
+    t_star_h = C_switch / (P_kW * c_HUF_per_kWh)
+    return t_star_h * 3600  # másodpercben
+
+print(boiler_optimum(1.5, 3, 5, 30))  # → 1.67 nap
+print(bulb_optimum(100, 50, 500, 10000))  # → 36 mp</pre></div>
+
+  <div class="code-label" style="margin-top:1rem" data-i18n="code2.label">Erősítő — koordináta-descent (black-box)</div>
+  <div class="code-box"><pre>
+import numpy as np
+
+def measure_gain_thd(RC, RE):
+    """Szimulált mérés: erősítés és torzítás."""
+    Av = RC / (RE + 26)           # közelítő, 26Ω = rE @ 1mA
+    THD = 0.01 * (RC / 1000)**2 / (RE + 1)**0.5  # nemlineáris modell
+    return Av, THD
+
+def J(RC, RE, lam=10):
+    Av, THD = measure_gain_thd(RC, RE)
+    if THD > 0.05:  # 5% THD küszöb
+        return -1e6  # bünteti a túl nagy torzítást
+    return np.log(Av) - lam * THD
+
+# Koordináta-descent
+RC, RE = 4700, 47   # Ohm
+step = 200
+for iteration in range(50):
+    for direction, param in [(1, 'RC'), (-1, 'RE')]:
+        for delta in [step, -step]:
+            if param == 'RC':
+                new_J = J(RC + delta, RE)
+                if new_J > J(RC, RE):
+                    RC += delta
+            else:
+                new_J = J(RC, RE + delta)
+                if new_J > J(RC, RE):
+                    RE += delta
+    step *= 0.9   # csökkentjük a lépésközt
+
+print(f"Optimum: RC={RC}Ω, RE={RE}Ω")
+Av_opt, THD_opt = measure_gain_thd(RC, RE)
+print(f"Av={Av_opt:.1f}x, THD={THD_opt*100:.2f}%")</pre></div>
+
+  <div class="code-label" style="margin-top:1rem" data-i18n="code3.label">Étterem — M/M/1 analitikus optimum</div>
+  <div class="code-box"><pre>
+import numpy as np
+
+def restaurant_optimum(mu, R_per_guest, lambda_cost):
+    """
+    mu: kiszolgálási ráta (vendég/óra)
+    R_per_guest: bevétel/vendég (Ft)
+    lambda_cost: élménysúly (Ft·óra)
+    """
+    rho_star = 1 - np.sqrt(lambda_cost / (mu * R_per_guest))
+    rho_star = np.clip(rho_star, 0, 0.99)
+    W_star = 1 / (mu * (1 - rho_star))     # várakozási idő (óra)
+    J_star = R_per_guest * rho_star - lambda_cost * W_star
+    return rho_star, W_star * 60, J_star   # perc
+
+# Példa: étterem 20 vendég/óra kapacitással
+rho, W_min, profit = restaurant_optimum(
+    mu=20, R_per_guest=3500, lambda_cost=8000
+)
+print(f"Optimális telítettség: {rho*100:.1f}%")
+print(f"Várakozási idő: {W_min:.1f} perc")
+print(f"Profit-score: {profit:.0f}")</pre></div>
+
+  <div class="code-label" style="margin-top:1rem" data-i18n="code4.label">Általános black-box optimum — Nelder–Mead (scipy)</div>
+  <div class="code-box"><pre>
+from scipy.optimize import minimize
+import numpy as np
+
+def black_box_objective(params):
+    """Cseréld le saját mérési függvényedre."""
+    x, y = params
+    # Szimulált célfüggvény: max gain, min torzítás
+    gain = -np.log(abs(x) + 1) - 0.5 * np.log(abs(y) + 1)
+    thd  = 0.01 * x**2 / (y + 1)**0.5
+    return gain + 10 * thd   # minimalizálandó
+
+result = minimize(
+    black_box_objective,
+    x0=[4700, 47],
+    method='Nelder-Mead',
+    options={'xatol': 1, 'fatol': 0.001, 'maxiter': 500}
+)
+print(f"Optimum: {result.x}")
+print(f"Iterációk: {result.nit}")</pre></div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span data-i18n="footer.tag">Optimumszámítás · Variációszámítás · Kód</span>
+</div>
+</div>
+
+<script>
+// ════ i18n ════
+function setVal(id, val){
+  const el=document.getElementById(id);
+  if(el) el.textContent=val;
+}
+
+const T = {
+  hu: {
+    "title": "Optimumszámítás a <em>hétköznapokban</em>",
+    "sub": "Bojlertől az Euler–Lagrange egyenletig · Interaktív szimulációk · Kód",
+    "sec.pattern": "Közös minta",
+    "pattern.text": "Minden optimumszámítási probléma — legyen az bojler, villanykörte, erősítő vagy étterem — ugyanabba az absztrakt sémába illeszthető: <strong>max(nyereség − λ · költség)</strong>. Az optimum általában nem a szélsőértékeken van, hanem egy egyensúlyi ponton, amelyet egy <strong>kompenzációs paraméter λ</strong> határoz meg.",
+    "eq.pattern.label": "Általános alak",
+    "sec.problems": "Interaktív problémák",
+    "tab.boiler": "🔥 Bojler", "tab.bulb": "💡 Izzó", "tab.amp": "📡 Erősítő", "tab.rest": "🍽️ Étterem",
+    "boiler.desc": "Lakásban villanybojler napi 3 órát fűt. Ha ritkán járunk be, érdemes lekapcsolni — de az újraforrósítás egyszeri költség. Mikortól éri meg?",
+    "boiler.eq.label": "Megtérülési feltétel",
+    "b.price.label": "c (Ft/kWh)", "b.reheat.label": "t_reheat (h)",
+    "btn.deepmath": "▸ Mélyebb matematika",
+    "boiler.math.p1": "A probléma diszkrét esemény + folytonos költség típusú. A 'kapcsolás' egyszeri Dirac-delta jellegű költség, míg a napi fűtés folytonos.",
+    "boiler.math.p2": "Ez nem funkcionál-variáció, hanem egyszerű törésponti egyenlet. Az optimum ott van, ahol a kumulatív megtakarítás éppen fedezi az újramelegítési költséget.",
+    "bulb.desc": "Egy bekapcsolás az izzó élettartamát csökkenti. Az energiaköltség idő szerint folytonos. Az optimum az az idő, ahol a két költség egyenlő.",
+    "bulb.eq.label": "Optimális kikapcsolási idő",
+    "bl.power.label": "P (W)", "bl.price.label": "c (Ft/kWh)", "bl.bulbprice.label": "Izzó ára (Ft)", "bl.life.label": "Élettartam (h)",
+    "bulb.math.p1": "A célfüggvény minimalizálja az összes 'élettartam-egységnyi' költséget:",
+    "bulb.math.p2": "A t* az az időküszöb, ahol a fenn tartás marginális energiaköltsége eléri a kapcsolás marginális élettartam-veszteségét. Ez a <strong>határ-elvű optimum</strong> legegyszerűbb formája.",
+    "amp.desc": "Földelt emitteres erősítőnél a kollektorellenállás növelése javítja az erősítést, de rontja a linearitást. Az optimum a Pareto-határon van.",
+    "amp.eq.label": "Célfüggvény",
+    "amp.math.p1": "Az erősítőoptimum kétdimenziós: a (R_C, R_E) tér felett kell maximumot keresni.",
+    "amp.math.p2": "A Pareto-front megmutatja az összes kompromisszumot: minden λ értékhez más optimális pont tartozik.",
+    "amp.math.p3": "Motoros potméterrel ez egy <strong>black-box optimumkeresés</strong>: koordináta-descent vagy Nelder–Mead módszer alkalmazható.",
+    "rest.desc": "Sorbanállás-elmélet: az étterem telítettsége (ρ) és a bevétel/élmény kompromisszuma. Telítettség közelében a várakozási idő nemlineárisan robban.",
+    "rest.eq.label": "M/M/1 várakozási idő",
+    "r.price.label": "Bevétel/fő (Ft)",
+    "rest.math.p1": "A M/M/1 sor optimuma az a ρ*, ahol a bevétel és az elveszett vendégek miatti veszteség kompenzálják egymást:",
+    "rest.math.p2": "Vegyük észre: a ρ→1 határnál W→∞ — a rendszer 'szétesik'. Ez a variációszámításban az <strong>egyensúly elvesztése</strong>.",
+    "sec.math": "Matematikai alap",
+    "math.intro": "Az összes fenti probléma egy közös matematikai sémából ered. Az optimum feltétele mindig a <strong>célfüggvény deriváltjának eltűnése</strong> — de ez a derivált sokféle formát ölthet.",
+    "eq.level1.label": "1. szint — Szám → szám optimum",
+    "eq.level2.label": "2. szint — Funkcionál optimum (variáció)",
+    "math.deep.p1": "A variáció a funkcionál <strong>Gâteaux-deriváltja</strong>: nem egy számon, hanem egy teljes függvényen értelmezett derivált.",
+    "math.deep.p2": "Részleges integrálással (ha η az elemen eltűnik):",
+    "math.deep.p3": "Ha ez minden η-ra nulla, akkor a maradék maga is nulla — ez az <strong>Euler–Lagrange-egyenlet</strong>:",
+    "math.deep.p4": "Fontos: ez az <em>erős alak</em>. A <em>gyenge alak</em> maga a variációs feltétel — és ez alapja a végeselem módszernek.",
+    "math.deep.p5": "A hierarchikus eset: ha a Lagrange-sűrűség maga is egy másik funkcionál variációs deriváltjára épül:",
+    "eq.types.label": "Optimumtípusok összefoglalása",
+    "th.type": "Típus", "th.cond": "Feltétel", "th.example": "Példa", "th.method": "Módszer",
+    "ot1.t":"Szám","ot1.e":"Bojler, izzó","ot1.m":"Algebrai",
+    "ot2.t":"Vektor","ot2.e":"Erősítő (R_C,R_E)","ot2.m":"Gradiens, Newton",
+    "ot3.t":"Funkcionál","ot3.e":"Minimális út, energia","ot3.m":"Euler–Lagrange",
+    "ot4.t":"Black-box","ot4.cond":"mérés alapján","ot4.e":"Motoros poti","ot4.m":"Nelder–Mead, coord-descent",
+    "ot5.t":"Stochasztikus","ot5.cond":"várható érték","ot5.e":"Vizsga, étterem","ot5.m":"Valószínűségi",
+    "sec.code": "Kód — Python implementációk",
+    "code1.label":"Bojler / izzó — analitikus optimum",
+    "code2.label":"Erősítő — koordináta-descent (black-box)",
+    "code3.label":"Étterem — M/M/1 analitikus optimum",
+    "code4.label":"Általános black-box optimum — Nelder–Mead (scipy)",
+    "footer.tag": "Optimumszámítás · Variációszámítás · Kód",
+  },
+  en: {
+    "title": "Optimization in <em>everyday life</em>",
+    "sub": "From boilers to Euler–Lagrange · Interactive simulations · Code",
+    "sec.pattern": "Common pattern",
+    "pattern.text": "Every optimization problem — boiler, light bulb, amplifier, or restaurant — fits the same abstract schema: <strong>max(gain − λ · cost)</strong>. The optimum is rarely at the extremes; it is an equilibrium point determined by a <strong>trade-off parameter λ</strong>.",
+    "eq.pattern.label": "General form",
+    "sec.problems": "Interactive problems",
+    "tab.boiler":"🔥 Boiler","tab.bulb":"💡 Bulb","tab.amp":"📡 Amplifier","tab.rest":"🍽️ Restaurant",
+    "boiler.desc":"A water heater runs 3 hours daily. If we rarely visit the flat, switching it off saves energy — but reheating costs a one-time fee. When does it pay off?",
+    "boiler.eq.label":"Break-even condition",
+    "b.price.label":"c (Ft/kWh)","b.reheat.label":"t_reheat (h)",
+    "btn.deepmath":"▸ Deep mathematics",
+    "boiler.math.p1":"The problem is a discrete event + continuous cost type. The switch is a one-time Dirac-delta cost, while daily heating is continuous.",
+    "boiler.math.p2":"This is not a functional variation, but a simple break-even equation. The optimum is where cumulative savings just cover the reheating cost.",
+    "bulb.desc":"Each switch-on reduces bulb lifetime. Energy cost is continuous in time. The optimum is where both costs are equal.",
+    "bulb.eq.label":"Optimal switch-off time",
+    "bl.power.label":"P (W)","bl.price.label":"c (Ft/kWh)","bl.bulbprice.label":"Bulb price (Ft)","bl.life.label":"Lifetime (h)",
+    "bulb.math.p1":"The objective minimises total cost per 'lifetime unit':",
+    "bulb.math.p2":"t* is the threshold where the marginal energy cost of staying on equals the marginal lifetime loss of switching. This is the simplest form of the <strong>marginal optimum</strong>.",
+    "amp.desc":"In a common-emitter amplifier, increasing RC improves gain but worsens linearity. The optimum is on the Pareto frontier: max gain subject to a THD constraint.",
+    "amp.eq.label":"Objective function",
+    "amp.math.p1":"The amplifier optimum is 2D: find the maximum over the (RC, RE) space.",
+    "amp.math.p2":"The Pareto front shows all trade-offs: each λ gives a different optimal point.",
+    "amp.math.p3":"With motor-driven pots this is <strong>black-box optimisation</strong>: coordinate descent or Nelder–Mead applies.",
+    "rest.desc":"Queueing theory: the restaurant utilisation (ρ) vs revenue/experience trade-off. Near saturation, waiting time blows up nonlinearly.",
+    "rest.eq.label":"M/M/1 waiting time",
+    "r.price.label":"Revenue/guest (Ft)",
+    "rest.math.p1":"The M/M/1 optimum is the ρ* where revenue and lost-customer losses balance:",
+    "rest.math.p2":"Note: as ρ→1, W→∞ — the system 'collapses'. In variational terms this is <strong>loss of equilibrium</strong>.",
+    "sec.math":"Mathematical foundation",
+    "math.intro":"All the above problems share a common mathematical structure. The optimum condition is always the <strong>vanishing of the objective's derivative</strong> — but this derivative can take many forms.",
+    "eq.level1.label":"Level 1 — Scalar optimum",
+    "eq.level2.label":"Level 2 — Functional optimum (variation)",
+    "math.deep.p1":"The variation is the <strong>Gâteaux derivative</strong> of the functional: a derivative defined on function space, not over a single number.",
+    "math.deep.p2":"After integration by parts (η vanishes on the boundary):",
+    "math.deep.p3":"If this is zero for all η, the integrand itself must vanish — this is the <strong>Euler–Lagrange equation</strong>:",
+    "math.deep.p4":"Important: this is the <em>strong form</em>. The <em>weak form</em> is the variational condition itself — the basis of the finite element method.",
+    "math.deep.p5":"The hierarchical case: when the Lagrangian itself is built from the variational derivative of another functional:",
+    "eq.types.label":"Summary of optimisation types",
+    "th.type":"Type","th.cond":"Condition","th.example":"Example","th.method":"Method",
+    "ot1.t":"Scalar","ot1.e":"Boiler, bulb","ot1.m":"Algebraic",
+    "ot2.t":"Vector","ot2.e":"Amplifier (RC,RE)","ot2.m":"Gradient, Newton",
+    "ot3.t":"Functional","ot3.e":"Minimal path, energy","ot3.m":"Euler–Lagrange",
+    "ot4.t":"Black-box","ot4.cond":"from measurement","ot4.e":"Motor pot","ot4.m":"Nelder–Mead, coord-descent",
+    "ot5.t":"Stochastic","ot5.cond":"expected value","ot5.e":"Exam, restaurant","ot5.m":"Probabilistic",
+    "sec.code":"Code — Python implementations",
+    "code1.label":"Boiler / bulb — analytic optimum",
+    "code2.label":"Amplifier — coordinate descent (black-box)",
+    "code3.label":"Restaurant — M/M/1 analytic optimum",
+    "code4.label":"General black-box optimum — Nelder–Mead (scipy)",
+    "footer.tag":"Optimisation · Calculus of Variations · Code",
+  },
+  de: {
+    "title": "Optimierung im <em>Alltag</em>",
+    "sub": "Vom Boiler zur Euler–Lagrange-Gleichung · Interaktive Simulationen · Code",
+    "sec.pattern":"Gemeinsames Muster",
+    "pattern.text":"Jedes Optimierungsproblem — Boiler, Glühbirne, Verstärker oder Restaurant — lässt sich in dasselbe abstrakte Schema einordnen: <strong>max(Gewinn − λ · Kosten)</strong>. Das Optimum liegt selten an den Extremen, sondern an einem Gleichgewichtspunkt, bestimmt durch den <strong>Trade-off-Parameter λ</strong>.",
+    "eq.pattern.label":"Allgemeine Form",
+    "sec.problems":"Interaktive Probleme",
+    "tab.boiler":"🔥 Boiler","tab.bulb":"💡 Glühbirne","tab.amp":"📡 Verstärker","tab.rest":"🍽️ Restaurant",
+    "boiler.desc":"Ein Warmwasserboiler heizt täglich 3 Stunden. Wenn wir selten in die Wohnung kommen, lohnt sich das Abschalten — aber das Wiederaufheizen kostet einmalig. Ab wann lohnt es sich?",
+    "boiler.eq.label":"Break-Even-Bedingung",
+    "b.price.label":"c (Ft/kWh)","b.reheat.label":"t_reheat (h)",
+    "btn.deepmath":"▸ Tiefere Mathematik",
+    "boiler.math.p1":"Das Problem ist vom Typ diskretes Ereignis + kontinuierliche Kosten. Das Schalten ist ein einmaliger Dirac-Impuls, das tägliche Heizen kontinuierlich.",
+    "boiler.math.p2":"Keine Funktionalvariation — einfache Break-Even-Gleichung. Das Optimum liegt dort, wo kumulative Einsparung die Wiederaufheizkosten deckt.",
+    "bulb.desc":"Jedes Einschalten verkürzt die Lebensdauer. Energiekosten laufen kontinuierlich. Das Optimum liegt dort, wo beide Kosten gleich sind.",
+    "bulb.eq.label":"Optimale Ausschaltzeit",
+    "bl.power.label":"P (W)","bl.price.label":"c (Ft/kWh)","bl.bulbprice.label":"Lampenpreis (Ft)","bl.life.label":"Lebensdauer (h)",
+    "bulb.math.p1":"Das Ziel ist die Minimierung der Gesamtkosten pro 'Lebensdauereinheit':",
+    "bulb.math.p2":"t* ist der Schwellenwert, ab dem die marginalen Energiekosten die marginalen Lebensdauerverluste übersteigen. Die einfachste Form des <strong>Marginaloptimums</strong>.",
+    "amp.desc":"Bei einem Emitterschaltungsverstärker verbessert größeres RC die Verstärkung, verschlechtert aber die Linearität. Das Optimum liegt auf der Pareto-Front.",
+    "amp.eq.label":"Zielfunktion",
+    "amp.math.p1":"Das Verstärkeroptimum ist 2D: Maximum über dem (RC, RE)-Raum suchen.",
+    "amp.math.p2":"Die Pareto-Front zeigt alle Kompromisse: jedes λ ergibt einen anderen optimalen Punkt.",
+    "amp.math.p3":"Mit Motor-Potis ist das eine <strong>Black-Box-Optimierung</strong>: Koordinatenabstieg oder Nelder–Mead anwendbar.",
+    "rest.desc":"Warteschlangentheorie: Kompromiss zwischen Auslastung (ρ) und Umsatz/Erlebnis. Nahe der Sättigung explodiert die Wartezeit nichtlinear.",
+    "rest.eq.label":"M/M/1 Wartezeit",
+    "r.price.label":"Umsatz/Gast (Ft)",
+    "rest.math.p1":"Das M/M/1-Optimum ist das ρ*, bei dem Umsatz und Verlust durch unzufriedene Gäste sich ausgleichen:",
+    "rest.math.p2":"Bei ρ→1 gilt W→∞ — das System 'bricht zusammen'. Variationstheoretisch ist das der <strong>Stabilitätsverlust</strong>.",
+    "sec.math":"Mathematische Grundlage",
+    "math.intro":"Alle obigen Probleme teilen eine gemeinsame mathematische Struktur. Die Optimumsbedingung ist stets das <strong>Verschwinden der Ableitung der Zielfunktion</strong>.",
+    "eq.level1.label":"Stufe 1 — Skalar-Optimum",
+    "eq.level2.label":"Stufe 2 — Funktional-Optimum (Variation)",
+    "math.deep.p1":"Die Variation ist die <strong>Gâteaux-Ableitung</strong> des Funktionals: eine Ableitung im Funktionenraum.",
+    "math.deep.p2":"Nach partieller Integration (η verschwindet am Rand):",
+    "math.deep.p3":"Wenn dies für alle η null ist, muss der Integrand selbst null sein — die <strong>Euler–Lagrange-Gleichung</strong>:",
+    "math.deep.p4":"Wichtig: dies ist die <em>starke Form</em>. Die <em>schwache Form</em> ist die Variationsbedingung selbst — Grundlage der FEM.",
+    "math.deep.p5":"Der hierarchische Fall: wenn die Lagrange-Dichte auf der Variationsableitung eines anderen Funktionals aufbaut:",
+    "eq.types.label":"Übersicht der Optimierungstypen",
+    "th.type":"Typ","th.cond":"Bedingung","th.example":"Beispiel","th.method":"Methode",
+    "ot1.t":"Skalar","ot1.e":"Boiler, Glühbirne","ot1.m":"Algebraisch",
+    "ot2.t":"Vektor","ot2.e":"Verstärker (RC,RE)","ot2.m":"Gradient, Newton",
+    "ot3.t":"Funktional","ot3.e":"Min. Weg, Energie","ot3.m":"Euler–Lagrange",
+    "ot4.t":"Black-Box","ot4.cond":"aus Messung","ot4.e":"Motor-Poti","ot4.m":"Nelder–Mead, Koord-Abstieg",
+    "ot5.t":"Stochastisch","ot5.cond":"Erwartungswert","ot5.e":"Prüfung, Restaurant","ot5.m":"Wahrscheinlichkeitsrechnung",
+    "sec.code":"Code — Python-Implementierungen",
+    "code1.label":"Boiler / Glühbirne — analytisches Optimum",
+    "code2.label":"Verstärker — Koordinatenabstieg (Black-Box)",
+    "code3.label":"Restaurant — M/M/1 analytisches Optimum",
+    "code4.label":"Allgemeines Black-Box-Optimum — Nelder–Mead (scipy)",
+    "footer.tag":"Optimierung · Variationsrechnung · Code",
+  }
+};
+
+let lang='hu';
+function setLang(l){
+  lang=l; document.documentElement.lang=l;
+  const t=T[l];
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(t[k]!==undefined) el.innerHTML=t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  if(window.MathJax) MathJax.typesetPromise();
+}
+
+// ════ TABS ════
+function showProb(id){
+  document.querySelectorAll('.prob-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.prob-tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  // draw the newly visible panel after layout
+  requestAnimationFrame(()=>{
+    if(id==='boiler') drawBoiler();
+    else if(id==='bulb') drawBulb();
+    else if(id==='amp') drawAmp();
+    else if(id==='rest') drawRest();
+  });
+}
+
+// ════ EXPAND ════
+function toggleExpand(id){
+  const el=document.getElementById(id);
+  const btn=el.previousElementSibling;
+  el.classList.toggle('open');
+  btn.classList.toggle('open');
+  if(window.MathJax && el.classList.contains('open')) MathJax.typesetPromise([el]);
+}
+
+// ════ CANVAS HELPERS ════
+function setupCanvas(id, h){
+  const c=document.getElementById(id);
+  if(!c) return null;
+  // Try rendered width, then style width, then parent width
+  let W = c.getBoundingClientRect().width;
+  if(W < 10) W = parseFloat(c.style.width)||0;
+  if(W < 10) W = c.parentElement?.getBoundingClientRect().width - 32 || 0;
+  if(W < 10) return null;
+  W = Math.round(W);
+  c.width=W*devicePixelRatio; c.height=Math.round(h*devicePixelRatio);
+  const ctx=c.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio);
+  return {ctx,W,H:h};
+}
+function axes(ctx,lp,rp,tp,bp,W,H){
+  ctx.strokeStyle='#2a2e2e'; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(lp,tp); ctx.lineTo(lp,H-bp); ctx.lineTo(W-rp,H-bp); ctx.stroke();
+}
+
+// ════ BOILER ════
+function drawBoiler(){
+  const r=setupCanvas('boiler-canvas',180); if(!r) return;
+  const {ctx,W,H}=r;
+  const P=(document.getElementById('b-power')?.value??15)/10;
+  const c=document.getElementById('b-price')?.value??30;
+  const tr=parseFloat(document.getElementById('b-reheat')?.value??5);
+  const th=3;
+  const daily=P*th*c;
+  const reheat=P*tr*c;
+  const Nstar=reheat/daily;
+
+  setVal('b-power-v', P.toFixed(1)+' kW');
+  setVal('b-price-v', c+' Ft');
+  setVal('b-reheat-v', tr+' h');
+
+  const maxN=Math.max(Nstar*2.2, 4);
+  const lp=56,rp=16,tp=18,bp=28;
+  const pw=W-lp-rp, ph=H-tp-bp;
+  axes(ctx,lp,rp,tp,bp,W,H);
+
+  // daily cumulative savings line
+  ctx.beginPath();
+  for(let n=0;n<=maxN;n+=maxN/100){
+    const saving=n*daily-reheat;
+    const x=lp+(n/maxN)*pw;
+    const y=tp+ph-((saving+reheat)/(maxN*daily))*ph;
+    n===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.strokeStyle='#28c898'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // reheat cost line
+  ctx.beginPath(); ctx.moveTo(lp,tp+ph-(reheat/(maxN*daily))*ph); ctx.lineTo(lp+pw,tp+ph-(reheat/(maxN*daily))*ph);
+  ctx.strokeStyle='rgba(200,169,110,.5)'; ctx.lineWidth=1; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+
+  // N* marker
+  const xstar=lp+(Nstar/maxN)*pw;
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xstar,tp); ctx.lineTo(xstar,H-bp); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#c8a96e'; ctx.font='11px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('N*='+Nstar.toFixed(1)+' nap',xstar,tp+12);
+
+  ctx.fillStyle='#28c898'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('Kumulatív megtakarítás',lp+6,tp+14);
+  ctx.fillStyle='rgba(200,169,110,.7)'; ctx.fillText('Újramelegítési költség',lp+6,tp+28);
+
+  const resEl=document.getElementById('boiler-result');
+  if(resEl) resEl.textContent=`N* = ${Nstar.toFixed(2)} nap TÁVOLLÉT után érdemes lekapcsolni a bojlert | Napi megtakarítás: ${daily.toFixed(0)} Ft | Újramelegítési cost: ${reheat.toFixed(0)} Ft`;
+}
+
+// ════ BULB ════
+function drawBulb(){
+  const r=setupCanvas('bulb-canvas',180); if(!r) return;
+  const {ctx,W,H}=r;
+  const P=document.getElementById('bl-power')?.value??100;
+  const c=document.getElementById('bl-price')?.value??50;
+  const bp2=parseInt(document.getElementById('bl-bulbprice')?.value??500);
+  const life=parseInt(document.getElementById('bl-life')?.value??10000);
+
+  setVal('bl-power-v', P+' W');
+  setVal('bl-price-v', c+' Ft');
+  setVal('bl-bulbprice-v', bp2+' Ft');
+  setVal('bl-life-v', (life/1000).toFixed(1)+'k h');
+
+  const Cswitch=bp2/life; // Ft per switch
+  const Penergy=(P/1000)*c; // Ft per hour
+  const tstar_h=Cswitch/Penergy;
+  const tstar_s=tstar_h*3600;
+
+  const maxT=Math.max(tstar_s*2.5,120);
+  const lp=16,rp=16,tp=18,bp=28;
+  const pw=W-lp-rp,ph=H-tp-bp;
+  axes(ctx,lp,rp,tp,bp,W,H);
+
+  // energy cost line
+  ctx.beginPath();
+  for(let i=0;i<=100;i++){
+    const t=(i/100)*maxT;
+    const y=tp+ph-((Penergy*t/3600)/(Penergy*maxT/3600+Cswitch*1.2))*ph;
+    i===0?ctx.moveTo(lp+(i/100)*pw,y):ctx.lineTo(lp+(i/100)*pw,y);
+  }
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // switch cost (constant)
+  const switchY=tp+ph-(Cswitch/(Penergy*maxT/3600+Cswitch*1.2))*ph;
+  ctx.beginPath(); ctx.moveTo(lp,switchY); ctx.lineTo(lp+pw,switchY);
+  ctx.strokeStyle='rgba(136,120,200,.6)'; ctx.lineWidth=1; ctx.setLineDash([4,3]); ctx.stroke(); ctx.setLineDash([]);
+
+  // t* marker
+  const xstar=lp+(tstar_s/maxT)*pw;
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xstar,tp); ctx.lineTo(xstar,H-bp); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle='#c8a96e'; ctx.font='11px DM Mono,monospace'; ctx.textAlign='center';
+  const lab=tstar_s<120?`t*=${tstar_s.toFixed(1)}s`:tstar_s<3600?`t*=${(tstar_s/60).toFixed(1)}p`:`t*=${tstar_h.toFixed(2)}h`;
+  ctx.fillText(lab,xstar,tp+12);
+
+  ctx.fillStyle='#c8a96e'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('Energiaköltség (kumulatív)',lp+6,tp+14);
+  ctx.fillStyle='rgba(136,120,200,.8)'; ctx.fillText('Kapcsolási élettartam-veszteség',lp+6,tp+28);
+
+  const resEl=document.getElementById('bulb-result');
+  if(resEl) resEl.textContent=`t* = ${tstar_s<60?tstar_s.toFixed(1)+' másodperc':tstar_s<3600?(tstar_s/60).toFixed(1)+' perc':tstar_h.toFixed(2)+' óra'} | Kapcsolási cost: ${Cswitch.toFixed(4)} Ft | Energia: ${Penergy.toFixed(4)} Ft/h`;
+}
+
+// ════ AMPLIFIER ════
+function drawAmp(){
+  const r=setupCanvas('amp-canvas',220); if(!r) return;
+  const {ctx,W,H}=r;
+  const RC=(document.getElementById('a-rc')?.value??47)*100;
+  const RE=document.getElementById('a-re')?.value??47;
+  const lam=document.getElementById('a-lambda')?.value??10;
+
+  setVal('a-rc-v', (RC/1000).toFixed(1)+' kΩ');
+  setVal('a-re-v', RE+' Ω');
+  setVal('a-lambda-v', lam);
+
+  function Av(rc,re){return rc/(re+26);}
+  function THD(rc,re){return Math.min(0.5, 0.005*(rc/1000)**2/(Math.sqrt(re+1)));}
+  function J(rc,re,l){return Math.log(Av(rc,re))-l*THD(rc,re);}
+
+  // Pareto front: vary RC for fixed lambda
+  const lp=54,rp=16,tp=18,bp=30;
+  const pw=W-lp-rp,ph=H-tp-bp;
+  axes(ctx,lp,rp,tp,bp,W,H);
+
+  const rcRange=[];
+  for(let rc=500;rc<=10000;rc+=100) rcRange.push(rc);
+  const avs=rcRange.map(rc=>Av(rc,RE));
+  const thds=rcRange.map(rc=>THD(rc,RE)*100);
+  const js=rcRange.map(rc=>J(rc,RE,lam));
+  const maxAv=Math.max(...avs), maxTHD=Math.max(...thds);
+
+  // THD curve
+  ctx.beginPath();
+  rcRange.forEach((rc,i)=>{
+    const x=lp+(i/(rcRange.length-1))*pw;
+    const y=tp+ph-(thds[i]/maxTHD)*ph*0.9;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='rgba(192,80,80,.7)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Av curve
+  ctx.beginPath();
+  rcRange.forEach((rc,i)=>{
+    const x=lp+(i/(rcRange.length-1))*pw;
+    const y=tp+ph-(avs[i]/maxAv)*ph*0.9;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#28c898'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // J curve
+  const maxJ=Math.max(...js), minJ=Math.min(...js);
+  ctx.beginPath();
+  rcRange.forEach((rc,i)=>{
+    const x=lp+(i/(rcRange.length-1))*pw;
+    const norm=(js[i]-minJ)/(maxJ-minJ||1);
+    const y=tp+ph-norm*ph*0.9;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=2; ctx.stroke();
+
+  // current RC marker
+  const iRC=Math.round((RC-500)/100);
+  const xRC=lp+(iRC/(rcRange.length-1))*pw;
+  ctx.strokeStyle='rgba(200,169,110,.5)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xRC,tp); ctx.lineTo(xRC,H-bp); ctx.stroke(); ctx.setLineDash([]);
+
+  // find optimal RC (max J)
+  const optI=js.indexOf(Math.max(...js));
+  const xOpt=lp+(optI/(rcRange.length-1))*pw;
+  ctx.fillStyle='#c8a96e'; ctx.font='10px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('opt',xOpt,tp+10);
+
+  // labels
+  ctx.font='10px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillStyle='#28c898'; ctx.fillText('Av (erősítés)',lp+4,tp+14);
+  ctx.fillStyle='rgba(192,80,80,.9)'; ctx.fillText('THD% (torzítás)',lp+4,tp+26);
+  ctx.fillStyle='#c8a96e'; ctx.fillText('J = log(Av) − λ·THD',lp+4,tp+38);
+
+  // x-axis label
+  ctx.fillStyle='#2e5868'; ctx.textAlign='center';
+  ctx.fillText(`RC: 0.5kΩ → 10kΩ   (RE=${RE}Ω, λ=${lam})`,lp+pw/2,H-8);
+
+  const curAv=Av(RC,RE).toFixed(1);
+  const curTHD=(THD(RC,RE)*100).toFixed(2);
+  const optRC=rcRange[optI];
+  const ampRes=document.getElementById('amp-result');
+  if(ampRes) ampRes.textContent=`Jelenlegi: Av=${curAv}x, THD=${curTHD}% | Optimális RC=${(optRC/1000).toFixed(1)}kΩ (Av=${Av(optRC,RE).toFixed(1)}x, THD=${(THD(optRC,RE)*100).toFixed(2)}%)`;
+}
+
+// ════ RESTAURANT ════
+function drawRest(){
+  const r=setupCanvas('rest-canvas',220); if(!r) return;
+  const {ctx,W,H}=r;
+  const lam=parseFloat(document.getElementById('r-lambda')?.value??800);
+  const R=parseInt(document.getElementById('r-rev')?.value??3500);
+  const mu=20;
+
+  setVal('r-lambda-v', lam);
+  setVal('r-rev-v', R.toLocaleString('hu-HU')+' Ft');
+
+  const rho_star=Math.max(0.05, Math.min(0.97, 1-Math.sqrt(lam/(mu*R))));
+
+  const lp=16, rp=60, tp=44, bp=28;
+  const pw=W-lp-rp, ph=H-tp-bp;
+  axes(ctx,lp,rp,tp,bp,W,H);
+
+  const N=120;
+  const rhos=Array.from({length:N},(_,i)=>0.01+i*(0.97/N));
+  const revenues=rhos.map(p=>R*p);
+  const waiting =rhos.map(p=>lam/(mu*(1-p)));
+  const netJ    =rhos.map((p,i)=>revenues[i]-waiting[i]);
+
+  const maxR=R*0.97;
+  const yMin=-maxR*0.4, yMax=maxR*1.05;
+
+  function toY(v){ return tp+ph-Math.max(0,Math.min(ph,((v-yMin)/(yMax-yMin))*ph)); }
+
+  // zero line
+  ctx.strokeStyle='#333'; ctx.lineWidth=.5; ctx.setLineDash([2,4]);
+  ctx.beginPath(); ctx.moveTo(lp,toY(0)); ctx.lineTo(lp+pw,toY(0)); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Revenue (green)
+  ctx.beginPath();
+  rhos.forEach((p,i)=>{ i===0?ctx.moveTo(lp+(i/(N-1))*pw,toY(revenues[i])):ctx.lineTo(lp+(i/(N-1))*pw,toY(revenues[i])); });
+  ctx.strokeStyle='#28c898'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Waiting cost (red) — cap at yMax for display
+  ctx.beginPath();
+  let s=false;
+  rhos.forEach((p,i)=>{
+    const v=Math.min(waiting[i], yMax*1.5);
+    const x=lp+(i/(N-1))*pw, y=toY(Math.min(v,yMax));
+    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='rgba(192,80,80,.9)'; ctx.lineWidth=1.5; ctx.stroke();
+
+  // Net J (gold) — only where meaningful
+  ctx.beginPath(); s=false;
+  rhos.forEach((p,i)=>{
+    const v=Math.max(yMin, Math.min(yMax, netJ[i]));
+    const x=lp+(i/(N-1))*pw, y=toY(v);
+    if(!s){ctx.moveTo(x,y);s=true;}else ctx.lineTo(x,y);
+  });
+  ctx.strokeStyle='#c8a96e'; ctx.lineWidth=2.5; ctx.stroke();
+
+  // ρ* vertical line
+  const xstar=lp+(rho_star/0.97)*pw;
+  ctx.strokeStyle='rgba(200,169,110,.6)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(xstar,tp); ctx.lineTo(xstar,tp+ph); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#c8a96e'; ctx.font='bold 11px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillText('ρ*='+(rho_star*100).toFixed(0)+'%', xstar+4, tp+14);
+
+  // J* value at rho*
+  const jStar=R*rho_star - lam/(mu*(1-rho_star));
+  ctx.fillStyle='rgba(200,169,110,.6)'; ctx.font='9px DM Mono,monospace';
+  ctx.fillText('J*='+jStar.toFixed(0), xstar+4, tp+26);
+
+  // Legend (top-left)
+  ctx.font='10px DM Mono,monospace'; ctx.textAlign='left';
+  ctx.fillStyle='#28c898';            ctx.fillText('Bevétel ~ ρ',               lp+4, tp-28);
+  ctx.fillStyle='rgba(192,80,80,.9)'; ctx.fillText('Várakozási veszteség',      lp+4, tp-16);
+  ctx.fillStyle='#c8a96e';            ctx.fillText('Nettó J (optimalizálandó)', lp+4, tp-4);
+
+  // x-axis label
+  ctx.fillStyle='#2e5868'; ctx.textAlign='center'; ctx.font='10px DM Mono,monospace';
+  ctx.fillText('Telítettség ρ: 0 → 0.97', lp+pw/2, H-6);
+
+  // y-axis ticks
+  [0, R*0.5, R*0.97].forEach(v=>{
+    const y=toY(v);
+    ctx.fillStyle='#3a4040'; ctx.textAlign='right'; ctx.font='9px DM Mono,monospace';
+    ctx.fillText((v/1000).toFixed(1)+'k', lp-3, y+3);
+    ctx.strokeStyle='#222'; ctx.lineWidth=.4;
+    ctx.beginPath(); ctx.moveTo(lp,y); ctx.lineTo(lp+pw,y); ctx.stroke();
+  });
+
+  const W_star=1/(mu*(1-rho_star))*60;
+  const restRes=document.getElementById('rest-result');
+  if(restRes) restRes.textContent=
+    `ρ* = ${(rho_star*100).toFixed(1)}% | Várakozás: ${W_star.toFixed(1)} perc | λ növelésével ρ* csökken → jobb élmény, kevesebb vendég`;
+}
+
+// ════ SLIDERS ════
+function initSliders(){
+  const addListener=(id,fn)=>{
+    const el=document.getElementById(id);
+    if(el) el.addEventListener('input',fn);
+  };
+  ['b-power','b-price','b-reheat'].forEach(id=>addListener(id,drawBoiler));
+  ['bl-power','bl-price','bl-bulbprice','bl-life'].forEach(id=>addListener(id,drawBulb));
+  ['a-rc','a-re','a-lambda'].forEach(id=>addListener(id,drawAmp));
+  ['r-lambda','r-rev'].forEach(id=>addListener(id,drawRest));
+}
+
+function drawAll(){
+  // Only draw canvases in visible panels
+  if(document.getElementById('panel-boiler')?.classList.contains('active')) drawBoiler();
+  if(document.getElementById('panel-bulb')?.classList.contains('active')) drawBulb();
+  if(document.getElementById('panel-amp')?.classList.contains('active')) drawAmp();
+  if(document.getElementById('panel-rest')?.classList.contains('active')) drawRest();
+}
+
+window.addEventListener('load',()=>{
+  setLang('hu');
+  initSliders();
+
+  // Get container width from the page (always visible)
+  function getContainerWidth(){
+    return document.querySelector('.page')?.offsetWidth
+      || document.querySelector('.prob-tabs')?.offsetWidth
+      || 600;
+  }
+
+  // Pre-set canvas width on ALL canvases so hidden ones also know their size
+  function presetCanvasWidths(){
+    const W = getContainerWidth() - 32; // minus padding
+    document.querySelectorAll('.prob-panel canvas').forEach(c=>{
+      if(c.offsetWidth < 10){
+        // force width attribute so getBoundingClientRect works when hidden
+        c.style.width = W+'px';
+      }
+    });
+  }
+
+  function init(){
+    presetCanvasWidths();
+    drawBoiler(); drawBulb(); drawAmp(); drawRest();
+  }
+
+  // Try after a short delay for iframe layout
+  setTimeout(init, 80);
+  setTimeout(init, 300); // second attempt in case iframe is slow
+});
+
+window.addEventListener('resize',()=>{
+  document.querySelectorAll('.prob-panel canvas').forEach(c=>{ c.style.width=''; });
+  drawBoiler(); drawBulb(); drawAmp(); drawRest();
+});
+</script>
+</body>
+</html>
