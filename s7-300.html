@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Siemens S7-300 — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:          #0e0f0f;
+  --bg2:         #151717;
+  --bg3:         #1c1f1f;
+  --border:      #2a2e2e;
+  --accent:      #c8a96e;
+  --accent2:     #7eb8a4;
+  --text:        #d8d4cc;
+  --text-dim:    #7a7870;
+  --text-bright: #eeeae2;
+  --orange:      #d4703a;
+  --red:         #c05050;
+  --green:       #4a9070;
+  --blue:        #4878a8;
+}
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body {
+  background:var(--bg); color:var(--text);
+  font-family:'Literata',Georgia,serif; font-size:16px; line-height:1.75;
+  overflow-x:hidden;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:
+    linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),
+    linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);
+  background-size:60px 60px; pointer-events:none; z-index:0;
+}
+.page { max-width:920px; margin:0 auto; padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px); position:relative; z-index:1; }
+
+/* lang */
+.lang-bar { display:flex; justify-content:flex-end; gap:.3rem; margin-bottom:1.6rem; }
+.lang-btn { font-family:'DM Mono',monospace; font-size:.65rem; letter-spacing:.12em; text-transform:uppercase; background:none; border:1px solid transparent; color:var(--text-dim); padding:.28rem .6rem; border-radius:2px; cursor:pointer; transition:all .18s; }
+.lang-btn:hover  { color:var(--accent); border-color:var(--border); }
+.lang-btn.active { color:var(--accent); border-color:var(--accent); }
+
+/* header */
+.proj-icon { font-size:2rem; margin-bottom:.7rem; display:block; }
+.proj-title { font-family:'DM Serif Display',serif; font-size:clamp(1.5rem,4vw,2.6rem); color:var(--text-bright); line-height:1.1; margin-bottom:.5rem; }
+.proj-title em { font-style:italic; color:var(--accent); }
+.proj-sub { font-family:'DM Mono',monospace; font-size:.7rem; color:var(--text-dim); letter-spacing:.1em; margin-bottom:1.4rem; display:flex; flex-wrap:wrap; gap:.4rem 1.2rem; }
+
+/* section */
+.section { margin-top:2.6rem; }
+.section-label { font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin-bottom:.8rem; display:flex; align-items:center; gap:.7rem; }
+.section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* overview */
+.overview-box { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--orange); padding:1.4rem 1.6rem; border-radius:2px; font-size:.97rem; line-height:1.8; color:var(--text); }
+
+/* photos */
+.photo-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
+@media(max-width:580px){ .photo-grid{grid-template-columns:1fr;} }
+.photo-wrap { border:1px solid var(--border); border-radius:2px; overflow:hidden; background:var(--bg3); }
+.photo-wrap img { width:100%; height:220px; object-fit:cover; display:block; transition:transform .4s; }
+.photo-wrap:hover img { transform:scale(1.03); }
+.photo-caption { font-family:'DM Mono',monospace; font-size:.62rem; color:var(--text-dim); letter-spacing:.08em; padding:.5rem .8rem; }
+
+/* spec table */
+.spec-table { width:100%; border-collapse:collapse; font-family:'DM Mono',monospace; font-size:.72rem; margin-top:.6rem; }
+.spec-table th { padding:.5rem .9rem; text-align:left; border-bottom:1px solid var(--border); color:var(--accent); font-weight:500; letter-spacing:.08em; }
+.spec-table td { padding:.5rem .9rem; border-bottom:1px solid var(--bg3); color:var(--text-dim); vertical-align:top; line-height:1.6; }
+.spec-table td:first-child { color:var(--accent2); white-space:nowrap; }
+.spec-table tr:hover td { color:var(--text); background:var(--bg3); }
+
+/* pro/con grid */
+.procon-grid { display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-top:.8rem; }
+@media(max-width:580px){ .procon-grid{grid-template-columns:1fr;} }
+.procon-box { background:var(--bg2); border:1px solid var(--border); border-radius:2px; padding:1.2rem 1.4rem; }
+.procon-box.pros { border-top:3px solid var(--green); }
+.procon-box.cons { border-top:3px solid var(--red); }
+.procon-title { font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.16em; text-transform:uppercase; margin-bottom:.8rem; }
+.procon-box.pros .procon-title { color:var(--accent2); }
+.procon-box.cons .procon-title { color:var(--red); }
+.procon-item { display:flex; gap:.7rem; font-size:.88rem; color:var(--text-dim); margin-bottom:.55rem; line-height:1.6; align-items:flex-start; }
+.procon-item .icon { font-size:.8rem; min-width:16px; margin-top:3px; }
+.procon-box.pros .icon { color:var(--accent2); }
+.procon-box.cons .icon { color:var(--red); }
+
+/* use case cards */
+.usecase-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:.8rem; margin-top:.8rem; }
+.usecase-card { background:var(--bg2); border:1px solid var(--border); padding:1.1rem 1.3rem; border-radius:2px; transition:border-color .2s; }
+.usecase-card:hover { border-color:var(--accent2); }
+.usecase-icon { font-size:1.3rem; margin-bottom:.5rem; display:block; }
+.usecase-title { font-family:'DM Serif Display',serif; font-size:.98rem; color:var(--text-bright); margin-bottom:.35rem; }
+.usecase-body { font-size:.84rem; color:var(--text-dim); line-height:1.65; }
+
+/* decision matrix */
+.decision-table { width:100%; border-collapse:collapse; font-size:.84rem; margin-top:.6rem; }
+.decision-table th { padding:.6rem .9rem; text-align:left; border-bottom:2px solid var(--border); color:var(--accent); font-family:'DM Mono',monospace; font-size:.62rem; letter-spacing:.1em; font-weight:500; }
+.decision-table td { padding:.6rem .9rem; border-bottom:1px solid var(--bg3); vertical-align:top; line-height:1.6; color:var(--text-dim); }
+.decision-table tr:hover td { background:var(--bg3); color:var(--text); }
+.badge { display:inline-block; font-family:'DM Mono',monospace; font-size:.6rem; letter-spacing:.08em; padding:.15rem .55rem; border-radius:2px; }
+.badge-green { background:rgba(74,144,112,.15); color:var(--accent2); border:1px solid rgba(74,144,112,.3); }
+.badge-red   { background:rgba(192,80,80,.12);  color:#d08080; border:1px solid rgba(192,80,80,.25); }
+.badge-amber { background:rgba(200,169,110,.1); color:var(--accent); border:1px solid rgba(200,169,110,.25); }
+
+/* quote */
+.experience-box { background:var(--bg2); border:1px solid var(--border); border-left:3px solid var(--accent); padding:1.3rem 1.6rem; border-radius:2px; font-size:.95rem; line-height:1.85; color:var(--text); font-style:italic; margin-top:.8rem; }
+.experience-box strong { color:var(--accent); font-style:normal; }
+
+/* replacement section */
+.replace-row { display:flex; align-items:center; gap:1rem; background:var(--bg2); border:1px solid var(--border); padding:1rem 1.2rem; border-radius:2px; margin-bottom:.5rem; transition:border-color .2s; }
+.replace-row:hover { border-color:var(--accent); }
+.replace-from { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--red); min-width:90px; }
+.replace-arrow { color:var(--text-dim); font-size:1.1rem; }
+.replace-to { font-family:'DM Mono',monospace; font-size:.72rem; color:var(--accent2); min-width:100px; }
+.replace-reason { font-size:.84rem; color:var(--text-dim); flex:1; }
+
+/* footer */
+.page-footer { margin-top:3.5rem; padding-top:1.5rem; border-top:1px solid var(--border); display:flex; justify-content:space-between; flex-wrap:wrap; gap:.5rem; font-family:'DM Mono',monospace; font-size:.63rem; color:var(--text-dim); letter-spacing:.08em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+  </div>
+
+  <span class="proj-icon">🏭</span>
+  <h1 class="proj-title" data-i18n="title">Siemens <em>S7-300</em> PLC<br>— ipari tapasztalatok</h1>
+  <div class="proj-sub">
+    <span>Bódis Tamás · BT Tech</span>
+    <span data-i18n="sub">Ipari automatizálás · PLC programozás · Karbantartás</span>
+  </div>
+
+  <!-- overview -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.overview">Áttekintés</div>
+    <div class="overview-box" data-i18n="overview.text">
+      A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam — digitális I/O bővítőkártya telepítéstől kezdve hibakeresésen át egész rack-rendszer átépítéséig.
+    </div>
+  </div>
+
+  <!-- photos -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.photos">Saját fotók — üzemi környezetből</div>
+    <div class="photo-grid">
+      <div class="photo-wrap">
+        <img src="s7-cpu.jpg" alt="Siemens S7-300 CPU közelkép MC951 memóriakártyával">
+        <div class="photo-caption" data-i18n="photo1.cap">CPU315-2AF03 · MC951/32kB memóriakártya · RUN/STOP/MRES kapcsoló</div>
+      </div>
+      <div class="photo-wrap">
+        <img src="s7-rack.jpg" alt="Siemens S7-300 rack PS307 tápegységgel és SM323 I/O modulokkal">
+        <div class="photo-caption" data-i18n="photo2.cap">Teljes rack: PS307-5A tápegység · CPU315 · SM321/SM323 digitális I/O modulok · kézi I/O-jelölések</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- specs -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.specs">Technikai adatok — CPU315-2AF03</div>
+    <table class="spec-table">
+      <thead><tr><th data-i18n="th.param">Paraméter</th><th data-i18n="th.value">Érték</th><th data-i18n="th.note">Megjegyzés</th></tr></thead>
+      <tbody>
+        <tr><td>Ciklusidő</td><td>0.1 ms / 1000 utasítás</td><td>Jellemzően 1–50 ms valós alkalmazásban</td></tr>
+        <tr><td>Munka-RAM</td><td>128 kB</td><td>Bővíthető MC memóriakártyával (max. 8 MB)</td></tr>
+        <tr><td>Digitális I/O</td><td>max. 1024 be / 1024 ki</td><td>SM321/SM322/SM323 modulokkal</td></tr>
+        <tr><td>Analóg I/O</td><td>max. 256 csatorna</td><td>SM331/SM332 modulok, 12–16 bit felbontás</td></tr>
+        <tr><td>Kommunikáció</td><td>MPI, Profibus-DP, Profinet</td><td>CP modulokkal Ethernet, AS-i, CAN</td></tr>
+        <tr><td>Tápfeszültség</td><td>24 V DC</td><td>PS307 tápegység: 2A / 5A / 10A változat</td></tr>
+        <tr><td>Üzemi hőmérséklet</td><td>0 … +60 °C</td><td>Kiterjesztett: −25 … +70 °C (SIPLUS)</td></tr>
+        <tr><td>Programozás</td><td>STEP 7 / TIA Portal</td><td>LAD, FBD, STL, SCL, Graph</td></tr>
+        <tr><td>Diagnosztika</td><td>SF / BF / DC5V / FRCE / RUN</td><td>LED-ek + STEP 7 online diagnosztika</td></tr>
+        <tr><td>Gyártás vége</td><td>2023 (értékesítés)</td><td>Utód: S7-1500 / ET200SP</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- pro/con -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.procon">Előnyök és hátrányok</div>
+    <div class="procon-grid">
+      <div class="procon-box pros">
+        <div class="procon-title" data-i18n="pros.title">✓ Előnyök</div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro1"><strong style="color:var(--accent2)">Bevált megbízhatóság</strong> — 30 éves kúltúra, rengeteg üzemeltető ismeri. MTBF értéke extrém magas, 10-15 éves üzemidő teljesen jellemző.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro2"><strong style="color:var(--accent2)">Moduláris bővíthetőség</strong> — a rack tetszőlegesen bővíthető I/O, kommunikációs és funkcionális modulokkal. Cserélhető az igény változásával.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro3"><strong style="color:var(--accent2)">Hatalmas ökoszisztéma</strong> — számtalan gyártó épített rá periféria-eszközöket, HMI-t, frekvenciaváltót. Szinte minden iparágban megtalálható.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro4"><strong style="color:var(--accent2)">Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, akár 127 eszköz egy szegmensen. Sok régi gép csak ezen kommunikál.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro5"><strong style="color:var(--accent2)">Gazdag diagnosztika</strong> — online állapotfigyelés STEP 7-ből, szimbólikus I/O monitorozás, hardverhiba-riportok modulszinten.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro6"><strong style="color:var(--accent2)">Tartalékalkatrész-piac</strong> — bőséges used market, sok raktáron tartott modul. Egy meghalt SM323 kártya akár másnap pótolható.</span></div>
+      </div>
+      <div class="procon-box cons">
+        <div class="procon-title" data-i18n="cons.title">✗ Hátrányok</div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con1"><strong style="color:#d08080">EOL — életciklus vége</strong> — Siemens 2023-ban leállította az értékesítést. Szerviz ugyan még fut, de új projektre nem javasolt, és alkatrész-ellátás egyre drágul.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con2"><strong style="color:#d08080">Magas ár</strong> — egy CPU315 + rack + modulok összköltsége €2000–5000 felett van. Kis alkalmazásokhoz teljesen aránytalanul drága.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con3"><strong style="color:#d08080">Nincs natív Ethernet/IP</strong> — az alap CPU-khoz CP343 kommunikációs modul kell, ami plusz költség és helyfoglalás.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con4"><strong style="color:#d08080">Nehézkes szoftver</strong> — STEP 7 Classic Windows-specifikus, registry-igényes, VirtualBox-on kell futtatni modern gépen. TIA Portal sokkal jobb, de drágább.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con5"><strong style="color:#d08080">Akkumulátor-függőség</strong> — a CPU RAM tartalmát akkumulátor tartja fenn áramkimaradáskor. Ez karbantartási feladat és meghibásodási pont.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con6"><strong style="color:#d08080">Nem skálázható lefelé</strong> — S7-300 alatti teljesítményszintre nincs értelme erőltetni, míg az S7-1200/1500 széria sokkal rugalmasabb.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- use cases -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.usecases">Mikor érdemes alkalmazni?</div>
+    <div class="usecase-grid">
+      <div class="usecase-card">
+        <span class="usecase-icon">🏗️</span>
+        <div class="usecase-title" data-i18n="uc1.title">Gyártósorok vezérlése</div>
+        <div class="usecase-body" data-i18n="uc1.body">Közepes komplexitású gyártósorok (50–500 I/O pont), ahol Profibus-DP hálón frekvenciaváltók, robotok és HMI-k csatlakoznak. Autóipar, élelmiszer, gyógyszer.</div>
+      </div>
+      <div class="usecase-card">
+        <span class="usecase-icon">🔧</span>
+        <div class="usecase-title" data-i18n="uc2.title">Meglévő telepítések karbantartása</div>
+        <div class="usecase-body" data-i18n="uc2.body">Ahol már fut S7-300 és a beruházás visszatérült, ott a csere gazdaságilag nem indokolt. A rendszer még évtizedekig üzemképes, ha alkatrészellátás megoldott.</div>
+      </div>
+      <div class="usecase-card">
+        <span class="usecase-icon">🌡️</span>
+        <div class="usecase-title" data-i18n="uc3.title">Folyamatvezérlés</div>
+        <div class="usecase-body" data-i18n="uc3.body">Hőmérséklet-, nyomás- és áramlásvezérlés PID szabályozókkal. Az analóg modulok (SM331/332) kiváló felbontása és a PID FB-ek könyvtára profi megoldást ad.</div>
+      </div>
+      <div class="usecase-card">
+        <span class="usecase-icon">⚡</span>
+        <div class="usecase-title" data-i18n="uc4.title">Energiaelosztás, szünetmentes rendszerek</div>
+        <div class="usecase-body" data-i18n="uc4.body">Transzformátorállomások, UPS vezérlők, ahol a megbízhatóság és a hosszú élettartam kritikus. A −25°C-os SIPLUS változat külső telepítésre is alkalmas.</div>
+      </div>
+      <div class="usecase-card">
+        <span class="usecase-icon">🚰</span>
+        <div class="usecase-title" data-i18n="uc5.title">Víz- és szennyvíztisztítás</div>
+        <div class="usecase-body" data-i18n="uc5.body">Szivattyúállomások, szűrőrendszerek automatizálása. A redundáns konfiguráció és a hosszú alkatrész-elérhetőség miatt évtizedekre terveznek ilyen rendszereket.</div>
+      </div>
+      <div class="usecase-card">
+        <span class="usecase-icon">🏭</span>
+        <div class="usecase-title" data-i18n="uc6.title">Bányászat, nehézipar</div>
+        <div class="usecase-body" data-i18n="uc6.body">Ahol extrém por, rezgés és hőmérséklet-ingadozás a norma. A SIPLUS sorozat megerősített házban, trópusi lakkozással készül ilyen környezetekre.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- when NOT to use -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.notwhen">Mikor NEM érdemes S7-300-at választani?</div>
+    <table class="decision-table">
+      <thead>
+        <tr>
+          <th data-i18n="dt.situation">Helyzet</th>
+          <th data-i18n="dt.s7300">S7-300</th>
+          <th data-i18n="dt.better">Jobb választás</th>
+          <th data-i18n="dt.why">Miért?</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td data-i18n="dt1.sit">Kis gép, &lt;32 I/O</td>
+          <td><span class="badge badge-red" data-i18n="dt.nem">Nem ajánlott</span></td>
+          <td>S7-1200, LOGO!, Arduino+SCADA</td>
+          <td data-i18n="dt1.why">Ára aránytalanul magas, túlméretezett, komplex telepítés kis feladathoz.</td>
+        </tr>
+        <tr>
+          <td data-i18n="dt2.sit">Új projekt 2024-ben</td>
+          <td><span class="badge badge-red" data-i18n="dt.nem">Nem ajánlott</span></td>
+          <td>S7-1500, ET200SP CPU</td>
+          <td data-i18n="dt2.why">EOL státusz, drágul az alkatrész, nincs gyártói fejlesztés. S7-1500 jobb teljesítmény azonos áron.</td>
+        </tr>
+        <tr>
+          <td data-i18n="dt3.sit">IoT / Ipar 4.0 integráció</td>
+          <td><span class="badge badge-amber" data-i18n="dt.felt">Feltételesen</span></td>
+          <td>S7-1500 + TIA Portal + MindSphere</td>
+          <td data-i18n="dt3.why">S7-300 natív cloud-csatlakozás nélkül. CP modulokkal megoldható, de bonyolult és drága.</td>
+        </tr>
+        <tr>
+          <td data-i18n="dt4.sit">Biztonságkritikus alkalmazás (SIL 2/3)</td>
+          <td><span class="badge badge-amber" data-i18n="dt.felt">Feltételesen</span></td>
+          <td>S7-300F (failsafe) verzió</td>
+          <td data-i18n="dt4.why">Külön failsafe CPU és F-modulok kellenek. S7-315F/317F drága, az S7-1500F jobb alternatíva.</td>
+        </tr>
+        <tr>
+          <td data-i18n="dt5.sit">Kis sorozatgyártás, rugalmasság kell</td>
+          <td><span class="badge badge-red" data-i18n="dt.nem">Nem ajánlott</span></td>
+          <td>Codesys-alapú PLC, Beckhoff CX</td>
+          <td data-i18n="dt5.why">Nyílt szabvány, olcsóbb hardver, PC-alapú vezérlés sokrétűbb lehetőséget ad.</td>
+        </tr>
+        <tr>
+          <td data-i18n="dt6.sit">Meglévő, jól működő rendszer</td>
+          <td><span class="badge badge-green" data-i18n="dt.igen">Tartsd meg</span></td>
+          <td>—</td>
+          <td data-i18n="dt6.why">Ha üzemel, ne változtass! A csere magas kockázat, nagy átállási cost és leállási idő.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- when to replace on production line -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.replace">Mikor érdemes gyártósorban lecserélni?</div>
+
+    <div class="experience-box" data-i18n="replace.intro">
+      A csere döntése mindig <strong>gazdasági számítás</strong>, nem technikai reflex. Egy üzemelő S7-300 rendszer leállítása, átprogramozása és újraindítása hétnyi leállást, €20–100 ezer közötti munkadíjat és komoly kockázatot jelent. Mégis vannak helyzetek, amikor a csere elkerülhetetlen vagy egyértelműen indokolt.
+    </div>
+
+    <div style="margin-top:1rem">
+      <div class="replace-row">
+        <span class="replace-from" data-i18n="rr.when">Mikor?</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to" data-i18n="rr.action">Teendő</span>
+        <span class="replace-reason" data-i18n="rr.reason">Indoklás</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--red)" data-i18n="rr1.when">CPU meghibásodás</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to">S7-315 → S7-1515</span>
+        <span class="replace-reason" data-i18n="rr1.reason">Ha a CPU meghalt és a program elérhető, megfontolandó a teljes migráció S7-1500-ra — ez egyszeri beruházás, de 15 évre biztosítja a jövőt.</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--orange)" data-i18n="rr2.when">Alkatrészhiány</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to">Modul csere / upgrade</span>
+        <span class="replace-reason" data-i18n="rr2.reason">Ha egy SM modul nem szerezhető be ésszerű áron, elképzelhető ET200SP remote I/O átállás, megtartva az S7-300 CPU-t középtávon.</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--orange)" data-i18n="rr3.when">Kapacitásbővítés</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to">ET200SP bővítés</span>
+        <span class="replace-reason" data-i18n="rr3.reason">Ha a rack megtelik, de a CPU teljesítménye elegendő, Profinet/Profibus ET200SP remote I/O-val bővíthető a rendszer CPU-csere nélkül.</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--blue)" data-i18n="rr4.when">Gyártósor korszerűsítés</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to">S7-1500 + TIA Portal</span>
+        <span class="replace-reason" data-i18n="rr4.reason">Tervezett karbantartási leállásnál, ha az összes többi gépelemet is modernizálják. Egyszeri nagy befektetés, de 2040-ig futható platform.</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--accent2)" data-i18n="rr5.when">Program elveszett</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to">Reverse engineering</span>
+        <span class="replace-reason" data-i18n="rr5.reason">Ha az eredeti program nincs meg, a CPU-ból feltölthető a jelenlegi program STEP 7-tel — de ez csak akkor működik, ha a CPU-ban van feltöltve és védelem nélkül.</span>
+      </div>
+      <div class="replace-row">
+        <span class="replace-from" style="color:var(--accent2)" data-i18n="rr6.when">Jól működik</span>
+        <span class="replace-arrow">→</span>
+        <span class="replace-to" style="color:var(--accent2)">Ne nyúlj hozzá!</span>
+        <span class="replace-reason" data-i18n="rr6.reason">"If it ain't broke, don't fix it" — az ipari automatizálásban különösen igaz. Egy üzemelő S7-300 megbízhatóbb, mint egy frissen átállított S7-1500.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- personal experience -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.experience">Személyes tapasztalat</div>
+    <div class="experience-box" data-i18n="experience.text">
+      A képeken látható rendszerrel konkrétan dolgoztam: <strong>CPU315-2AF03</strong> rack-et bővítettem digitális I/O kártyával (SM323), valamint hibakeresést végeztem egy Profibus-szegmens szakadás miatt leállt gyártósoron. Az S7-300 erőssége pontosan az, ami a képeken is látszik — a kézzel felírt I/O-jelölések az SM modulokon: <strong>évtizedek alatt felhalmozott, dokumentált, átlátható rendszer</strong>, amiben egy tapasztalt villanyszerelő vagy automatikus technikus azonnal eligazodik. Ez a rugalmasság és az emberi skálázhatóság az, amit az S7-1500 papíron jobb mutatói nem tudnak pótolni ott, ahol az emberek a fejükben hordják a rendszert.
+    </div>
+  </div>
+
+  <!-- comparison with cheaper -->
+  <div class="section">
+    <div class="section-label" data-i18n="sec.vsbudget">Mikor elég egy olcsóbb kategória?</div>
+    <table class="decision-table">
+      <thead>
+        <tr><th data-i18n="vb.plc">PLC</th><th data-i18n="vb.price">Ár (CPU)</th><th data-i18n="vb.io">I/O</th><th data-i18n="vb.best">Legjobb alkalmazás</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:var(--accent)"><strong>LOGO! 8</strong></td><td>€150–300</td><td>8–24</td><td data-i18n="vb1">Kis gépek, szivattyúvezérlés, időzítők, egyszerű sorkapcsok kiváltása.</td></tr>
+        <tr><td style="color:var(--accent)"><strong>S7-1200</strong></td><td>€300–600</td><td>14–284</td><td data-i18n="vb2">Kis-közepes gépek, egyszerű Profinet háló, Motion Control kis tengelyekre.</td></tr>
+        <tr><td style="color:var(--accent2)"><strong>S7-300</strong></td><td>€800–2000</td><td>max. 2048</td><td data-i18n="vb3">Közepes gyártósorok, Profibus-DP hálók, komplex folyamatvezérlés, meglévő telepítések.</td></tr>
+        <tr><td style="color:var(--accent2)"><strong>S7-1500</strong></td><td>€1200–4000</td><td>korlátlan</td><td data-i18n="vb4">Nagy rendszerek, Ipar 4.0, biztonsági funkciók, motion control, hosszú jövő.</td></tr>
+        <tr><td style="color:var(--text-dim)">Beckhoff CX</td><td>€500–2000</td><td>korlátlan</td><td data-i18n="vb5">PC-alapú, nyílt rendszerek, EtherCAT servo-meghajtók, rugalmas szoftver-stack.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">
+    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>Siemens SIMATIC S7-300 — Ipari tapasztalatok</span>
+  </div>
+</div>
+
+<script>
+const T = {
+  hu: {
+    "title": "Siemens <em>S7-300</em> PLC<br>— ipari tapasztalatok",
+    "sub": "Ipari automatizálás · PLC programozás · Karbantartás",
+    "sec.overview": "Áttekintés",
+    "overview.text": "A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam — digitális I/O bővítőkártya telepítéstől kezdve hibakeresésen át egész rack-rendszer átépítéséig.",
+    "sec.photos": "Saját fotók — üzemi környezetből",
+    "photo1.cap": "CPU315-2AF03 · MC951/32kB memóriakártya · RUN/STOP/MRES kapcsoló",
+    "photo2.cap": "Teljes rack: PS307-5A tápegység · CPU315 · SM321/SM323 digitális I/O modulok · kézi I/O-jelölések",
+    "sec.specs": "Technikai adatok — CPU315-2AF03",
+    "th.param": "Paraméter", "th.value": "Érték", "th.note": "Megjegyzés",
+    "sec.procon": "Előnyök és hátrányok",
+    "pros.title": "✓ Előnyök", "cons.title": "✗ Hátrányok",
+    "pro1": "<strong style='color:var(--accent2)'>Bevált megbízhatóság</strong> — 30 éves kultúra, rengeteg üzemeltető ismeri. MTBF értéke extrém magas, 10-15 éves üzemidő teljesen jellemző.",
+    "pro2": "<strong style='color:var(--accent2)'>Moduláris bővíthetőség</strong> — a rack tetszőlegesen bővíthető I/O, kommunikációs és funkcionális modulokkal.",
+    "pro3": "<strong style='color:var(--accent2)'>Hatalmas ökoszisztéma</strong> — számtalan gyártó épített rá periféria-eszközöket, HMI-t, frekvenciaváltót.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, akár 127 eszköz egy szegmensen.",
+    "pro5": "<strong style='color:var(--accent2)'>Gazdag diagnosztika</strong> — online állapotfigyelés STEP 7-ből, szimbólikus I/O monitorozás, hardverhiba-riportok.",
+    "pro6": "<strong style='color:var(--accent2)'>Tartalékalkatrész-piac</strong> — bőséges used market, sok raktáron tartott modul.",
+    "con1": "<strong style='color:#d08080'>EOL — életciklus vége</strong> — Siemens 2023-ban leállította az értékesítést. Alkatrész-ellátás egyre drágul.",
+    "con2": "<strong style='color:#d08080'>Magas ár</strong> — egy CPU315 + rack + modulok összköltsége €2000–5000 felett van.",
+    "con3": "<strong style='color:#d08080'>Nincs natív Ethernet/IP</strong> — az alap CPU-khoz CP343 kommunikációs modul kell.",
+    "con4": "<strong style='color:#d08080'>Nehézkes szoftver</strong> — STEP 7 Classic Windows-specifikus, VirtualBox-on kell futtatni modern gépen.",
+    "con5": "<strong style='color:#d08080'>Akkumulátor-függőség</strong> — a CPU RAM tartalmát akkumulátor tartja fenn, ez karbantartási feladat.",
+    "con6": "<strong style='color:#d08080'>Nem skálázható lefelé</strong> — kis alkalmazásokra az S7-1200 sokkal jobb választás.",
+    "sec.usecases": "Mikor érdemes alkalmazni?",
+    "uc1.title": "Gyártósorok vezérlése", "uc1.body": "Közepes komplexitású gyártósorok (50–500 I/O pont), ahol Profibus-DP hálón frekvenciaváltók, robotok és HMI-k csatlakoznak. Autóipar, élelmiszer, gyógyszer.",
+    "uc2.title": "Meglévő telepítések karbantartása", "uc2.body": "Ahol már fut S7-300 és a beruházás visszatérült, a csere gazdaságilag nem indokolt. A rendszer még évtizedekig üzemképes.",
+    "uc3.title": "Folyamatvezérlés", "uc3.body": "Hőmérséklet-, nyomás- és áramlásvezérlés PID szabályozókkal. Az SM331/332 modulok és a PID FB-ek könyvtára profi megoldást ad.",
+    "uc4.title": "Energiaelosztás, szünetmentes rendszerek", "uc4.body": "Transzformátorállomások, UPS vezérlők, ahol a megbízhatóság és a hosszú élettartam kritikus.",
+    "uc5.title": "Víz- és szennyvíztisztítás", "uc5.body": "Szivattyúállomások, szűrőrendszerek automatizálása. A hosszú alkatrész-elérhetőség miatt évtizedekre terveznek ilyen rendszereket.",
+    "uc6.title": "Bányászat, nehézipar", "uc6.body": "Ahol extrém por, rezgés és hőmérséklet-ingadozás a norma. A SIPLUS sorozat ilyen környezetekre készül.",
+    "sec.notwhen": "Mikor NEM érdemes S7-300-at választani?",
+    "dt.situation": "Helyzet", "dt.s7300": "S7-300", "dt.better": "Jobb választás", "dt.why": "Miért?",
+    "dt.nem": "Nem ajánlott", "dt.felt": "Feltételesen", "dt.igen": "Tartsd meg",
+    "dt1.sit": "Kis gép, <32 I/O", "dt1.why": "Ára aránytalanul magas, túlméretezett.",
+    "dt2.sit": "Új projekt 2024-ben", "dt2.why": "EOL státusz, drágul az alkatrész, nincs fejlesztés. S7-1500 jobb.",
+    "dt3.sit": "IoT / Ipar 4.0", "dt3.why": "Natív cloud-csatlakozás nélkül. CP modulokkal megoldható, de bonyolult.",
+    "dt4.sit": "Biztonságkritikus (SIL 2/3)", "dt4.why": "Külön failsafe CPU kell. S7-1500F jobb alternatíva.",
+    "dt5.sit": "Kis sorozatgyártás", "dt5.why": "Nyílt szabvány Codesys-alapú PLC sokrétűbb lehetőséget ad.",
+    "dt6.sit": "Jól működő rendszer", "dt6.why": "Ha üzemel, ne változtass! A csere magas kockázat és leállási idő.",
+    "sec.replace": "Mikor érdemes gyártósorban lecserélni?",
+    "replace.intro": "A csere döntése mindig <strong>gazdasági számítás</strong>, nem technikai reflex. Egy üzemelő S7-300 leállítása és átprogramozása hétnyi leállást, €20–100 ezer munkadíjat jelent. Mégis vannak helyzetek, amikor indokolt.",
+    "rr.when": "Mikor?", "rr.action": "Teendő", "rr.reason": "Indoklás",
+    "rr1.when": "CPU meghibásodás", "rr1.reason": "Ha a CPU meghalt és a program elérhető, megfontolandó a teljes migráció S7-1500-ra.",
+    "rr2.when": "Alkatrészhiány", "rr2.reason": "Ha egy SM modul nem szerezhető be, ET200SP remote I/O átállás jöhet szóba.",
+    "rr3.when": "Kapacitásbővítés", "rr3.reason": "Ha a rack megtelik, Profinet ET200SP remote I/O-val bővíthető CPU-csere nélkül.",
+    "rr4.when": "Gyártósor korszerűsítés", "rr4.reason": "Tervezett leállásnál, ha minden gépelemet modernizálnak. Egyszeri nagy befektetés, 2040-ig futható platform.",
+    "rr5.when": "Program elveszett", "rr5.reason": "A CPU-ból feltölthető STEP 7-tel — de csak védelem nélkül és ha be van töltve.",
+    "rr6.when": "Jól működik", "rr6.reason": "\"If it ain't broke, don't fix it\" — ipari automatizálásban különösen igaz.",
+    "sec.experience": "Személyes tapasztalat",
+    "experience.text": "A képeken látható rendszerrel konkrétan dolgoztam: <strong>CPU315-2AF03</strong> rack-et bővítettem digitális I/O kártyával (SM323), valamint hibakeresést végeztem egy Profibus-szegmens szakadás miatt leállt gyártósoron. Az S7-300 erőssége pontosan az, ami a képeken is látszik — a kézzel felírt I/O-jelölések: <strong>évtizedek alatt felhalmozott, dokumentált, átlátható rendszer</strong>, amiben egy tapasztalt villanyszerelő azonnal eligazodik.",
+    "sec.vsbudget": "Mikor elég egy olcsóbb kategória?",
+    "vb.plc": "PLC", "vb.price": "Ár (CPU)", "vb.io": "I/O", "vb.best": "Legjobb alkalmazás",
+    "vb1": "Kis gépek, szivattyúvezérlés, időzítők, egyszerű sorkapcsok kiváltása.",
+    "vb2": "Kis-közepes gépek, egyszerű Profinet háló, Motion Control kis tengelyekre.",
+    "vb3": "Közepes gyártósorok, Profibus-DP hálók, komplex folyamatvezérlés, meglévő telepítések.",
+    "vb4": "Nagy rendszerek, Ipar 4.0, biztonsági funkciók, motion control, hosszú jövő.",
+    "vb5": "PC-alapú, nyílt rendszerek, EtherCAT servo-meghajtók, rugalmas szoftver-stack.",
+  },
+  en: {
+    "title": "Siemens <em>S7-300</em> PLC<br>— Industrial experience",
+    "sub": "Industrial automation · PLC programming · Maintenance",
+    "sec.overview": "Overview",
+    "overview.text": "The Siemens SIMATIC S7-300 is one of the most significant mid-range PLCs — manufactured since 1994, it still runs in tens of thousands of active installations worldwide. Its modular architecture, robust power supplies, and vast ecosystem (Step 7, TIA Portal, Profibus, Profinet) made it the defining standard in industrial automation for decades. In my own work I have operated CPU315-2AF03 and CPU312 units — from installing digital I/O expansion cards through fault-finding to full rack system rebuilds.",
+    "sec.photos": "Own photos — operational environment",
+    "photo1.cap": "CPU315-2AF03 · MC951/32kB memory card · RUN/STOP/MRES selector",
+    "photo2.cap": "Full rack: PS307-5A PSU · CPU315 · SM321/SM323 digital I/O modules · hand-written I/O labels",
+    "sec.specs": "Technical data — CPU315-2AF03",
+    "th.param": "Parameter", "th.value": "Value", "th.note": "Note",
+    "sec.procon": "Advantages and disadvantages",
+    "pros.title": "✓ Advantages", "cons.title": "✗ Disadvantages",
+    "pro1": "<strong style='color:var(--accent2)'>Proven reliability</strong> — 30-year culture, many operators know it well. Extremely high MTBF; 10–15 year operational lifetime is typical.",
+    "pro2": "<strong style='color:var(--accent2)'>Modular expandability</strong> — the rack can be expanded arbitrarily with I/O, communication and function modules.",
+    "pro3": "<strong style='color:var(--accent2)'>Vast ecosystem</strong> — countless manufacturers built peripheral devices, HMIs, and drives on it.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP network</strong> — fast, deterministic bus up to 12 Mbit/s, up to 127 devices per segment.",
+    "pro5": "<strong style='color:var(--accent2)'>Rich diagnostics</strong> — online monitoring from STEP 7, symbolic I/O watch, hardware fault reports per module.",
+    "pro6": "<strong style='color:var(--accent2)'>Spare parts market</strong> — abundant used market, many modules kept in stock.",
+    "con1": "<strong style='color:#d08080'>EOL — end of life</strong> — Siemens halted sales in 2023. Parts supply is increasingly expensive.",
+    "con2": "<strong style='color:#d08080'>High cost</strong> — a CPU315 + rack + modules easily exceeds €2000–5000.",
+    "con3": "<strong style='color:#d08080'>No native Ethernet/IP</strong> — base CPUs require a CP343 communication module.",
+    "con4": "<strong style='color:#d08080'>Cumbersome software</strong> — STEP 7 Classic is Windows-specific and needs VirtualBox on modern machines.",
+    "con5": "<strong style='color:#d08080'>Battery dependency</strong> — CPU RAM content is backed by battery; a maintenance and failure point.",
+    "con6": "<strong style='color:#d08080'>Not downward-scalable</strong> — for small applications the S7-1200 is a far better choice.",
+    "sec.usecases": "When to use it?",
+    "uc1.title": "Production line control", "uc1.body": "Medium-complexity lines (50–500 I/O points) with drives, robots and HMIs on Profibus-DP. Automotive, food, pharma.",
+    "uc2.title": "Maintaining existing installations", "uc2.body": "Where S7-300 is already running and the investment has been recovered, replacement is not economically justified.",
+    "uc3.title": "Process control", "uc3.body": "Temperature, pressure and flow control with PID. The SM331/332 modules and PID FB library give a professional solution.",
+    "uc4.title": "Power distribution, UPS", "uc4.body": "Transformer substations, UPS controllers where reliability and long lifetime are critical.",
+    "uc5.title": "Water and wastewater treatment", "uc5.body": "Pump stations, filter system automation. Long parts availability means these systems are designed for decades.",
+    "uc6.title": "Mining, heavy industry", "uc6.body": "Where extreme dust, vibration and temperature swings are the norm. The SIPLUS series is built for these environments.",
+    "sec.notwhen": "When NOT to choose the S7-300?",
+    "dt.situation": "Situation", "dt.s7300": "S7-300", "dt.better": "Better choice", "dt.why": "Why?",
+    "dt.nem": "Not recommended", "dt.felt": "Conditionally", "dt.igen": "Keep it",
+    "dt1.sit": "Small machine, <32 I/O", "dt1.why": "Disproportionately expensive, oversized for a small task.",
+    "dt2.sit": "New project in 2024", "dt2.why": "EOL status, rising parts costs, no development. S7-1500 is better.",
+    "dt3.sit": "IoT / Industry 4.0", "dt3.why": "No native cloud connectivity. Possible with CP modules but complex.",
+    "dt4.sit": "Safety-critical (SIL 2/3)", "dt4.why": "Separate failsafe CPU needed. S7-1500F is a better alternative.",
+    "dt5.sit": "Small-batch manufacturing", "dt5.why": "Open-standard Codesys-based PLC offers more flexibility.",
+    "dt6.sit": "Well-functioning system", "dt6.why": "If it works, don't touch it! Replacement carries high risk and downtime.",
+    "sec.replace": "When to replace on a production line?",
+    "replace.intro": "The replacement decision is always an <strong>economic calculation</strong>, not a technical reflex. Stopping, reprogramming and restarting a running S7-300 means weeks of downtime and €20–100k in labour. Yet there are situations when it is justified.",
+    "rr.when": "When?", "rr.action": "Action", "rr.reason": "Rationale",
+    "rr1.when": "CPU failure", "rr1.reason": "If the CPU dies and the program is available, full migration to S7-1500 is worth considering.",
+    "rr2.when": "Parts shortage", "rr2.reason": "If a module cannot be sourced at a reasonable price, ET200SP remote I/O migration may be an option.",
+    "rr3.when": "Capacity expansion", "rr3.reason": "If the rack is full, Profinet ET200SP remote I/O can expand the system without replacing the CPU.",
+    "rr4.when": "Line modernisation", "rr4.reason": "At a planned shutdown when all machine elements are being upgraded. One-time large investment, platform runs to 2040.",
+    "rr5.when": "Program lost", "rr5.reason": "Can be uploaded from the CPU via STEP 7 — but only if loaded and unprotected.",
+    "rr6.when": "Working fine", "rr6.reason": "\"If it ain't broke, don't fix it\" — especially true in industrial automation.",
+    "sec.experience": "Personal experience",
+    "experience.text": "I worked directly with the system shown in the photos: I expanded a <strong>CPU315-2AF03</strong> rack with a digital I/O card (SM323) and performed fault-finding on a production line that had stopped due to a Profibus segment break. The strength of the S7-300 is exactly what the photos show — the hand-written I/O labels on the SM modules: <strong>a documented, transparent system built up over decades</strong> that an experienced electrician can navigate immediately.",
+    "sec.vsbudget": "When is a cheaper category sufficient?",
+    "vb.plc": "PLC", "vb.price": "Price (CPU)", "vb.io": "I/O", "vb.best": "Best application",
+    "vb1": "Small machines, pump control, timers, simple relay replacement.",
+    "vb2": "Small-medium machines, simple Profinet network, motion control for small axes.",
+    "vb3": "Medium production lines, Profibus-DP networks, complex process control, existing installations.",
+    "vb4": "Large systems, Industry 4.0, safety functions, motion control, long-term platform.",
+    "vb5": "PC-based, open systems, EtherCAT servo drives, flexible software stack.",
+  },
+  de: {
+    "title": "Siemens <em>S7-300</em> SPS<br>— Industrielle Erfahrungen",
+    "sub": "Industrieautomatisierung · SPS-Programmierung · Wartung",
+    "sec.overview": "Überblick",
+    "overview.text": "Die Siemens SIMATIC S7-300 ist eine der bedeutendsten SPS der mittleren Leistungsklasse — seit 1994 gefertigt und noch heute in Zehntausenden aktiver Installationen weltweit im Einsatz. Ihr modularer Aufbau, robuste Netzteile und das riesige Ökosystem (Step 7, TIA Portal, Profibus, Profinet) machten sie jahrzehntelang zum bestimmenden Standard der Industrieautomatisierung.",
+    "sec.photos": "Eigene Fotos — aus dem Betrieb",
+    "photo1.cap": "CPU315-2AF03 · MC951/32kB Speicherkarte · RUN/STOP/MRES Schalter",
+    "photo2.cap": "Vollständiges Rack: PS307-5A Netzteil · CPU315 · SM321/SM323 Digital-I/O · handgeschriebene I/O-Beschriftungen",
+    "sec.specs": "Technische Daten — CPU315-2AF03",
+    "th.param": "Parameter", "th.value": "Wert", "th.note": "Hinweis",
+    "sec.procon": "Vor- und Nachteile",
+    "pros.title": "✓ Vorteile", "cons.title": "✗ Nachteile",
+    "pro1": "<strong style='color:var(--accent2)'>Bewährte Zuverlässigkeit</strong> — 30 Jahre Erfahrung, viele Betreiber kennen sie. Extrem hohe MTBF, 10–15 Jahre Betriebsdauer typisch.",
+    "pro2": "<strong style='color:var(--accent2)'>Modulare Erweiterbarkeit</strong> — das Rack kann beliebig mit I/O-, Kommunikations- und Funktionsmodulen erweitert werden.",
+    "pro3": "<strong style='color:var(--accent2)'>Riesiges Ökosystem</strong> — zahllose Hersteller haben Peripheriegeräte, HMIs und Antriebe darauf aufgebaut.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP-Netzwerk</strong> — schneller, deterministischer Bus bis 12 Mbit/s, bis zu 127 Geräte pro Segment.",
+    "pro5": "<strong style='color:var(--accent2)'>Umfangreiche Diagnose</strong> — Online-Überwachung aus STEP 7, symbolische I/O-Beobachtung.",
+    "pro6": "<strong style='color:var(--accent2)'>Ersatzteilmarkt</strong> — reichhaltiger Gebrauchtmarkt, viele Module auf Lager.",
+    "con1": "<strong style='color:#d08080'>EOL — Lebensende</strong> — Siemens hat 2023 den Verkauf eingestellt. Teileversorgung wird teurer.",
+    "con2": "<strong style='color:#d08080'>Hoher Preis</strong> — CPU315 + Rack + Module übersteigt leicht €2000–5000.",
+    "con3": "<strong style='color:#d08080'>Kein natives Ethernet/IP</strong> — Basis-CPUs benötigen ein CP343-Kommunikationsmodul.",
+    "con4": "<strong style='color:#d08080'>Umständliche Software</strong> — STEP 7 Classic ist Windows-spezifisch und benötigt VirtualBox.",
+    "con5": "<strong style='color:#d08080'>Batterieabhängigkeit</strong> — RAM-Inhalt wird durch Batterie gesichert; Wartungsaufwand.",
+    "con6": "<strong style='color:#d08080'>Nicht nach unten skalierbar</strong> — für kleine Anwendungen ist die S7-1200 besser geeignet.",
+    "sec.usecases": "Wann sinnvoll einsetzen?",
+    "uc1.title": "Fertigungsliniensteuerung", "uc1.body": "Mittelkomplexe Linien (50–500 I/O-Punkte) mit Antrieben, Robotern und HMIs an Profibus-DP. Automotive, Lebensmittel, Pharma.",
+    "uc2.title": "Bestehende Anlagen warten", "uc2.body": "Wo S7-300 bereits läuft und die Investition amortisiert ist, ist ein Austausch wirtschaftlich nicht gerechtfertigt.",
+    "uc3.title": "Prozessregelung", "uc3.body": "Temperatur-, Druck- und Durchflussregelung mit PID. SM331/332-Module und PID-FB-Bibliothek bieten professionelle Lösungen.",
+    "uc4.title": "Energieverteilung, USV", "uc4.body": "Transformatorstationen, USV-Steuerungen mit hohen Anforderungen an Zuverlässigkeit und Langlebigkeit.",
+    "uc5.title": "Wasser- und Abwasseraufbereitung", "uc5.body": "Pumpstationen, Filteranlagenautomatisierung — auf Jahrzehnte ausgelegt dank langer Teilverfügbarkeit.",
+    "uc6.title": "Bergbau, Schwerindustrie", "uc6.body": "Extreme Stäube, Vibrationen und Temperaturschwankungen. SIPLUS-Serie für solche Umgebungen ausgelegt.",
+    "sec.notwhen": "Wann NICHT S7-300 wählen?",
+    "dt.situation": "Situation", "dt.s7300": "S7-300", "dt.better": "Bessere Wahl", "dt.why": "Warum?",
+    "dt.nem": "Nicht empfohlen", "dt.felt": "Bedingt", "dt.igen": "Behalten",
+    "dt1.sit": "Kleine Maschine, <32 I/O", "dt1.why": "Unverhältnismäßig teuer, überdimensioniert.",
+    "dt2.sit": "Neues Projekt 2024", "dt2.why": "EOL-Status, steigende Teilekosten. S7-1500 ist besser.",
+    "dt3.sit": "IoT / Industrie 4.0", "dt3.why": "Keine native Cloud-Anbindung. Mit CP-Modulen möglich, aber komplex.",
+    "dt4.sit": "Sicherheitskritisch (SIL 2/3)", "dt4.why": "Separate Failsafe-CPU nötig. S7-1500F ist besser.",
+    "dt5.sit": "Kleinserienfertigung", "dt5.why": "Offener Codesys-Standard bietet mehr Flexibilität.",
+    "dt6.sit": "Funktionierendes System", "dt6.why": "\"Never change a running system\" — gilt in der Industrieautomatisierung besonders.",
+    "sec.replace": "Wann auf einer Fertigungslinie ersetzen?",
+    "replace.intro": "Die Austauschenentscheidung ist immer eine <strong>wirtschaftliche Kalkulation</strong>. Stillstand, Umprogrammierung und Neuanlauf bedeuten wochenlangen Ausfall und €20–100k Arbeitskosten.",
+    "rr.when": "Wann?", "rr.action": "Maßnahme", "rr.reason": "Begründung",
+    "rr1.when": "CPU-Ausfall", "rr1.reason": "Wenn CPU defekt und Programm vorhanden, vollständige Migration auf S7-1500 erwägen.",
+    "rr2.when": "Teilemangel", "rr2.reason": "Wenn Modul nicht beschaffbar, ET200SP Remote-I/O-Migration in Betracht ziehen.",
+    "rr3.when": "Kapazitätserweiterung", "rr3.reason": "Bei vollem Rack: Profinet ET200SP Remote-I/O ohne CPU-Tausch.",
+    "rr4.when": "Linienmodernisierung", "rr4.reason": "Bei geplantem Stillstand und Gesamtmodernisierung. Einmalige Investition, Plattform bis 2040.",
+    "rr5.when": "Programm verloren", "rr5.reason": "Aus CPU über STEP 7 hochladbar — nur wenn geladen und ungeschützt.",
+    "rr6.when": "Läuft einwandfrei", "rr6.reason": "\"Never change a running system\" — in der Automatisierung besonders wahr.",
+    "sec.experience": "Persönliche Erfahrung",
+    "experience.text": "Ich habe direkt mit dem auf den Fotos gezeigten System gearbeitet: Erweiterung eines <strong>CPU315-2AF03</strong>-Racks mit einer Digital-I/O-Karte (SM323) und Fehlersuche an einer Linie, die wegen eines Profibus-Segmentbruchs zum Stillstand kam. Die handgeschriebenen I/O-Beschriftungen auf den SM-Modulen zeigen die <strong>über Jahrzehnte aufgebaute, dokumentierte Transparenz</strong> solcher Systeme.",
+    "sec.vsbudget": "Wann reicht eine günstigere Kategorie?",
+    "vb.plc": "SPS", "vb.price": "Preis (CPU)", "vb.io": "I/O", "vb.best": "Beste Anwendung",
+    "vb1": "Kleine Maschinen, Pumpensteuerung, Zeitgeber, Schützersatz.",
+    "vb2": "Klein-mittelgroße Maschinen, einfaches Profinet-Netz, Motion für kleine Achsen.",
+    "vb3": "Mittlere Fertigungslinien, Profibus-DP-Netz, komplexe Prozessregelung, bestehende Anlagen.",
+    "vb4": "Große Anlagen, Industrie 4.0, Sicherheitsfunktionen, Motion Control, Langzeit-Plattform.",
+    "vb5": "PC-basiert, offene Systeme, EtherCAT-Servoregler, flexibler Software-Stack.",
+  }
+};
+
+let lang = 'hu';
+function setLang(l) {
+  lang = l;
+  document.documentElement.lang = l;
+  const t = T[l];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent === l.toUpperCase())
+  );
+}
+
+window.addEventListener('load', () => setLang('hu'));
+</script>
+</body>
+</html>
