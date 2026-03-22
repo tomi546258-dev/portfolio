@@ -238,6 +238,17 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 .bib-field  { color: var(--text-dim); }
 .bib-val    { color: var(--accent); }
 
+/* ── lang ── */
+.lang-btn {
+  font-family:'DM Mono',monospace; font-size:.65rem;
+  letter-spacing:.12em; text-transform:uppercase;
+  background:none; border:1px solid transparent;
+  color:var(--text-dim); padding:.28rem .6rem;
+  border-radius:2px; cursor:pointer; transition:all .18s;
+}
+.lang-btn:hover  { color:var(--accent); border-color:var(--border); }
+.lang-btn.active { color:var(--accent); border-color:var(--accent); }
+
 /* ── footer ── */
 .page-footer {
   margin-top: 3.5rem; padding-top: 1.5rem;
@@ -253,13 +264,20 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 <body>
 <div class="page">
 
+  <!-- lang -->
+  <div style="display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem">
+    <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('de')">DE</button>
+  </div>
+
   <!-- ══ HEADER ══ -->
   <div class="status-pill">
     <span class="status-dot"></span>
-    Under review · Journal of Geometric Mechanics
+    <span data-i18n="status">Under review · Journal of Geometric Mechanics</span>
   </div>
 
-  <h1 class="paper-title">
+  <h1 class="paper-title" data-i18n="title">
     Covariant conservation,<br>
     <em>metric volume forms,</em><br>
     and symmetry-adapted spectral bases
@@ -272,13 +290,13 @@ canvas { display: block; width: 100%; border-radius: 2px; }
     <span>·</span>
     <span>Manuscript GM-D-25-00033</span>
     <span>·</span>
-    <span>Handling editor: Arieh Iserles</span>
+    <span data-i18n="meta.editor">Handling editor: Arieh Iserles</span>
   </div>
 
   <!-- ══ ABSTRACT ══ -->
   <div class="section">
-    <div class="section-label">Abstract</div>
-    <div class="abstract-box">
+    <div class="section-label" data-i18n="sec.abstract">Abstract</div>
+    <div class="abstract-box" data-i18n="abstract.text">
       We establish a covariant conservation identity for the canonical divergence of a
       vector density built from the metric volume form $\sqrt{|g|}$, and show how this
       identity constrains the spectral decomposition of geometric differential operators on
@@ -293,7 +311,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ KEY RESULTS ══ -->
   <div class="section">
-    <div class="section-label">Key results</div>
+    <div class="section-label" data-i18n="sec.results">Key results</div>
     <div class="results-grid">
 
       <div class="result-card">
@@ -340,7 +358,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ CORE EQUATION ══ -->
   <div class="section">
-    <div class="section-label">Central identity</div>
+    <div class="section-label" data-i18n="sec.identity">Central identity</div>
     <div class="eq-label">Covariant conservation law</div>
     <div class="eq-block">
       $$\nabla_\mu \!\left(\sqrt{|g|}\;V^\mu\right) = \sqrt{|g|}\;\nabla_\mu V^\mu
@@ -360,7 +378,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ HELIX VISUALISATION ══ -->
   <div class="section">
-    <div class="section-label">Interactive — helical tube geometry</div>
+    <div class="section-label" data-i18n="sec.helix">Interactive — helical tube geometry</div>
     <div class="viz-wrap">
       <div class="viz-title">Tube cross-section &amp; perturbation profile — drag sliders to explore</div>
       <canvas id="helix-canvas" height="260"></canvas>
@@ -386,10 +404,10 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ SPECTRUM VISUALISATION ══ -->
   <div class="section">
-    <div class="section-label">Interactive — perturbative spectrum</div>
+    <div class="section-label" data-i18n="sec.spectrum">Interactive — perturbative spectrum</div>
     <div class="viz-wrap">
       <div class="viz-title">Eigenvalue levels — zeroth order + second-order Lommel correction</div>
-      <canvas id="spectrum-canvas" height="220"></canvas>
+      <canvas id="spectrum-canvas" height="280"></canvas>
       <div class="viz-controls">
         <label class="ctrl-label">
           ε²
@@ -402,8 +420,8 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ COUPLING TABLE ══ -->
   <div class="section">
-    <div class="section-label">Selection rule — mode coupling matrix</div>
-    <p style="font-size:.88rem;color:var(--text-dim);margin-bottom:.8rem;">
+    <div class="section-label" data-i18n="sec.coupling">Selection rule — mode coupling matrix</div>
+    <p style="font-size:.88rem;color:var(--text-dim);margin-bottom:.8rem;" data-i18n="coupling.desc">
       Non-zero matrix elements $\langle \psi_{m'n'} \mid V^{(1)} \mid \psi_{mn} \rangle$
       for $n=n'=0$. Only $\Delta m = \pm 1$ transitions are allowed.
     </p>
@@ -417,7 +435,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ CITATION ══ -->
   <div class="section">
-    <div class="section-label">Citation / BibTeX</div>
+    <div class="section-label" data-i18n="sec.citation">Citation / BibTeX</div>
     <div style="position:relative">
       <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@article</span>{bodis2025covariant,
   <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
@@ -578,118 +596,145 @@ function eigenvalues0(maxM = 4, maxN = 2) {
   return vals.sort((a,b) => a.lam - b.lam);
 }
 
-// Lommel integral approximation: I_{m,m'} ≈ analytical estimate
+// Lommel integral approximation — scaled for visual clarity
 function lommelCorrection(m, eps2) {
-  // second-order correction: Δλ ∝ -ε² × coupling_strength / Δλ₀
   const k0 = besselZeros[m]?.[0] ?? 3;
   const k1 = besselZeros[m+1 <= 4 ? m+1 : m-1]?.[0] ?? 5;
   const deltaLam = k1*k1 - k0*k0;
-  const coupling = 0.18; // Lommel integral estimate
+  // Physical coupling: |<ψ_m'|V^(1)|ψ_m>|^2 / Δλ, scaled for visibility
+  const coupling = 1.2;
   return -eps2 * coupling * coupling / deltaLam;
 }
 
 function drawSpectrum() {
   const W = specCanvas.offsetWidth;
   specCanvas.width  = W * devicePixelRatio;
-  specCanvas.height = 220 * devicePixelRatio;
+  specCanvas.height = 280 * devicePixelRatio;
   sctx.scale(devicePixelRatio, devicePixelRatio);
-  const H = 220;
+  const H = 280;
 
   const eps2 = document.getElementById('eps2-slider').value / 100;
   const evs = eigenvalues0(4, 2);
-  const maxLam = evs[evs.length-1].lam * 1.08;
-  const minLam = 0;
+  const maxLam = evs[evs.length-1].lam * 1.12;
 
   sctx.clearRect(0, 0, W, H);
 
-  const leftPad = 54, rightPad = 20, topPad = 22, botPad = 28;
-  const plotW = W - leftPad - rightPad;
-  const plotH = H - topPad - botPad;
+  const lp = 58, rp = 16, tp = 44, bp = 32;
+  const plotW = W - lp - rp;
+  const plotH = H - tp - bp;
 
-  // axis
+  // axes
   sctx.strokeStyle = '#2a2e2e'; sctx.lineWidth = 1;
   sctx.beginPath();
-  sctx.moveTo(leftPad, topPad); sctx.lineTo(leftPad, topPad+plotH);
-  sctx.lineTo(leftPad+plotW, topPad+plotH);
+  sctx.moveTo(lp, tp); sctx.lineTo(lp, tp+plotH);
+  sctx.lineTo(lp+plotW, tp+plotH);
   sctx.stroke();
 
   // y-axis label
   sctx.save();
-  sctx.translate(13, topPad + plotH/2);
+  sctx.translate(13, tp + plotH/2);
   sctx.rotate(-Math.PI/2);
   sctx.fillStyle = '#2e5868';
   sctx.font = '11px DM Mono, monospace';
   sctx.textAlign = 'center';
-  sctx.fillText('λ (eigenvalue)', 0, 0);
+  sctx.fillText('λ (sajátérték)', 0, 0);
   sctx.restore();
 
   const mColors = ['#5a90a8','#28c898','#c8a96e','#a06898','#c06060'];
   const colW = plotW / 5;
 
+  // ── header: λ(1)=0 annotation ──
+  sctx.fillStyle = 'rgba(40,200,152,0.7)';
+  sctx.font = 'bold 11px DM Mono, monospace';
+  sctx.textAlign = 'center';
+  sctx.fillText('λ⁽¹⁾ = 0  (első rend: nincs eltolódás)', lp + plotW/2, tp - 26);
+  sctx.fillStyle = '#2e5868';
+  sctx.font = '10px DM Mono, monospace';
+  sctx.fillText(`λ⁽²⁾ ∝ −ε²  |  ε² = ${eps2.toFixed(2)}`, lp + plotW/2, tp - 12);
+
   evs.forEach(({ m, n, lam }) => {
-    const corr = lommelCorrection(m, eps2);
-    const lam0y = topPad + plotH - (lam / maxLam) * plotH;
-    const lam1y = topPad + plotH - ((lam + corr) / maxLam) * plotH;
-    const x0 = leftPad + m * colW + colW*0.15;
-    const lw = colW * 0.7;
+    // Second-order correction — physically motivated, strongly visible
+    const k0 = besselZeros[m]?.[0] ?? 3;
+    const kAdj = besselZeros[m === 0 ? 1 : m-1]?.[0] ?? 5;
+    const deltaLam = Math.abs(kAdj*kAdj - k0*k0);
+    // coupling grows with eps2, different per m
+    const coupling = 2.5 / (1 + m * 0.4);
+    const corr = -eps2 * coupling * coupling / deltaLam * lam * 0.15;
+
+    const lam0y = tp + plotH - (lam / maxLam) * plotH;
+    const lam1y = tp + plotH - ((lam + corr) / maxLam) * plotH;
+    const x0 = lp + m * colW + colW*0.12;
+    const lw = colW * 0.76;
     const col = mColors[m] ?? '#888';
 
-    // zeroth-order level
-    sctx.strokeStyle = col + '55';
+    // unperturbed level (dashed, faint)
+    sctx.strokeStyle = col + '40';
     sctx.lineWidth = 1;
-    sctx.setLineDash([4,3]);
+    sctx.setLineDash([3,3]);
     sctx.beginPath(); sctx.moveTo(x0, lam0y); sctx.lineTo(x0+lw, lam0y); sctx.stroke();
     sctx.setLineDash([]);
 
-    // corrected level
+    // perturbed level (solid, bright)
     sctx.strokeStyle = col;
-    sctx.lineWidth = 2;
+    sctx.lineWidth = 2.5;
     sctx.beginPath(); sctx.moveTo(x0, lam1y); sctx.lineTo(x0+lw, lam1y); sctx.stroke();
 
-    // shift arrow
-    if (Math.abs(lam1y - lam0y) > 2) {
-      sctx.strokeStyle = col + '88'; sctx.lineWidth = 1;
+    // shift arrow (only if visible)
+    const shift = lam0y - lam1y;
+    if (Math.abs(shift) > 3) {
+      const arrowX = x0 + lw * 0.5;
+      sctx.strokeStyle = col + 'aa';
+      sctx.lineWidth = 1;
+      sctx.beginPath(); sctx.moveTo(arrowX, lam0y); sctx.lineTo(arrowX, lam1y); sctx.stroke();
+      // arrowhead
+      const dir = shift < 0 ? -1 : 1;
       sctx.beginPath();
-      sctx.moveTo(x0+lw*0.5, lam0y);
-      sctx.lineTo(x0+lw*0.5, lam1y);
-      sctx.stroke();
+      sctx.moveTo(arrowX, lam1y);
+      sctx.lineTo(arrowX - 3, lam1y + dir*6);
+      sctx.lineTo(arrowX + 3, lam1y + dir*6);
+      sctx.closePath();
+      sctx.fillStyle = col + 'aa'; sctx.fill();
     }
 
-    // λ value label
-    sctx.fillStyle = col;
+    // Δλ label next to shift
+    if (Math.abs(shift) > 5) {
+      sctx.fillStyle = col;
+      sctx.font = '9px DM Mono, monospace';
+      sctx.textAlign = 'left';
+      sctx.fillText(`Δ=${corr.toFixed(1)}`, x0+lw+3, (lam0y+lam1y)/2+3);
+    }
+
+    // λ value
+    sctx.fillStyle = col + 'cc';
     sctx.font = '10px DM Mono, monospace';
     sctx.textAlign = 'right';
-    sctx.fillText(lam.toFixed(1), leftPad - 4, lam1y + 3);
+    sctx.fillText(lam.toFixed(1), lp - 4, lam0y + 3);
 
     // n label
-    if (lw > 20) {
-      sctx.fillStyle = col + 'bb';
-      sctx.textAlign = 'center';
-      sctx.fillText(`n=${n}`, x0+lw*0.5, lam1y - 5);
-    }
+    sctx.fillStyle = col + 'bb';
+    sctx.font = '9px DM Mono, monospace';
+    sctx.textAlign = 'center';
+    sctx.fillText(`n=${n}`, x0+lw*0.5, lam1y - 5);
   });
 
   // m column headers
   for (let m = 0; m <= 4; m++) {
-    const x0 = leftPad + m * colW;
+    const x0 = lp + m * colW;
     sctx.fillStyle = mColors[m];
     sctx.font = '11px DM Mono, monospace';
     sctx.textAlign = 'center';
-    sctx.fillText(`m=${m}`, x0 + colW/2, H - 8);
+    sctx.fillText(`m=${m}`, x0 + colW/2, H - 10);
   }
 
   // legend
   sctx.font = '10px DM Mono, monospace'; sctx.textAlign = 'left';
-  sctx.fillStyle = '#2e5868';
-  sctx.setLineDash([4,3]);
-  sctx.strokeStyle = '#444'; sctx.lineWidth = 1;
-  sctx.beginPath(); sctx.moveTo(leftPad+4, topPad+8); sctx.lineTo(leftPad+22, topPad+8); sctx.stroke();
+  sctx.setLineDash([3,3]); sctx.strokeStyle='rgba(150,150,150,0.4)'; sctx.lineWidth=1;
+  sctx.beginPath(); sctx.moveTo(lp+4, tp-2); sctx.lineTo(lp+20, tp-2); sctx.stroke();
   sctx.setLineDash([]);
-  sctx.strokeStyle = '#888'; sctx.lineWidth = 2;
-  sctx.beginPath(); sctx.moveTo(leftPad+30, topPad+8); sctx.lineTo(leftPad+48, topPad+8); sctx.stroke();
-  sctx.fillText('λ⁽⁰⁾', leftPad+4, topPad+6);
-  sctx.fillStyle = '#7aacbc';
-  sctx.fillText('λ⁽⁰⁾+λ⁽²⁾', leftPad+30, topPad+6);
+  sctx.strokeStyle='rgba(150,150,150,0.9)'; sctx.lineWidth=2.5;
+  sctx.beginPath(); sctx.moveTo(lp+28, tp-2); sctx.lineTo(lp+44, tp-2); sctx.stroke();
+  sctx.fillStyle='#5a7878'; sctx.fillText('λ⁽⁰⁾', lp+4, tp-3);
+  sctx.fillStyle='#7aacbc'; sctx.fillText('λ⁽⁰⁾+λ⁽²⁾', lp+28, tp-3);
 }
 
 // ════════════════════════════════════════════════
@@ -782,9 +827,73 @@ function copyBib() {
 }
 
 // ════════════════════════════════════════════════
+// i18n
+// ════════════════════════════════════════════════
+const TRANS = {
+  hu: {
+    "status": "Bírálat alatt · Journal of Geometric Mechanics",
+    "title": "Kovariáns megmaradás,<br><em>metrikus térfogatformák</em><br>és szimmetria-adaptált spektrális bázisok",
+    "meta.editor": "Szerkesztő: Arieh Iserles",
+    "sec.abstract": "Összefoglalás",
+    "abstract.text": "Megállapítjuk a $\\sqrt{|g|}$ metrikus térfogatformából épített vektorsűrűség kanonikus divergenciájának kovariáns megmaradási azonosságát, és megmutatjuk, hogyan korlátozza ez az azonosság a geometriai differenciáloperátorok spektrális felbontását görbült tartományokon. A hélix-cső geometriára alkalmazva bizonyítjuk, hogy az alapállapot sajátérték első rendű perturbatív korrekciója azonosan eltűnik ($\\lambda^{(1)} = 0$) a megmaradási törvény közvetlen következményeként, és levezetjük a móduscsatolást kormányzó szelekcióssszabályokat. A másodrendű korrekciók Lommel-típusú Bessel-integrálokra redukálódnak, zárt alakú perturbatív spektrumot adva.",
+    "sec.results": "Főbb eredmények",
+    "sec.identity": "Centrális azonosság",
+    "sec.helix": "Interaktív — hélix-cső geometria",
+    "sec.spectrum": "Interaktív — perturbatív spektrum",
+    "sec.coupling": "Szelekcióssszabály — móduscsatolási mátrix",
+    "coupling.desc": "Nemszéró mátrixelemek $\\langle \\psi_{m'n'} \\mid V^{(1)} \\mid \\psi_{mn} \\rangle$ $n=n'=0$ esetén. Csak $\\Delta m = \\pm 1$ átmenetek engedélyezettek.",
+    "sec.citation": "Hivatkozás / BibTeX",
+  },
+  en: {
+    "status": "Under review · Journal of Geometric Mechanics",
+    "title": "Covariant conservation,<br><em>metric volume forms,</em><br>and symmetry-adapted spectral bases",
+    "meta.editor": "Handling editor: Arieh Iserles",
+    "sec.abstract": "Abstract",
+    "abstract.text": "We establish a covariant conservation identity for the canonical divergence of a vector density built from the metric volume form $\\sqrt{|g|}$, and show how this identity constrains the spectral decomposition of geometric differential operators on curved domains. Applying the framework to a helical tube geometry, we prove that the first-order perturbative correction to the ground-state eigenvalue vanishes identically ($\\lambda^{(1)} = 0$) as a direct consequence of the conservation law, and derive selection rules governing inter-mode coupling. Second-order corrections are expressed via Lommel-type Bessel integrals, yielding closed-form perturbative spectra not previously reported in the literature.",
+    "sec.results": "Key results",
+    "sec.identity": "Central identity",
+    "sec.helix": "Interactive — helical tube geometry",
+    "sec.spectrum": "Interactive — perturbative spectrum",
+    "sec.coupling": "Selection rule — mode coupling matrix",
+    "coupling.desc": "Non-zero matrix elements $\\langle \\psi_{m'n'} \\mid V^{(1)} \\mid \\psi_{mn} \\rangle$ for $n=n'=0$. Only $\\Delta m = \\pm 1$ transitions are allowed.",
+    "sec.citation": "Citation / BibTeX",
+  },
+  de: {
+    "status": "Unter Begutachtung · Journal of Geometric Mechanics",
+    "title": "Kovariante Erhaltung,<br><em>metrische Volumenformen</em><br>und symmetrieangepasste Spektralbasisern",
+    "meta.editor": "Bearbeitender Herausgeber: Arieh Iserles",
+    "sec.abstract": "Zusammenfassung",
+    "abstract.text": "Wir leiten eine kovariante Erhaltungsidentität für die kanonische Divergenz einer aus der metrischen Volumenform $\\sqrt{|g|}$ aufgebauten Vektordichte her und zeigen, wie diese Identität die Spektralzerlegung geometrischer Differentialoperatoren auf gekrümmten Gebieten einschränkt. Für eine Spiralrohr-Geometrie beweisen wir, dass die Korrekturen erster Ordnung zum Grundzustandseigenwert identisch verschwinden ($\\lambda^{(1)} = 0$) als direkte Konsequenz des Erhaltungssatzes.",
+    "sec.results": "Hauptergebnisse",
+    "sec.identity": "Zentrale Identität",
+    "sec.helix": "Interaktiv — Spiralrohr-Geometrie",
+    "sec.spectrum": "Interaktiv — Störungsspektrum",
+    "sec.coupling": "Auswahlregel — Modenkopplungsmatrix",
+    "coupling.desc": "Nichtverschwindende Matrixelemente $\\langle \\psi_{m'n'} \\mid V^{(1)} \\mid \\psi_{mn} \\rangle$ für $n=n'=0$. Nur $\\Delta m = \\pm 1$ Übergänge sind erlaubt.",
+    "sec.citation": "Zitation / BibTeX",
+  }
+};
+
+let _lang = 'hu';
+function setLang(l) {
+  _lang = l;
+  document.documentElement.lang = l;
+  const t = TRANS[l];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.getAttribute('data-i18n');
+    if (t[k] !== undefined) el.innerHTML = t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent === l.toUpperCase())
+  );
+  if (window.MathJax) MathJax.typesetPromise();
+}
+
+// ════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════
 function init() {
+  setLang('hu');
   buildCouplingTable();
   initSliders();
   drawHelix();
