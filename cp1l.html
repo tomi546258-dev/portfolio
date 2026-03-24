@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Omron CP1L — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0f0f;--bg2:#151717;--bg3:#1c1f1f;--border:#2a2e2e;
+  --accent:#c8a96e;--accent2:#7eb8a4;--text:#d8d4cc;--text-dim:#7a7870;
+  --text-bright:#eeeae2;--orange:#d4703a;--purple:#8878c8;--red:#c05050;
+  --omron:#cc3333;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:920px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+
+/* lang */
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+
+/* header */
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--omron);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:1.6rem;}
+
+/* photo placeholder */
+.photo-placeholder{background:var(--bg2);border:1px dashed var(--border);border-radius:2px;padding:2rem 1.5rem;text-align:center;margin-top:.8rem;}
+.photo-placeholder-text{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text-dim);letter-spacing:.1em;}
+
+/* section */
+.section{margin-top:2.6rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* overview */
+.overview-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--omron);padding:1.4rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;}
+
+/* spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+@media(max-width:560px){.spec-grid{grid-template-columns:1fr;}}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.spec-key{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.spec-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);}
+.spec-note{font-size:.78rem;color:var(--text-dim);margin-top:.15rem;}
+
+/* USB highlight */
+.usb-box{background:linear-gradient(135deg,rgba(126,184,164,.08),rgba(200,169,110,.06));border:1px solid var(--accent2);border-radius:2px;padding:1.2rem 1.5rem;margin-top:.8rem;display:flex;gap:1.2rem;align-items:flex-start;}
+.usb-icon{font-size:2rem;flex-shrink:0;margin-top:.1rem;}
+.usb-text{font-size:.9rem;line-height:1.75;}
+.usb-text strong{color:var(--accent2);}
+
+/* ladder diagram */
+.ladder-wrap{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1.2rem;margin-top:.8rem;overflow-x:auto;}
+.ladder-title{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);margin-bottom:.8rem;}
+canvas{display:block;border-radius:2px;}
+
+/* module cards */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:.6rem;margin-top:.8rem;}
+.module-card{background:var(--bg2);border:1px solid var(--border);padding:.9rem 1.1rem;border-radius:2px;}
+.module-type{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;color:var(--omron);margin-bottom:.3rem;}
+.module-name{font-family:'DM Serif Display',serif;font-size:.9rem;color:var(--text-bright);margin-bottom:.25rem;}
+.module-body{font-size:.78rem;color:var(--text-dim);line-height:1.6;}
+.module-model{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent);margin-top:.35rem;}
+
+/* config accordion */
+.config-item{background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;overflow:hidden;}
+.config-header{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.1rem;cursor:pointer;transition:background .15s;user-select:none;}
+.config-header:hover{background:var(--bg3);}
+.config-title{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent2);letter-spacing:.06em;}
+.config-arrow{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);transition:transform .2s;}
+.config-item.open .config-arrow{transform:rotate(90deg);}
+.config-body{display:none;padding:.9rem 1.2rem 1rem;border-top:1px solid var(--border);font-size:.87rem;color:var(--text-dim);line-height:1.75;}
+.config-item.open .config-body{display:block;}
+.config-body strong{color:var(--text);}
+.config-body code{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--bg3);padding:.1rem .35rem;border-radius:2px;color:var(--accent);}
+
+/* comparison table */
+.comp-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.7rem;margin-top:.6rem;}
+.comp-table th{padding:.5rem .8rem;text-align:left;border-bottom:1px solid var(--border);color:var(--accent);font-weight:500;letter-spacing:.08em;}
+.comp-table td{padding:.5rem .8rem;border-bottom:1px solid var(--bg3);color:var(--text-dim);vertical-align:top;line-height:1.6;}
+.comp-table td:first-child{color:var(--accent2);}
+.comp-table tr.hl td{background:rgba(126,184,164,.04);color:var(--text);}
+.badge-good{color:var(--accent2);}
+.badge-bad{color:var(--red);}
+.badge-mid{color:var(--accent);}
+
+/* I/O calculator */
+.calc-box{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.3rem 1.5rem;margin-top:.8rem;}
+.calc-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;flex-wrap:wrap;}
+.calc-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-dim);min-width:170px;letter-spacing:.05em;}
+.calc-input{font-family:'DM Mono',monospace;font-size:.78rem;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.3rem .6rem;border-radius:2px;width:70px;text-align:right;}
+.calc-input:focus{outline:none;border-color:var(--accent2);}
+.calc-result{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1rem 1.2rem;margin-top:.8rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:1.9;}
+.calc-ok{color:var(--accent2);}
+.calc-warn{color:var(--accent);}
+.calc-err{color:var(--red);}
+
+/* experience */
+.exp-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.95rem;line-height:1.85;}
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">Omron <em>CP1L</em> — kompakt PLC mélyről</h1>
+<div class="proj-sub" data-i18n="sub">CX-Programmer · Ladder Diagram · USB programozás · Bővítőmodulok · Konfiguráció</div>
+
+<!-- overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.overview">Miért ajánlom?</div>
+  <div class="overview-box" data-i18n="overview.text">
+    Az Omron CP1L az a PLC, amit <strong>nem becsülnek alá eleget</strong>. Első pillantásra kis doboz, egyszerű kábel, megfizethető ár — de belül egy teljes értékű, profin konfigurálható vezérlő, amit ipari gépektől kezdve okos szekrényzáráson át léptetőmotoros pozicionálásig mindenhol alkalmaznak.
+    Azt szeretem benne, hogy <strong>USB-kábellel azonnal programozható</strong> — nincs külön programozó adapter, nincs driver-bonyodalom, csak bedugod és megy a CX-Programmer. Ez élesben nagyon sokat számít.
+  </div>
+</div>
+
+<!-- USB highlight -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.usb">Az USB programozás előnye</div>
+  <div class="usb-box">
+    <span class="usb-icon">🔌</span>
+    <div class="usb-text" data-i18n="usb.text">
+      Sok PLC-nél külön programozó kábel kell (RS232, USB-serial adapter, driver-probléma), amit el kell vinni a helyszínre.
+      A CP1L-nél: <strong>egy szokásos USB-B kábel</strong> (printer kábel) + CX-Programmer telepítve = kész.
+      A laptop felismeri, a szoftver csatlakozik, és máris online vagy. Hibakereséskor, gyors módosításnál ez rengeteg időt spórol — különösen ha a gép valahol nehezen elérhető helyen van.
+    </div>
+  </div>
+</div>
+
+<!-- photo placeholder -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.photo">Saját fotó — Omron CP1L</div>
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;max-width:480px;">
+    <img src="cp1l-photo.png" alt="Omron SYSMAC CP1L PLC" style="width:100%;display:block;">
+    <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text-dim);padding:.5rem .9rem;letter-spacing:.08em;" data-i18n="photo.caption">Omron SYSMAC CP1L · DC24V · EXP bővítő csatlakozó · POWER / RUN / ERR / USB/ACT / BKUP LED-ek</div>
+  </div>
+</div>
+
+<!-- specs -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.specs">Technikai adatok — CP1L-M60DR-A</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.io">I/O pontok (alap)</div><div class="spec-val">36 be / 24 ki = 60 pont</div><div class="spec-note" data-i18n="sv.io">Max. 160 pont bővítőkkel</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.cpu">CPU típusok</div><div class="spec-val">CP1L-L (10/14/20) · CP1L-M (30/40/60)</div><div class="spec-note" data-i18n="sv.cpu">CP1L-E: beépített Ethernet</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.prog">Programozás</div><div class="spec-val">USB-B · RS232C</div><div class="spec-note" data-i18n="sv.prog">CX-Programmer vagy Sysmac Studio</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.cycle">Ciklusidő</div><div class="spec-val">0.1 µs / utasítás</div><div class="spec-note" data-i18n="sv.cycle">Jellemzően 1–5 ms valós programban</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.pulse">Pulse output</div><div class="spec-val">2 × 100 kHz</div><div class="spec-note" data-i18n="sv.pulse">Direkt léptetőmotor vezérlés, PLS/ACC utasítás</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.analog">Analóg (beépített)</div><div class="spec-val">2 be + 1 ki (CP1L-M)</div><div class="spec-note" data-i18n="sv.analog">0–10V / 4–20mA, 12 bit felbontás</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.comm">Kommunikáció</div><div class="spec-val">Modbus RTU · Host Link · NT Link</div><div class="spec-note" data-i18n="sv.comm">CP1L-E: Modbus TCP + EtherNet/IP natívan</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.price">Ár (CPU)</div><div class="spec-val">€150 – €400</div><div class="spec-note" data-i18n="sv.price">S7-300 töredéke azonos I/O-ra</div></div>
+  </div>
+</div>
+
+<!-- Ladder diagram canvas -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.ladder">Interaktív — Ladder Diagram szimulátor</div>
+  <div class="ladder-wrap">
+    <!-- Program tabs -->
+    <div style="display:flex;gap:.4rem;margin-bottom:.9rem;flex-wrap:wrap;">
+      <button class="prog-tab active" onclick="selectProg(0,this)" style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;padding:.28rem .8rem;border-radius:2px;border:1px solid var(--accent);color:var(--accent);background:none;cursor:pointer;">START/STOP</button>
+      <button class="prog-tab" onclick="selectProg(1,this)" style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;padding:.28rem .8rem;border-radius:2px;border:1px solid var(--border);color:var(--text-dim);background:none;cursor:pointer;">TIM — Időzítő</button>
+      <button class="prog-tab" onclick="selectProg(2,this)" style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;padding:.28rem .8rem;border-radius:2px;border:1px solid var(--border);color:var(--text-dim);background:none;cursor:pointer;">CNT — Számláló</button>
+    </div>
+    <div class="ladder-title" id="ladder-prog-title">Motor indítás / leállítás — START/STOP logika</div>
+    <canvas id="ladder-canvas" height="240"></canvas>
+    <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-top:.6rem;padding:.3rem 0;">
+      Kattints a kontaktusokra a szimulációhoz ▸
+    </div>
+    <div id="ladder-status" style="font-family:'DM Mono',monospace;font-size:.7rem;color:var(--accent2);padding:.3rem 0;min-height:1.4rem;"></div>
+  </div>
+</div>
+
+<!-- Expansion modules -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.modules">Bővítőmodulok</div>
+  <div class="module-grid">
+    <div class="module-card">
+      <div class="module-type" data-i18n="m1.type">Digitális I/O</div>
+      <div class="module-name" data-i18n="m1.name">CP1W-16ER / 40EDT</div>
+      <div class="module-body" data-i18n="m1.body">8–40 digitális I/O hozzáadása. Relay vagy tranzisztor kimenet. Akár 7 modul sorba fűzhető — 160 pontig.</div>
+      <div class="module-model">CP1W-16ER · CP1W-40EDT</div>
+    </div>
+    <div class="module-card">
+      <div class="module-type" data-i18n="m2.type">Analóg I/O</div>
+      <div class="module-name" data-i18n="m2.name">CP1W-AD041 / DA041</div>
+      <div class="module-body" data-i18n="m2.body">4 csatornás analóg be- vagy kimenet. 0–10V / 4–20mA, 12 bit. PID vezérléshez, hőmérséklet szabályozáshoz.</div>
+      <div class="module-model">CP1W-AD041 · CP1W-DA041</div>
+    </div>
+    <div class="module-card">
+      <div class="module-type" data-i18n="m3.type">Hőmérséklet</div>
+      <div class="module-name" data-i18n="m3.name">CP1W-TS002 / TS102</div>
+      <div class="module-body" data-i18n="m3.body">Termoelem (K, J, T, E, L, U) vagy PT100/PT1000 közvetlen bekötés. Nincs szükség külső átalakítóra.</div>
+      <div class="module-model">CP1W-TS002 · CP1W-TS102</div>
+    </div>
+    <div class="module-card">
+      <div class="module-type" data-i18n="m4.type">Kommunikáció</div>
+      <div class="module-name" data-i18n="m4.name">CP1W-CIF01 / CIF11</div>
+      <div class="module-body" data-i18n="m4.body">RS232C vagy RS422/485 port bővítés. Modbus RTU master/slave, inverter kommunikáció, vonalkód olvasó.</div>
+      <div class="module-model">CP1W-CIF01 · CP1W-CIF11</div>
+    </div>
+    <div class="module-card">
+      <div class="module-type" data-i18n="m5.type">Pozicionálás</div>
+      <div class="module-name" data-i18n="m5.name">CP1W-NC113 / NC213</div>
+      <div class="module-body" data-i18n="m5.body">1 vagy 2 tengelyes pozicionáló modul, beépített profil-generátorral. Léptetőmotor vagy szervó driver közvetlen meghajtás.</div>
+      <div class="module-model">CP1W-NC113 · CP1W-NC213</div>
+    </div>
+    <div class="module-card">
+      <div class="module-type" data-i18n="m6.type">CompoBus/S</div>
+      <div class="module-name" data-i18n="m6.name">CP1W-SRT21</div>
+      <div class="module-body" data-i18n="m6.body">Slave csatlakozás CompoBus/S hálóhoz. Elosztott I/O, max. 256 pont 100m-es hálón. Gyors, determinisztikus.</div>
+      <div class="module-model">CP1W-SRT21</div>
+    </div>
+  </div>
+</div>
+
+<!-- Deep configuration -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.config">Konfiguráció mélyen — CX-Programmer</div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg1.title">I/O tábla és eszközkonfiguráció (I/O Table)</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg1.body">
+      A CX-Programmer <strong>I/O Table</strong> ablaka az első amit meg kell nyitni új projektnél. Itt definiálod:
+      <br><br>
+      • <strong>CPU típusa</strong> — pl. CP1L-M60DR-A (fontos: relay vagy tranzisztor kimenet, AC vagy DC táp)
+      <br>• <strong>Bővítőmodulok sorrendje</strong> — a fizikai sorrendnek meg kell egyeznie a szoftverbeli sorrenddel, különben helytelen I/O-cím generálódik
+      <br>• <strong>I/O foglalás</strong> — minden modul automatikusan kap egy kezdőcímet (pl. CIO 0.00–CIO 0.07 az első 8 bemenet)
+      <br><br>
+      <strong>Praktikus tipp:</strong> online módban (<code>PLC → Transfer → From PLC</code>) automatikusan beolvassa a valódi konfigurációt — így nem kell kézzel beállítani, elég csatlakozni.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg2.title">PLC Setup — kommunikáció, ciklusidő, hibakezelés</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg2.body">
+      A <strong>PLC Setup</strong> (Settings → PLC Settings) tartalmazza az összes alacsony szintű beállítást:
+      <br><br>
+      • <strong>Minimum ciklusidő</strong> — ha a program rövidebb mint ez, a CPU vár. Időkritikus rendszereknél fontos (pl. 5 ms minimum)
+      <br>• <strong>RS232C port beállítás</strong> — baudrate, paritás, stopbit a soros kommunikációhoz. Modbus RTU esetén tipikusan <code>9600, 8E1</code> vagy <code>19200, 8N1</code>
+      <br>• <strong>Startup mode</strong> — RUN vagy PROGRAM módban indul a PLC tápfeszültség visszatérésekor. Gyártósoron mindig RUN!
+      <br>• <strong>Fehér/fekete lista I/O</strong> — mely I/O-hibák okozzanak leállást és melyek csak figyelmeztetést
+      <br>• <strong>Battery hiba kezelés</strong> — CP1L akkumulátora az óra (RTC) tartásáért felel, nem a programért (flash-ben van)
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg3.title">Pulse output konfiguráció — léptetőmotor</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg3.body">
+      A CP1L-M beépített <strong>2 darab 100 kHz-es pulse output</strong> csatornával rendelkezik (Q0.00 és Q0.01 kimenetek — tranzisztor változat kötelező!).
+      <br><br>
+      <strong>Konfiguráció lépései:</strong>
+      <br>• PLC Setup → Built-in Input/Output → Pulse Output 0/1 beállítás
+      <br>• <strong>Üzemmód</strong>: CW/CCW (kétirányú) vagy Pulse+Direction (Step/Dir — a legtöbb driver ezt várja)
+      <br>• <strong>Gyorsítás/lassítás</strong>: trapéz vagy S-görbe profil — ACC utasítással programozható
+      <br><br>
+      <strong>Ladder utasítások:</strong>
+      <br>• <code>PLS2</code> — megadott sebességre és pozícióba megy, majd megáll
+      <br>• <code>ACC</code> — gyorsítási/lassítási profil beállítása
+      <br>• <code>INI</code> — pozícióregiszter nullázása, mozgás megszakítása
+      <br>• <code>PRV</code> — aktuális pozíció és sebesség olvasása
+      <br><br>
+      <strong>Egy CP1L-M + léptetőmotor driver + 2 végállás kapcsoló</strong> = komplett pozicionáló rendszer, külön motion controller nélkül.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg4.title">Modbus RTU kommunikáció beállítása</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg4.body">
+      A CP1L soros portján <strong>Modbus RTU master vagy slave</strong> üzemmódban tud kommunikálni — inverterekkel, HMI-kkal, érzékelőkkel.
+      <br><br>
+      <strong>Master beállítás (CP1L olvas/ír egy invertert):</strong>
+      <br>• PLC Setup → Serial Port 1 → Mode: <code>Modbus RTU Master</code>
+      <br>• Baudrate, paritás az inverter kézikönyve szerint (tipikusan 9600 8N1 vagy 19200 8E1)
+      <br>• Ladder-ben: <code>PMCR</code> utasítás — Modbus function code, slave cím, regiszter cím, adatok
+      <br><br>
+      <strong>Slave beállítás (HMI olvassa a CP1L-t):</strong>
+      <br>• Mode: <code>Modbus RTU Slave</code>, slave ID beállítás
+      <br>• A CIO, DM, HR területek automatikusan elérhetők Modbus regiszterként
+      <br><br>
+      <strong>Tipp:</strong> ha RS485 kell (hosszabb kábel, több eszköz), a CP1W-CIF11 modul hozzáad egy RS422/485 portot — az alap RS232 port mellett párhuzamosan használható.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg5.title">Memóriaterületek — CIO, DM, HR, AR, TIM, CNT</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg5.body">
+      A CP1L memóriaterületei a Ladder programozás alapjai:
+      <br><br>
+      • <strong>CIO (0–6143)</strong> — I/O és belső relék. CIO 0–99: fizikai I/O, CIO 100–: belső használat
+      <br>• <strong>DM (D0–D32767)</strong> — adatmemória, 16 bites szavak. Receptek, beállítások, mérési adatok tárolása. <em>Power-fail safe</em> — áramkimaradás után is megmarad
+      <br>• <strong>HR (H0–H511)</strong> — holding relék, szintén power-fail safe. Állapotjelzők, amik nem nullázódnak le áramkimaradáskor
+      <br>• <strong>AR (A0–A959)</strong> — speciális segédterületek. A448–A511: olvasható rendszerinformációk (hibakódok, ciklusidő, port állapot)
+      <br>• <strong>TIM / CNT</strong> — időzítők és számlálók. CP1L-ben 4096 db. TIM0–TIM4095, CNT0–CNT4095
+      <br>• <strong>IR / DR</strong> — index és adatregiszterek indirekt címzéshez. Táblázat-feldolgozásnál, receptkezelésnél nélkülözhetetlen
+      <br><br>
+      <strong>Praktikus szabály:</strong> amit a HMI-nak meg kell jelenítenie → DM-be. Amit a program belső állapotként kezel → CIO 100+. Amit áramkimaradás után is meg kell tartani → HR.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg6.title">CX-Programmer — online monitoring és hibakeresés</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg6.body">
+      Online módban a CX-Programmer az egyik legjobb PLC diagnosztikai felület:
+      <br><br>
+      • <strong>Ladder monitoring</strong> — az aktív kontaktusok és tekercsek élő zölddel világítanak. Azonnal látod, melyik feltétel teljesül és melyik nem
+      <br>• <strong>Watch window</strong> — bármely memóriaterület (DM, CIO, TIM) valós idejű figyelése, módosítása. Ideális rekceptek teszteléséhez
+      <br>• <strong>Force set/reset</strong> — bármely bit kényszerítetten be- vagy kikapcsolható. Fizikai I/O szimulációjához szükség van rá — pl. ha nincs kéznél érzékelő
+      <br>• <strong>Error log</strong> — PLC → Error Log: az összes korábbi hiba időbélyeggel. Ritka, intermittáló hibák visszakövetéséhez arany
+      <br>• <strong>Differenciál szkenner</strong> — változásra figyelő módban látható, melyik bit mikor változott — sporadikus hibáknál életmentő
+      <br><br>
+      <strong>Tipp online módosításhoz:</strong> <code>Program → Online Edit</code> — a futó programot módosíthatod anélkül, hogy a PLC megállna. Kritikus gépeknél ez az egyetlen elfogadható módszer.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header">
+      <span class="config-title" data-i18n="cfg7.title">PID vezérlés — beépített PID utasítás</span>
+      <span class="config-arrow">▸</span>
+    </div>
+    <div class="config-body" data-i18n="cfg7.body">
+      A CP1L tartalmaz egy <strong>beépített PID funkciót</strong> — nincs szükség külön modul vásárlásra egyszerű hőmérséklet vagy nyomásszabályozáshoz.
+      <br><br>
+      • <strong>PID utasítás</strong>: <code>PIDAT</code> — beállítási érték, mért érték, kimeneti érték, és egy 25 szavas paraméterblokk (DM-ben)
+      <br>• <strong>Paraméterek</strong>: P arány, I integrálási idő (perc), D deriválási idő, kimeneti határ min/max, mintavételi idő
+      <br>• <strong>Auto-tuning</strong>: <code>PIDAT</code> AT flag = 1 → a PLC maga méri fel a folyamatot és számol paramétereket
+      <br>• <strong>Kaszkád PID</strong>: két PIDAT utasítás egymás után — külső hurok kimenet = belső hurok setpoint
+      <br><br>
+      <strong>Tipikus alkalmazás:</strong> hőmérséklet szabályozás CP1W-TS002 termoelemmel + CP1W-DA041 analóg kimenettel + SSR (Solid State Relay). Teljesen moduláris, egy laptop és egy USB kábel elég a beállításhoz.
+    </div>
+  </div>
+</div>
+
+<!-- I/O calculator -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.calc">I/O méretező kalkulátor</div>
+  <div class="calc-box">
+    <div class="calc-row">
+      <span class="calc-label" data-i18n="calc.di">Digitális bemenetek (DI)</span>
+      <input class="calc-input" type="number" id="c-di" value="12" min="0" oninput="calcIO()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label" data-i18n="calc.do">Digitális kimenetek (DO)</span>
+      <input class="calc-input" type="number" id="c-do" value="8" min="0" oninput="calcIO()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label" data-i18n="calc.ai">Analóg bemenetek (AI)</span>
+      <input class="calc-input" type="number" id="c-ai" value="2" min="0" oninput="calcIO()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label" data-i18n="calc.ao">Analóg kimenetek (AO)</span>
+      <input class="calc-input" type="number" id="c-ao" value="1" min="0" oninput="calcIO()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label" data-i18n="calc.pulse">Pulse output tengelyek</span>
+      <input class="calc-input" type="number" id="c-pulse" value="0" min="0" max="2" oninput="calcIO()">
+    </div>
+    <div class="calc-result" id="calc-result"></div>
+  </div>
+</div>
+
+<!-- Comparison -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.compare">CP1L vs S7-300 vs S7-1200</div>
+  <table class="comp-table">
+    <thead><tr><th data-i18n="th.param">Szempont</th><th>CP1L</th><th>S7-1200</th><th>S7-300</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td data-i18n="c.price">Ár (alap CPU)</td><td class="badge-good">€150–400</td><td class="badge-mid">€300–600</td><td class="badge-bad">€800–2000</td></tr>
+      <tr><td data-i18n="c.prog">Programozás</td><td class="badge-good">USB-B (normál)</td><td class="badge-mid">USB (saját kábel)</td><td class="badge-bad">MPI adapter</td></tr>
+      <tr><td data-i18n="c.expand">Bővíthetőség</td><td class="badge-mid">max. 7 modul, 160 I/O</td><td class="badge-good">max. 8 modul</td><td class="badge-good">korlátlan rack</td></tr>
+      <tr class="hl"><td data-i18n="c.pulse">Pulse output</td><td class="badge-good">2×100 kHz beépített</td><td class="badge-good">4×100 kHz</td><td class="badge-bad">külön modul kell</td></tr>
+      <tr><td data-i18n="c.modbus">Modbus RTU</td><td class="badge-good">natív</td><td class="badge-good">natív</td><td class="badge-mid">CP modul kell</td></tr>
+      <tr><td data-i18n="c.ethernet">Ethernet</td><td class="badge-mid">CP1L-E változat</td><td class="badge-good">beépített</td><td class="badge-bad">CP343 modul</td></tr>
+      <tr class="hl"><td data-i18n="c.future">Jövőállóság</td><td class="badge-mid">aktív gyártás</td><td class="badge-good">S7-1200 hosszú táv</td><td class="badge-bad">EOL 2023</td></tr>
+      <tr><td data-i18n="c.sweet">Ideális méret</td><td class="badge-good">10–120 I/O</td><td class="badge-good">14–284 I/O</td><td class="badge-mid">50–2048 I/O</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- experience -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.experience">Személyes tapasztalat</div>
+  <div class="exp-box" data-i18n="experience.text">
+    A CP1L-lel való munka meggyőzött arról, hogy egy PLC értékét nem az ára vagy a neve határozza meg, hanem az, hogy mennyire van <strong>arányban a feladattal</strong>. CX-Programmer-ben programozva, USB-n csatlakozva, Modbus RTU-n egy frekvenciaváltóval kommunikálva — ez egy komplett, professzionális rendszer, ami töredék annyi időbe kerül beállítani, mint egy S7-300. A bővítőmodulok rendszere pedig lehetővé teszi, hogy a projekt növekedésével együtt nőjön a hardver — nem kell mindent előre megvenni.
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span data-i18n="footer.tag">Omron CP1L · CX-Programmer · Ipari automatizálás</span>
+</div>
+</div>
+
+<script>
+const T={hu:{
+"title":"Omron <em>CP1L</em> — kompakt PLC mélyről",
+"sub":"CX-Programmer · Ladder Diagram · USB programozás · Bővítőmodulok · Konfiguráció",
+"sec.overview":"Miért ajánlom?",
+"overview.text":"Az Omron CP1L az a PLC, amit <strong>nem becsülnek alá eleget</strong>. Első pillantásra kis doboz, egyszerű kábel, megfizethető ár — de belül egy teljes értékű, profin konfigurálható vezérlő. Azt szeretem benne, hogy <strong>USB-kábellel azonnal programozható</strong> — nincs külön programozó adapter, nincs driver-bonyodalom.",
+"sec.usb":"Az USB programozás előnye",
+"usb.text":"Sok PLC-nél külön programozó kábel kell. A CP1L-nél: <strong>egy szokásos USB-B kábel</strong> (printer kábel) + CX-Programmer = kész. A laptop felismeri, a szoftver csatlakozik. Hibakereséskor, gyors módosításnál ez rengeteg időt spórol — különösen ha a gép nehezen elérhető helyen van.",
+"sec.photo":"Saját fotó — hamarosan",
+"photo.text":"Saját CP1L fotó — feltöltés folyamatban",
+"sec.specs":"Technikai adatok — CP1L-M60DR-A",
+"sk.io":"I/O pontok (alap)","sv.io":"Max. 160 pont bővítőkkel",
+"sk.cpu":"CPU típusok","sv.cpu":"CP1L-E: beépített Ethernet",
+"sk.prog":"Programozás","sv.prog":"CX-Programmer vagy Sysmac Studio",
+"sk.cycle":"Ciklusidő","sv.cycle":"Jellemzően 1–5 ms valós programban",
+"sk.pulse":"Pulse output","sv.pulse":"Direkt léptetőmotor vezérlés",
+"sk.analog":"Analóg (beépített)","sv.analog":"0–10V / 4–20mA, 12 bit",
+"sk.comm":"Kommunikáció","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP natívan",
+"sk.price":"Ár (CPU)","sv.price":"S7-300 töredéke azonos I/O-ra",
+"sec.ladder":"Interaktív — Ladder Diagram példa",
+"ladder.title":"Motor indítás / leállítás — START/STOP logika",
+"ladder.desc":"Kattints egy kontaktusra vagy tekercse a szimulációhoz ▸",
+"sec.modules":"Bővítőmodulok",
+"m1.type":"Digitális I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digitális I/O hozzáadása. Relay vagy tranzisztor kimenet. Akár 7 modul sorba fűzhető.",
+"m2.type":"Analóg I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4 csatornás analóg be- vagy kimenet. 0–10V / 4–20mA, 12 bit. PID vezérléshez.",
+"m3.type":"Hőmérséklet","m3.name":"CP1W-TS002 / TS102","m3.body":"Termoelem vagy PT100/PT1000 közvetlen bekötés. Nincs szükség külső átalakítóra.",
+"m4.type":"Kommunikáció","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C vagy RS422/485 port bővítés. Modbus RTU, inverter kommunikáció.",
+"m5.type":"Pozicionálás","m5.name":"CP1W-NC113 / NC213","m5.body":"1 vagy 2 tengelyes pozicionáló modul. Léptetőmotor vagy szervó driver meghajtás.",
+"m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave csatlakozás CompoBus/S hálóhoz. Max. 256 pont 100m-es hálón.",
+"sec.config":"Konfiguráció mélyen — CX-Programmer",
+"cfg1.title":"I/O tábla és eszközkonfiguráció",
+"cfg1.body":"A CX-Programmer I/O Table ablaka az első amit meg kell nyitni új projektnél. A bővítőmodulok sorrendjének meg kell egyeznie a szoftverbeli sorrenddel. Online módban automatikusan beolvassa a valódi konfigurációt.",
+"cfg2.title":"PLC Setup — kommunikáció, ciklusidő, hibakezelés",
+"cfg2.body":"A PLC Setup tartalmazza az összes alacsony szintű beállítást: minimum ciklusidő, RS232C baudrate/paritás, startup mode (RUN-ban indul-e), hiba-kezelési policy.",
+"cfg3.title":"Pulse output konfiguráció — léptetőmotor",
+"cfg3.body":"2×100 kHz beépített pulse output (tranzisztor kimenet kell!). CW/CCW vagy Pulse+Direction mód. PLS2, ACC, INI, PRV utasítások. Egy CP1L-M + driver + 2 végállás = komplett pozicionáló.",
+"cfg4.title":"Modbus RTU kommunikáció beállítása",
+"cfg4.body":"Soros porton Modbus RTU master vagy slave. PMCR utasítás a Ladder-ben. RS485 esetén CP1W-CIF11 modul. Az alap RS232 port és a bővítő egyszerre használható.",
+"cfg5.title":"Memóriaterületek — CIO, DM, HR, AR, TIM, CNT",
+"cfg5.body":"CIO: I/O és belső relék. DM: adatmemória, power-fail safe. HR: holding relék, megmarad áramkimaradás után. AR: rendszerinformációk. TIM/CNT: 4096 időzítő és számláló.",
+"cfg6.title":"CX-Programmer — online monitoring és hibakeresés",
+"cfg6.body":"Ladder monitoring: aktív kontaktusok zölddel. Watch window: valós idejű memóriafigyelés. Force set/reset: fizikai I/O szimulálása. Error log: hibák időbélyeggel. Online Edit: futó program módosítása leállás nélkül.",
+"cfg7.title":"PID vezérlés — beépített PID utasítás",
+"cfg7.body":"PIDAT utasítás: P, I, D paraméterek, auto-tuning, kaszkád PID lehetséges. CP1W-TS002 + CP1W-DA041 + SSR = komplett hőmérséklet szabályozó rendszer.",
+"sec.calc":"I/O méretező kalkulátor",
+"calc.di":"Digitális bemenetek (DI)","calc.do":"Digitális kimenetek (DO)",
+"calc.ai":"Analóg bemenetek (AI)","calc.ao":"Analóg kimenetek (AO)",
+"calc.pulse":"Pulse output tengelyek",
+"sec.compare":"CP1L vs S7-300 vs S7-1200",
+"th.param":"Szempont",
+"c.price":"Ár (alap CPU)","c.prog":"Programozás","c.expand":"Bővíthetőség",
+"c.pulse":"Pulse output","c.modbus":"Modbus RTU","c.ethernet":"Ethernet",
+"c.future":"Jövőállóság","c.sweet":"Ideális méret",
+"sec.experience":"Személyes tapasztalat",
+"experience.text":"A CP1L-lel való munka meggyőzött, hogy egy PLC értékét az határozza meg, mennyire van <strong>arányban a feladattal</strong>. USB-n csatlakozva, Modbus RTU-n frekvenciaváltóval kommunikálva — ez komplett, professzionális rendszer, töredék beállítási idővel. A bővítőmodulok rendszere lehetővé teszi, hogy a projekt növekedésével együtt nőjön a hardver.",
+"photo.caption":"Omron SYSMAC CP1L · DC24V · EXP bővítő csatlakozó · LED: POWER / RUN / ERR / USB/ACT / BKUP","footer.tag":"Omron CP1L · CX-Programmer · Ipari automatizálás"},
+en:{
+"title":"Omron <em>CP1L</em> — compact PLC in depth",
+"sub":"CX-Programmer · Ladder Diagram · USB programming · Expansion modules · Configuration",
+"sec.overview":"Why I recommend it",
+"overview.text":"The Omron CP1L is the PLC that doesn't get enough credit. At first glance a small box, a simple cable, an affordable price — but inside a fully-featured, professionally configurable controller. What I love: <strong>programmable with a standard USB cable</strong> — no special adapter, no driver headaches.",
+"sec.usb":"The USB programming advantage",
+"usb.text":"Many PLCs require a special programming cable. With the CP1L: <strong>a standard USB-B cable</strong> (printer cable) + CX-Programmer installed = done. The laptop recognises it instantly. During fault-finding this saves enormous time.",
+"sec.photo":"Own photo — coming soon",
+"photo.text":"Own CP1L photo — upload in progress",
+"sec.specs":"Technical data — CP1L-M60DR-A",
+"sk.io":"I/O points (built-in)","sv.io":"Up to 160 points with expansion",
+"sk.cpu":"CPU variants","sv.cpu":"CP1L-E: built-in Ethernet",
+"sk.prog":"Programming","sv.prog":"CX-Programmer or Sysmac Studio",
+"sk.cycle":"Cycle time","sv.cycle":"Typically 1–5 ms in real programs",
+"sk.pulse":"Pulse output","sv.pulse":"Direct stepper motor control",
+"sk.analog":"Analog (built-in)","sv.analog":"0–10V / 4–20mA, 12-bit",
+"sk.comm":"Communication","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP native",
+"sk.price":"Price (CPU)","sv.price":"Fraction of S7-300 for same I/O",
+"sec.ladder":"Interactive — Ladder Diagram example",
+"ladder.title":"Motor start/stop — START/STOP logic in ladder diagram",
+"ladder.desc":"Click a contact or coil to simulate ▸",
+"sec.modules":"Expansion modules",
+"m1.type":"Digital I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digital I/O. Relay or transistor output. Up to 7 modules chained.",
+"m2.type":"Analog I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4-channel analog input or output. 0–10V / 4–20mA, 12-bit. For PID control.",
+"m3.type":"Temperature","m3.name":"CP1W-TS002 / TS102","m3.body":"Thermocouple or PT100/PT1000 direct input. No external converter needed.",
+"m4.type":"Communication","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C or RS422/485 port expansion. Modbus RTU, drive communication.",
+"m5.type":"Positioning","m5.name":"CP1W-NC113 / NC213","m5.body":"1 or 2 axis positioning module. Stepper or servo driver output.",
+"m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave for CompoBus/S network. Up to 256 points over 100m.",
+"sec.config":"Deep configuration — CX-Programmer",
+"cfg1.title":"I/O table and device configuration",
+"cfg1.body":"The I/O Table window is the first thing to open in a new project. Module order must match physical order. Online mode auto-reads the actual configuration.",
+"cfg2.title":"PLC Setup — communication, cycle time, error handling",
+"cfg2.body":"PLC Setup contains all low-level settings: minimum cycle time, RS232C baudrate/parity, startup mode, error handling policy.",
+"cfg3.title":"Pulse output configuration — stepper motor",
+"cfg3.body":"2×100 kHz built-in (transistor output required). CW/CCW or Pulse+Direction mode. PLS2, ACC, INI, PRV instructions. One CP1L-M + driver + 2 limit switches = complete positioner.",
+"cfg4.title":"Modbus RTU communication setup",
+"cfg4.body":"Modbus RTU master or slave on serial port. PMCR instruction in Ladder. For RS485 add CP1W-CIF11. Base RS232 and expansion port usable simultaneously.",
+"cfg5.title":"Memory areas — CIO, DM, HR, AR, TIM, CNT",
+"cfg5.body":"CIO: I/O and internal relays. DM: data memory, power-fail safe. HR: holding relays, retained after power loss. AR: system info. TIM/CNT: 4096 timers and counters.",
+"cfg6.title":"CX-Programmer — online monitoring and fault-finding",
+"cfg6.body":"Ladder monitoring: active contacts glow green. Watch window: real-time memory monitoring. Force set/reset: simulate physical I/O. Error log: faults with timestamps. Online Edit: modify running program without stopping.",
+"cfg7.title":"PID control — built-in PID instruction",
+"cfg7.body":"PIDAT instruction: P, I, D parameters, auto-tuning, cascade PID possible. CP1W-TS002 + CP1W-DA041 + SSR = complete temperature control system.",
+"sec.calc":"I/O sizing calculator",
+"calc.di":"Digital inputs (DI)","calc.do":"Digital outputs (DO)",
+"calc.ai":"Analog inputs (AI)","calc.ao":"Analog outputs (AO)",
+"calc.pulse":"Pulse output axes",
+"sec.compare":"CP1L vs S7-300 vs S7-1200",
+"th.param":"Criterion",
+"c.price":"Price (base CPU)","c.prog":"Programming","c.expand":"Expandability",
+"c.pulse":"Pulse output","c.modbus":"Modbus RTU","c.ethernet":"Ethernet",
+"c.future":"Future-proofing","c.sweet":"Ideal size",
+"sec.experience":"Personal experience",
+"experience.text":"Working with the CP1L convinced me that a PLC's value is determined by how well it matches the task. USB connected, Modbus RTU talking to a drive — a complete professional system, a fraction of the setup time. The expansion module system lets the hardware grow with the project.",
+"photo.caption":"Omron SYSMAC CP1L · DC24V · EXP expansion connector · LEDs: POWER / RUN / ERR / USB/ACT / BKUP","footer.tag":"Omron CP1L · CX-Programmer · Industrial automation"},
+de:{
+"title":"Omron <em>CP1L</em> — kompakte SPS in der Tiefe",
+"sub":"CX-Programmer · Kontaktplan · USB-Programmierung · Erweiterungsmodule · Konfiguration",
+"sec.overview":"Warum ich es empfehle",
+"overview.text":"Die Omron CP1L ist die SPS, die zu wenig Wertschätzung bekommt. Eine vollwertige, professionell konfigurierbare Steuerung. Was ich liebe: <strong>Programmierbar mit einem Standard-USB-Kabel</strong> — kein spezieller Adapter, keine Treiber-Probleme.",
+"sec.usb":"Der Vorteil der USB-Programmierung",
+"usb.text":"Bei vielen SPSen braucht man ein spezielles Programmierkabel. Bei der CP1L: <strong>ein normales USB-B-Kabel</strong> + CX-Programmer = fertig. Der Laptop erkennt es sofort. Bei der Fehlersuche spart das enorm Zeit.",
+"sec.photo":"Eigenes Foto — demnächst",
+"photo.text":"Eigenes CP1L-Foto — Upload in Bearbeitung",
+"sec.specs":"Technische Daten — CP1L-M60DR-A",
+"sk.io":"I/O-Punkte (eingebaut)","sv.io":"Bis 160 Punkte mit Erweiterung",
+"sk.cpu":"CPU-Varianten","sv.cpu":"CP1L-E: eingebautes Ethernet",
+"sk.prog":"Programmierung","sv.prog":"CX-Programmer oder Sysmac Studio",
+"sk.cycle":"Zykluszeit","sv.cycle":"Typisch 1–5 ms in realen Programmen",
+"sk.pulse":"Pulsausgang","sv.pulse":"Direkte Schrittmotorsteuerung",
+"sk.analog":"Analog (eingebaut)","sv.analog":"0–10V / 4–20mA, 12-Bit",
+"sk.comm":"Kommunikation","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP nativ",
+"sk.price":"Preis (CPU)","sv.price":"Bruchteil der S7-300 für gleiche I/O",
+"sec.ladder":"Interaktiv — Kontaktplan-Beispiel",
+"ladder.title":"Motorstart/-stopp — START/STOP-Logik im Kontaktplan",
+"ladder.desc":"Klicke auf einen Kontakt oder eine Spule zur Simulation ▸",
+"sec.modules":"Erweiterungsmodule",
+"m1.type":"Digital I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digitale I/O. Relais- oder Transistorausgang. Bis zu 7 Module reihbar.",
+"m2.type":"Analog I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4-kanaliger Analogeingang oder -ausgang. 0–10V / 4–20mA, 12-Bit. Für PID-Regelung.",
+"m3.type":"Temperatur","m3.name":"CP1W-TS002 / TS102","m3.body":"Thermoelement oder PT100/PT1000 direkter Eingang. Kein externer Wandler nötig.",
+"m4.type":"Kommunikation","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C oder RS422/485 Porterweiterung. Modbus RTU, Umrichter-Kommunikation.",
+"m5.type":"Positionierung","m5.name":"CP1W-NC113 / NC213","m5.body":"1 oder 2-achsiges Positioniermodul. Schrittmotor- oder Servoantrieb.",
+"m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave für CompoBus/S-Netzwerk. Bis 256 Punkte über 100m.",
+"sec.config":"Tiefe Konfiguration — CX-Programmer",
+"cfg1.title":"I/O-Tabelle und Gerätekonfiguration",
+"cfg1.body":"Die I/O-Tabelle ist das erste was man in einem neuen Projekt öffnet. Die Modulreihenfolge muss der physischen Reihenfolge entsprechen. Im Online-Modus liest sie die echte Konfiguration automatisch aus.",
+"cfg2.title":"PLC Setup — Kommunikation, Zykluszeit, Fehlerbehandlung",
+"cfg2.body":"PLC Setup enthält alle Low-Level-Einstellungen: minimale Zykluszeit, RS232C Baudrate/Parität, Startmodus, Fehlerbehandlungsrichtlinie.",
+"cfg3.title":"Pulsausgang-Konfiguration — Schrittmotor",
+"cfg3.body":"2×100 kHz eingebaut (Transistorausgang erforderlich). CW/CCW oder Puls+Richtung. PLS2, ACC, INI, PRV-Anweisungen. Eine CP1L-M + Treiber + 2 Endschalter = komplette Positioniereinheit.",
+"cfg4.title":"Modbus RTU Kommunikationseinrichtung",
+"cfg4.body":"Modbus RTU Master oder Slave am seriellen Port. PMCR-Anweisung im Kontaktplan. Für RS485 CP1W-CIF11 hinzufügen.",
+"cfg5.title":"Speicherbereiche — CIO, DM, HR, AR, TIM, CNT",
+"cfg5.body":"CIO: I/O und interne Relais. DM: Datenspeicher, stromausfallsicher. HR: Halterelais, bleibt nach Stromausfall. AR: Systeminformationen. TIM/CNT: 4096 Timer und Zähler.",
+"cfg6.title":"CX-Programmer — Online-Monitoring und Fehlersuche",
+"cfg6.body":"Kontaktplan-Monitoring: aktive Kontakte leuchten grün. Watch-Fenster: Echtzeit-Speicherüberwachung. Force Set/Reset: physische I/O simulieren. Fehlerprotokoll mit Zeitstempeln. Online-Edit: laufendes Programm ohne Stopp ändern.",
+"cfg7.title":"PID-Regelung — eingebaute PID-Anweisung",
+"cfg7.body":"PIDAT-Anweisung: P, I, D Parameter, Auto-Tuning, Kaskaden-PID möglich. CP1W-TS002 + CP1W-DA041 + SSR = komplettes Temperaturregelungssystem.",
+"sec.calc":"I/O-Dimensionierungsrechner",
+"calc.di":"Digitale Eingänge (DI)","calc.do":"Digitale Ausgänge (DO)",
+"calc.ai":"Analoge Eingänge (AI)","calc.ao":"Analoge Ausgänge (AO)",
+"calc.pulse":"Pulsausgang-Achsen",
+"sec.compare":"CP1L vs S7-300 vs S7-1200",
+"th.param":"Kriterium",
+"c.price":"Preis (Basis-CPU)","c.prog":"Programmierung","c.expand":"Erweiterbarkeit",
+"c.pulse":"Pulsausgang","c.modbus":"Modbus RTU","c.ethernet":"Ethernet",
+"c.future":"Zukunftssicherheit","c.sweet":"Ideale Größe",
+"sec.experience":"Persönliche Erfahrung",
+"experience.text":"Die Arbeit mit der CP1L hat mich überzeugt, dass der Wert einer SPS davon abhängt, wie gut sie zur Aufgabe passt. USB angeschlossen, Modbus RTU mit einem Umrichter kommunizierend — ein komplettes professionelles System mit einem Bruchteil des Einrichtungsaufwands.",
+"photo.caption":"Omron SYSMAC CP1L · DC24V · EXP Erweiterungsanschluss · LEDs: POWER / RUN / ERR / USB/ACT / BKUP","footer.tag":"Omron CP1L · CX-Programmer · Industrieautomatisierung"}};
+
+let lang='hu';
+function setLang(l){lang=l;document.documentElement.lang=l;const t=T[l];document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));calcIO();}
+
+// ════ CONFIG ACCORDION ════
+function toggleConfig(el){el.classList.toggle('open');}
+
+// ════ I/O CALCULATOR ════
+const CP1L_MODELS=[
+  {name:'CP1L-L10',di:6,dob:4,ai:0,ao:0,ext:0},
+  {name:'CP1L-L14',di:8,dob:6,ai:0,ao:0,ext:0},
+  {name:'CP1L-L20',di:12,dob:8,ai:0,ao:0,ext:0},
+  {name:'CP1L-M30',di:18,dob:12,ai:2,ao:1,ext:3},
+  {name:'CP1L-M40',di:24,dob:16,ai:2,ao:1,ext:3},
+  {name:'CP1L-M60',di:36,dob:24,ai:2,ao:1,ext:7},
+];
+const EXT_DI=8,EXT_DO=8,EXT_AI=4,EXT_AO=4;
+
+function calcIO(){
+  const di=parseInt(document.getElementById('c-di').value)||0;
+  const doN=parseInt(document.getElementById('c-do').value)||0;
+  const ai=parseInt(document.getElementById('c-ai').value)||0;
+  const ao=parseInt(document.getElementById('c-ao').value)||0;
+  const pulse=Math.min(2,parseInt(document.getElementById('c-pulse').value)||0);
+  const res=document.getElementById('calc-result');
+  if(!res)return;
+  const t=T[lang]||T.hu;
+
+  // find smallest fitting model
+  let rec=null;
+  for(const m of CP1L_MODELS){
+    const extNeeded=Math.max(
+      Math.ceil(Math.max(0,di-m.di)/EXT_DI),
+      Math.ceil(Math.max(0,doN-m.dob)/EXT_DO),
+      Math.ceil(Math.max(0,ai-m.ai)/EXT_AI),
+      Math.ceil(Math.max(0,ao-m.ao)/EXT_AO)
+    );
+    if(extNeeded<=m.ext){
+      rec={model:m,ext:extNeeded};
+      break;
+    }
+  }
+
+  if(!rec){
+    res.innerHTML='<span class="calc-err">⚠ A kért I/O meghaladja a CP1L maximumát (160 DI/DO, 7 modul). S7-1200 / S7-300 javasolt.</span>';
+    return;
+  }
+
+  const pulseOk=(pulse<=2&&rec.model.name.includes('M'));
+  const pulseNote=pulse>0&&!rec.model.name.includes('M')?'<br><span class="calc-warn">⚠ Pulse output csak CP1L-M sorozatban elérhető!</span>':'';
+
+  res.innerHTML=`<span class="calc-ok">✓ Ajánlott modell: <strong>${rec.model.name}DR-A</strong></span>
+<br>Beépített: ${rec.model.di} DI · ${rec.model.dob} DO · ${rec.model.ai} AI · ${rec.model.ao} AO
+${rec.ext>0?`<br>Szükséges bővítőmodul: <strong>${rec.ext} db</strong>`:'<br>Bővítőmodul nem szükséges'}
+${pulse>0?`<br>Pulse output: ${pulse} tengely — ${pulseOk?'<span class="calc-ok">✓ elérhető beépítve</span>':'<span class="calc-err">✗ nincs</span>'}`:''}${pulseNote}
+<br>Becsült ár: <span class="calc-ok">€${rec.model.di<=12?180:rec.model.di<=18?220:320}–${rec.model.di<=12?280:rec.model.di<=18?340:450}</span>${rec.ext>0?` + ${rec.ext}×€80–120 modul`:''}`;
+}
+
+// ════ LADDER DIAGRAM ════
+const ladder={
+  start:false, stop:false, motor:false, seal:false
+};
+
+// ════ LADDER SIMULATOR — 3 programs ════
+let currentProg = 0;
+const st0 = { start:false, stop:false, motor:false, seal:false };
+const st1 = { input:false, timer_running:false, timer_done:false, timer_val:0, timer_preset:30, output:false, _interval:null };
+const st2 = { pulse:false, reset:false, count:0, preset:5, done:false, _last:false };
+
+function selectProg(n,btn){
+  currentProg=n;
+  document.querySelectorAll('.prog-tab').forEach(b=>{ b.style.borderColor='var(--border)'; b.style.color='var(--text-dim)'; });
+  btn.style.borderColor='var(--accent)'; btn.style.color='var(--accent)';
+  const titles=['Motor START/STOP — seal logika','TIM0 időzítő — 3 mp késleltetés','CNT0 számláló — 5 impulzus'];
+  const el=document.getElementById('ladder-prog-title'); if(el) el.textContent=titles[n];
+  setStatus(''); drawLadder();
+}
+function setStatus(msg){ const el=document.getElementById('ladder-status'); if(el) el.textContent=msg; }
+
+function startTimer(){
+  if(st1._interval) return;
+  st1.timer_running=true; st1.timer_val=0;
+  st1._interval=setInterval(()=>{
+    if(!st1.input){ clearInterval(st1._interval); st1._interval=null; st1.timer_running=false; st1.timer_val=0; st1.timer_done=false; st1.output=false; drawLadder(); return; }
+    st1.timer_val++;
+    if(st1.timer_val>=st1.timer_preset){ st1.timer_done=true; st1.output=true; clearInterval(st1._interval); st1._interval=null; st1.timer_running=false; }
+    setStatus('⏱ TIM0: '+(st1.timer_val/10).toFixed(1)+' / '+(st1.timer_preset/10).toFixed(1)+' s');
+    drawLadder();
+  },100);
+}
+
+function drawLadder(){
+  const c=document.getElementById('ladder-canvas'); if(!c) return;
+  const LW=560,LH=240,dpr=devicePixelRatio||1;
+  c.width=LW*dpr; c.height=LH*dpr; c.style.width=LW+'px'; c.style.height=LH+'px';
+  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,LW,LH);
+  if(currentProg===0) drawP0(ctx,LW,LH);
+  else if(currentProg===1) drawP1(ctx,LW,LH);
+  else drawP2(ctx,LW,LH);
+}
+
+function drawRails(ctx,LW,LH){ ctx.strokeStyle='#2a3a3a'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(20,8); ctx.lineTo(20,LH-8); ctx.stroke(); ctx.beginPath(); ctx.moveTo(LW-20,8); ctx.lineTo(LW-20,LH-8); ctx.stroke(); }
+function wl(ctx,col,x1,y1,x2,y2){ ctx.strokeStyle=col; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }
+function rl(ctx,t,x,y){ ctx.fillStyle='#2e5868'; ctx.font='9px DM Mono,monospace'; ctx.textAlign='left'; ctx.fillText(t,x,y); }
+
+function drawC(ctx,x,y,type,label,active){
+  const col=active?'#28c898':'#3a4848'; ctx.strokeStyle=col; ctx.lineWidth=1.5;
+  wl(ctx,col,x-30,y,x-10,y); wl(ctx,col,x+10,y,x+30,y);
+  ctx.beginPath(); ctx.moveTo(x-10,y-12); ctx.lineTo(x-10,y+12); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x+10,y-12); ctx.lineTo(x+10,y+12); ctx.stroke();
+  if(type==='NC'){ ctx.beginPath(); ctx.moveTo(x-10,y+10); ctx.lineTo(x+10,y-10); ctx.stroke(); }
+  ctx.fillStyle=active?'#28c898':'#4a6060'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+  label.split('\n').forEach((ln,i)=>ctx.fillText(ln,x,y-16+(i*10)));
+}
+function drawCoilF(ctx,x,y,label,active){
+  const col=active?'#c8a96e':'#3a4848'; ctx.strokeStyle=col; ctx.lineWidth=1.5;
+  wl(ctx,col,x-30,y,x-14,y);
+  ctx.beginPath(); ctx.arc(x,y,14,Math.PI*0.35,Math.PI*1.65); ctx.stroke();
+  if(active){ctx.fillStyle='rgba(200,169,110,.1)';ctx.beginPath();ctx.arc(x,y,14,0,Math.PI*2);ctx.fill();}
+  ctx.fillStyle=active?'#c8a96e':'#4a6060'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+  label.split('\n').forEach((ln,i)=>ctx.fillText(ln,x,y-18+(i*10)));
+}
+function drawTimBox(ctx,x,y,val,preset,done){
+  const col=done?'#28c898':'#c8a96e'; ctx.strokeStyle=col; ctx.lineWidth=1.5;
+  ctx.strokeRect(x-40,y-22,80,44);
+  if(done){ctx.fillStyle='rgba(40,200,152,.07)';ctx.fillRect(x-40,y-22,80,44);}
+  ctx.fillStyle=col; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('TIM0',x,y-10); ctx.font='8px DM Mono,monospace';
+  ctx.fillText((val/10).toFixed(1)+'/'+(preset/10).toFixed(1)+'s',x,y+4);
+  ctx.fillStyle=done?'#28c898':'#4a6060'; ctx.fillText(done?'DONE':'fut...',x,y+15);
+  wl(ctx,'#1e2e2e',x+40,y,x+80,y);
+}
+function drawCntBox(ctx,x,y,count,preset,done){
+  const col=done?'#28c898':'#c8a96e'; ctx.strokeStyle=col; ctx.lineWidth=1.5;
+  ctx.strokeRect(x-40,y-22,80,44);
+  if(done){ctx.fillStyle='rgba(40,200,152,.07)';ctx.fillRect(x-40,y-22,80,44);}
+  ctx.fillStyle=col; ctx.font='bold 9px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('CNT0',x,y-10); ctx.font='8px DM Mono,monospace';
+  ctx.fillText(count+' / '+preset,x,y+4);
+  ctx.fillStyle=done?'#28c898':'#4a6060'; ctx.fillText(done?'DONE':'számlál',x,y+15);
+  wl(ctx,'#1e2e2e',x+40,y,x+80,y);
+}
+
+function drawP0(ctx,LW,LH){
+  drawRails(ctx,LW,LH);
+  const r1y=85,brY=r1y+38,r2y=178;
+  wl(ctx,'#1e2e2e',20,r1y,LW-55,r1y); wl(ctx,'#1e2e2e',20,r2y,LW-55,r2y);
+  wl(ctx,'#1e2e2e',50,r1y,50,brY); wl(ctx,'#1e2e2e',200,r1y,200,brY); wl(ctx,'#1e2e2e',50,brY,200,brY);
+  drawC(ctx,120,r1y,'NO','START\n0.00',st0.start);
+  drawC(ctx,120,brY,'NO','SEAL\n10.00',st0.seal);
+  drawC(ctx,330,r1y,'NC','STOP\n0.01',!st0.stop);
+  drawCoilF(ctx,LW-30,r1y,'MOTOR\n10.00',st0.motor);
+  drawC(ctx,180,r2y,'NO','MOTOR\n10.00',st0.motor);
+  drawCoilF(ctx,LW-30,r2y,'LAMP\n100.00',st0.motor);
+  rl(ctx,'Rung 1 — Start/Stop/Seal',22,r1y-24);
+  rl(ctx,'Rung 2 — Jelzőlámpa',22,r2y-24);
+}
+function drawP1(ctx,LW,LH){
+  drawRails(ctx,LW,LH);
+  const r1y=85,r2y=178;
+  wl(ctx,'#1e2e2e',20,r1y,LW-55,r1y); wl(ctx,'#1e2e2e',20,r2y,LW-55,r2y);
+  drawC(ctx,130,r1y,'NO','INPUT\n0.00',st1.input);
+  drawTimBox(ctx,360,r1y,st1.timer_val,st1.timer_preset,st1.timer_done);
+  drawC(ctx,160,r2y,'NO','TIM0\nDONE',st1.timer_done);
+  drawCoilF(ctx,LW-30,r2y,'OUT\n100.01',st1.output);
+  rl(ctx,'Rung 1 — TIM0 (3s késleltetés, kattints INPUT-ra)',22,r1y-24);
+  rl(ctx,'Rung 2 — Kimenet TIM0 lejárta után',22,r2y-24);
+  if(st1.timer_running||st1.timer_done){
+    const pct=Math.min(1,st1.timer_val/st1.timer_preset);
+    const bx=20,bw=LW-40,bh=7,by=LH-16;
+    ctx.fillStyle='#1e2e2e'; ctx.fillRect(bx,by,bw,bh);
+    ctx.fillStyle=st1.timer_done?'#28c898':'#c8a96e'; ctx.fillRect(bx,by,bw*pct,bh);
+    ctx.strokeStyle='#2a3a3a'; ctx.lineWidth=1; ctx.strokeRect(bx,by,bw,bh);
+  }
+}
+function drawP2(ctx,LW,LH){
+  drawRails(ctx,LW,LH);
+  const r1y=75,r2y=152,r3y=210;
+  wl(ctx,'#1e2e2e',20,r1y,LW-55,r1y); wl(ctx,'#1e2e2e',20,r2y,LW-55,r2y); wl(ctx,'#1e2e2e',20,r3y,LW-55,r3y);
+  drawC(ctx,130,r1y,'NO','PULSE\n0.02',st2.pulse);
+  drawCntBox(ctx,360,r1y,st2.count,st2.preset,st2.done);
+  drawC(ctx,130,r2y,'NO','RESET\n0.03',st2.reset);
+  drawC(ctx,160,r3y,'NO','CNT0\nDONE',st2.done);
+  drawCoilF(ctx,LW-30,r3y,'OUT\n100.02',st2.done);
+  rl(ctx,'Rung 1 — CNT0 impulzus számol (kattints PULSE-ra)',22,r1y-18);
+  rl(ctx,'Rung 2 — RESET (nulláz)',22,r2y-18);
+  rl(ctx,'Rung 3 — Kimenet eléréskor',22,r3y-18);
+}
+
+document.addEventListener('DOMContentLoaded',function(){
+  setLang('hu'); calcIO();
+  const c=document.getElementById('ladder-canvas'); if(!c) return;
+  c.addEventListener('click',function(e){
+    const r=this.getBoundingClientRect();
+    const x=(e.clientX-r.left)*(560/r.width), y=(e.clientY-r.top)*(240/r.height), H=24;
+    if(currentProg===0){
+      if(Math.abs(x-120)<H&&Math.abs(y-85)<H) st0.start=!st0.start;
+      else if(Math.abs(x-330)<H&&Math.abs(y-85)<H) st0.stop=!st0.stop;
+      if(st0.start&&!st0.stop) st0.motor=true;
+      if(st0.stop) st0.motor=false;
+      if(!st0.motor) st0.start=false;
+      st0.seal=st0.motor;
+      setStatus(st0.motor?'▶ MOTOR fut — SEAL aktív':st0.stop?'⏹ STOP — leállítva':'⏸ Várakozás — nyomj START-ot');
+    } else if(currentProg===1){
+      if(Math.abs(x-130)<H&&Math.abs(y-85)<H){
+        st1.input=!st1.input;
+        if(st1.input&&!st1.timer_done) startTimer();
+        else if(!st1.input){ if(st1._interval){clearInterval(st1._interval);st1._interval=null;} st1.timer_running=false; st1.timer_val=0; st1.timer_done=false; st1.output=false; setStatus('⏸ INPUT=0 — TIM0 nullázva'); }
+      }
+    } else if(currentProg===2){
+      if(Math.abs(x-130)<H&&Math.abs(y-75)<H){
+        st2.pulse=!st2.pulse;
+        if(st2.pulse&&!st2.done){ st2.count++; if(st2.count>=st2.preset) st2.done=true; }
+        setStatus(st2.done?'✓ CNT0 = '+st2.preset+' — OUT=1':'▶ Számláló: '+st2.count+' / '+st2.preset);
+      }
+      if(Math.abs(x-130)<H&&Math.abs(y-152)<H){
+        st2.reset=!st2.reset;
+        if(st2.reset){ st2.count=0; st2.done=false; st2.pulse=false; setStatus('↺ RESET — nullázva'); }
+      }
+    }
+    drawLadder();
+  });
+  setTimeout(drawLadder,80);
+});
+window.addEventListener('resize',drawLadder);
+
+</script>
+</body>
+</html>
