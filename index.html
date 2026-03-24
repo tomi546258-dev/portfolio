@@ -1336,16 +1336,16 @@ R_μν − ½Rg_μν = 8πGT_μν
       if (e.target === this) closeSudoku();
     });
 
-    // ── Látogatásszámláló (hits.seeyoufarm.com) ──
+    // ── Látogatásszámláló (counterapi.dev) ──
     (async function() {
       const el = document.getElementById('visit-count');
       try {
         const res = await fetch(
-          'https://hits.seeyoufarm.com/api/count/incr/badge.json?url=tomi546258-dev.github.io%2Fportfolio&count_bg=%2328c898&title_bg=%23151717&icon=&title=&edge_flat=true'
+          'https://api.counterapi.dev/v1/tomi546258-dev/portfolio/up'
         );
         if (!res.ok) throw new Error();
         const data = await res.json();
         // today / total
-        const total = data.total_count ?? data.totalCount;
+        const total = data.count;
         if (total !== undefined) {
           el.textContent = Number(total).toLocale
