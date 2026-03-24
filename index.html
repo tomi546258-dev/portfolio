@@ -786,7 +786,7 @@ R_μν − ½Rg_μν = 8πGT_μν
     </div>
     <div class="hero-content">
       <p class="hero-label" data-i18n="hero.label">Mérnök & Kutató</p>
-      <h1 data-i18n="hero.h1">Precizitás<br>a <em>mérésben</em><br>és elméletben.</h1>
+      <h1 data-i18n="hero.h1">Mérnöki precizitás<br><em>automatizálásban</em><br>és elméletben.</h1>
       <p class="hero-sub">BT Tech · Óbudai Egyetem · Budapest</p>
       <p class="hero-desc" data-i18n="hero.desc">
         Ipari automatizálás, PLC programozás és elméleti fizika metszéspontján dolgozom.
@@ -1090,10 +1090,20 @@ R_μν − ½Rg_μν = 8πGT_μν
         kapcsán szívesen veszem a megkereséseket.
       </p>
       <div class="contact-links">
-        <a href="/cdn-cgi/l/email-protection#ccb8a3a1a5f9f8fafef9f48caba1ada5a0e2afa3a1" class="contact-link">
+        <a href="#" id="email-link" class="contact-link" onclick="this.href='mai'+'lto:'+'tomi546258'+'@'+'gmail.com'">
           <span class="contact-link-label">E-mail</span>
-          <span class="__cf_email__" data-cfemail="b4c0dbd9dd81808286818cf4d3d9d5ddd89ad7dbd9">[email&#160;protected]</span>
+          <span id="email-display">tomi546258&#8203;[&#64;]&#8203;gmail&#8203;.com</span>
         </a>
+        <script>
+          // Render real email after page load — bypasses Cloudflare obfuscation
+          document.addEventListener('DOMContentLoaded', function() {
+            var u='tomi546258', d='gmail.com';
+            var el=document.getElementById('email-display');
+            var lk=document.getElementById('email-link');
+            if(el) el.textContent = u+'@'+d;
+            if(lk) lk.href = 'mailto:'+u+'@'+d;
+          });
+        </script>
         <a href="https://orcid.org/0009-0004-6349-712X" class="contact-link">
           <span class="contact-link-label">ORCID</span>
           0009-0004-6349-712X
@@ -1149,7 +1159,7 @@ R_μν − ½Rg_μν = 8πGT_μν
         "nav.about": "Rólam", "nav.pubs": "Publikációk", "nav.projects": "Projektek",
         "nav.blog": "Blog & Írások", "nav.contact": "Kapcsolat",
         "hero.label": "Mérnök & Kutató",
-        "hero.h1": "Precizitás<br>az <em>automatizálásban</em><br>és elméletben.",
+        "hero.h1": "Mérnöki precizitás<br><em>automatizálásban</em><br>és elméletben.",
         "hero.desc": "Ipari automatizálás, PLC programozás és elméleti fizika metszéspontján dolgozom. Siemens, Omron, RF rendszerek, optimumszámítás és numerikus módszerek – ahol a mérnöki gondolkodás találkozik a matematikával.",
         "hero.cta1": "Publikációk", "hero.cta2": "Kapcsolat",
         "about.p1": "Mérnökként ipari automatizálással és vezérléstechnikával foglalkozom. Dolgozom Siemens S7, Omron CP1L PLC-kkel, RF tesztberendezésekkel és mérőrendszerekkel, melyekhez VBA- és Python-alapú automatizálási rendszereket fejlesztek.",
@@ -1185,7 +1195,7 @@ R_μν − ½Rg_μν = 8πGT_μν
         "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
         "nav.blog": "Blog & Texte", "nav.contact": "Kontakt",
         "hero.label": "Ingenieur & Forscher",
-        "hero.h1": "Präzision<br>in der <em>Automatisierung</em><br>und Theorie.",
+        "hero.h1": "Ingenieurpräzision<br>in <em>Automatisierung</em><br>und Theorie.",
         "hero.desc": "Ich arbeite an der Schnittstelle von industrieller Automatisierung, SPS-Programmierung und theoretischer Physik. RF-Systeme, quantenmechanische Rahmenwerke und numerische Methoden – dort, wo Mathematik auf Realität trifft.",
         "hero.cta1": "Publikationen", "hero.cta2": "Kontakt",
         "about.p1": "Als Ingenieur beschäftige ich mich mit industrieller Automatisierung und Steuerungstechnik. Ich arbeite mit Siemens S7, Omron CP1L SPSen und HF-Testgeräten und entwickle VBA- und Python-basierte Automatisierungssysteme.",
@@ -1222,7 +1232,7 @@ R_μν − ½Rg_μν = 8πGT_μν
         "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
         "nav.blog": "Blog & Writing", "nav.contact": "Contact",
         "hero.label": "Engineer & Researcher",
-        "hero.h1": "Precision<br>in <em>automation</em><br>and theory.",
+        "hero.h1": "Engineering precision<br>in <em>automation</em><br>and theory.",
         "hero.desc": "I work at the intersection of industrial automation, PLC programming, and theoretical physics. RF systems, quantum mechanical frameworks, and numerical methods – where mathematics meets reality.",
         "hero.cta1": "Publications", "hero.cta2": "Contact",
         "about.p1": "As an engineer, I specialise in industrial automation and control systems. I work with Siemens S7, Omron CP1L PLCs and RF test equipment, developing VBA- and Python-based automation systems.",
