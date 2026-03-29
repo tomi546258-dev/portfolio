@@ -1043,6 +1043,28 @@ R_μν − ½Rg_μν = 8πGT_μν
         </div>
       </div>
       <div class="project-card">
+        <span class="project-icon">📡</span>
+        <div class="project-title" data-i18n="proj.synth.title">BT-Synth-1V — Frekvenciaszintézer</div>
+        <p class="project-desc" data-i18n="proj.synth.desc">LMX2595 PLL IC alapú saját tervezésű RF szintézer. 10 MHz–19 GHz, KiCad NYÁKterv, impedanciavezérelt RF vonalak, delta-sigma modulátor.</p>
+        <div class="project-tech">
+          <span class="tech-badge">LMX2595</span>
+          <span class="tech-badge">KiCad</span>
+          <span class="tech-badge">PLL</span>
+          <span class="tech-badge">RF</span>
+        </div>
+        <div style="margin-top:1rem">
+          <button onclick="openModal('synth.html','BT-Synth-1V — Frekvenciaszintézer')"
+            style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                   background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                   border-radius:2px;cursor:pointer;transition:all .2s;"
+            onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+            onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+            ▸ Részletek
+          </button>
+        </div>
+      </div>
+
+      <div class="project-card">
         <span class="project-icon">🔧</span>
         <div class="project-title" data-i18n="proj.sc.title">SmartClone – Arduino Diagnosztika</div>
         <p class="project-desc" data-i18n="proj.sc.desc">Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.</p>
@@ -1201,6 +1223,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.opt.desc": "Bojlertől az Euler–Lagrange egyenletig. Interaktív szimulációk, Python kód, variációszámítás.",
         "proj.qm.title": "Kvantum-hidrodinamikai Keretek",
         "proj.qm.desc": "A kvantummechanika és hidrodinamika kapcsolatának geometriai vizsgálata. Független kutatás kovariáns megmaradáselméletben.",
+        "proj.synth.title": "BT-Synth-1V — Frekvenciaszintézer",
+        "proj.synth.desc": "LMX2595 PLL IC alapú saját RF szintézer. 10 MHz–19 GHz, KiCad NYÁKterv, impedanciavezérelt vonalak.",
         "proj.sc.title": "SmartClone – Arduino Diagnosztika",
         "proj.sc.desc": "Beágyazott diagnosztikai rendszer Arduino platformon. PCB-tekercses transzformátor tervek kidolgozása.",
         "proj.sudoku.title": "Sudoku – ILP Megoldó",
@@ -1240,6 +1264,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.sfe.desc": "Automatisierte Verarbeitung und Analyse von Messdateien. Komplexe Messworkflows mit adaptivem Mittelungssystem.",
         "proj.qm.title": "Quanten-hydrodynamische Rahmenwerke",
         "proj.qm.desc": "Geometrische Untersuchung der Verbindung zwischen Quantenmechanik und Hydrodynamik. Eigenständige Forschung zur kovarianten Erhaltungstheorie.",
+        "proj.synth.title": "BT-Synth-1V — Frequenzsynthesizer",
+        "proj.synth.desc": "Selbst entworfener RF-Synthesizer mit LMX2595. 10 MHz–19 GHz, KiCad-Leiterplatte, impedanzkontrollierte Leiterbahnen.",
         "proj.sc.title": "SmartClone – Arduino Diagnostik",
         "proj.sc.desc": "Eingebettetes Diagnosesystem auf Arduino-Plattform. Entwicklung innovativer PCB-Spulen-Transformatoren.",
         "proj.sudoku.title": "Sudoku – ILP-Löser",
@@ -1279,6 +1305,8 @@ R_μν − ½Rg_μν = 8πGT_μν
         "proj.sfe.desc": "Automated processing and analysis of measurement files. Complex measurement workflows with an adaptive averaging system.",
         "proj.qm.title": "Quantum-Hydrodynamic Frameworks",
         "proj.qm.desc": "Geometric investigation of the connection between quantum mechanics and hydrodynamics. Independent research in covariant conservation theory.",
+        "proj.synth.title": "BT-Synth-1V — Frequency Synthesizer",
+        "proj.synth.desc": "Custom RF synthesizer based on LMX2595 PLL IC. 10 MHz–19 GHz, KiCad PCB design, impedance-controlled RF traces.",
         "proj.sc.title": "SmartClone – Arduino Diagnostics",
         "proj.sc.desc": "Embedded diagnostic system on the Arduino platform. Development of innovative PCB-coil transformer designs.",
         "proj.sudoku.title": "Sudoku – ILP Solver",
@@ -1341,7 +1369,7 @@ R_μν − ½Rg_μν = 8πGT_μν
       const el = document.getElementById('visit-count');
       try {
         const res = await fetch(
-          'https://api.counterapi.dev/v1/tomi546258-dev/portfolio/up'
+          'https://api.counterapi.dev/v1/tomi546258/portfolio2025/up'
         );
         if (!res.ok) throw new Error();
         const data = await res.json();
