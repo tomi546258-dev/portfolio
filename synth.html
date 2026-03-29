@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BT-Synth-1V — Frekvenciaszintézer tervezése | Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f0f;--bg2:#151717;--bg3:#1c1f1f;--border:#2a2e2e;--accent:#c8a96e;--accent2:#7eb8a4;--text:#d8d4cc;--text-dim:#7a7870;--text-bright:#eeeae2;--orange:#d4703a;--purple:#8878c8;--red:#c05050;--blue:#5888c8;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:960px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--accent);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:1.6rem;}
+.section{margin-top:2.6rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.overview-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);padding:1.4rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;}
+.overview-box strong{color:var(--accent2);}
+
+/* photo grid */
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+@media(max-width:600px){.photo-grid{grid-template-columns:1fr;}}
+.photo-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.photo-card img{width:100%;display:block;}
+.photo-cap{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text-dim);padding:.45rem .8rem;letter-spacing:.06em;}
+
+/* spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+@media(max-width:560px){.spec-grid{grid-template-columns:1fr;}}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.spec-key{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.spec-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);}
+.spec-note{font-size:.78rem;color:var(--text-dim);margin-top:.15rem;}
+
+/* lmx block diagram */
+.block-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.2rem;margin-top:.8rem;overflow-x:auto;}
+canvas{display:block;}
+
+/* config accordion */
+.config-item{background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;overflow:hidden;}
+.config-header{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.1rem;cursor:pointer;transition:background .15s;user-select:none;}
+.config-header:hover{background:var(--bg3);}
+.config-title{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent2);letter-spacing:.06em;}
+.config-arrow{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);transition:transform .2s;}
+.config-item.open .config-arrow{transform:rotate(90deg);}
+.config-body{display:none;padding:.9rem 1.2rem 1rem;border-top:1px solid var(--border);font-size:.87rem;color:var(--text-dim);line-height:1.8;}
+.config-item.open .config-body{display:block;}
+.config-body strong{color:var(--text);}
+.config-body code{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--bg3);padding:.1rem .35rem;border-radius:2px;color:var(--accent);}
+
+/* register table */
+.reg-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.68rem;margin-top:.6rem;}
+.reg-table th{padding:.45rem .7rem;text-align:left;border-bottom:1px solid var(--border);color:var(--accent);letter-spacing:.08em;}
+.reg-table td{padding:.45rem .7rem;border-bottom:1px solid var(--bg3);color:var(--text-dim);line-height:1.5;}
+.reg-table td:first-child{color:var(--accent2);}
+.reg-table tr:hover td{background:rgba(126,184,164,.04);}
+
+/* freq calculator */
+.calc-box{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.3rem 1.5rem;margin-top:.8rem;}
+.calc-row{display:flex;align-items:center;gap:.8rem;margin-bottom:.6rem;flex-wrap:wrap;}
+.calc-label{font-family:'DM Mono',monospace;font-size:.68rem;color:var(--text-dim);min-width:160px;letter-spacing:.05em;}
+.calc-input{font-family:'DM Mono',monospace;font-size:.78rem;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:.3rem .6rem;border-radius:2px;width:90px;text-align:right;}
+.calc-input:focus{outline:none;border-color:var(--accent2);}
+.calc-unit{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--text-dim);}
+.calc-result{background:var(--bg3);border:1px solid var(--border);border-radius:2px;padding:1rem 1.2rem;margin-top:.8rem;font-family:'DM Mono',monospace;font-size:.75rem;line-height:2;}
+.ok{color:var(--accent2);} .warn{color:var(--accent);} .err{color:var(--red);}
+
+/* pcb layers */
+.layer-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.5rem;margin-top:.8rem;}
+.layer-card{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.layer-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:.5rem;vertical-align:middle;}
+.layer-name{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text);letter-spacing:.06em;}
+.layer-desc{font-size:.78rem;color:var(--text-dim);margin-top:.2rem;line-height:1.5;}
+
+.exp-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.95rem;line-height:1.85;}
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="page">
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">BT-Synth-1V — <em>Frekvenciaszintézer</em> tervezése</h1>
+<div class="proj-sub" data-i18n="sub">LMX2316 PLL · KiCad NYÁKterv · PIC16F876 vezérlés · SPI kommunikáció · VCO vezérlés</div>
+
+<!-- overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.overview">A projekt</div>
+  <div class="overview-box" data-i18n="overview.text">
+    A BT-Synth-1V egy <strong>saját tervezésű frekvenciaszintézer</strong> Texas Instruments LMX2316 PLL IC alapján.
+    A tervezés célja egy stabil, széles sávban hangolható RF jelforrás, amely LCD kijelzőn mutatja a beállított
+    frekvenciát, rotary encoderel vezérelhető, és SPI buszon kommunikál a PLL-lel.
+    A <strong>nyomtatott áramköri lapot KiCad-ben terveztem</strong> — saját footprintekkel, impedanciavezérelt
+    RF vonalakkal és gondosan megtervezett tápellátással.
+  </div>
+</div>
+
+<!-- Photos -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.photos">Fotók — 3D render és KiCad layout</div>
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="bt-synth1-3d.png" alt="BT-Synth-1V 3D render">
+      <div class="photo-cap" data-i18n="photo1.cap">KiCad 3D render — LCD + SMA csatlakozók + rotary encoder + LMX2316</div>
+    </div>
+    <div class="photo-card">
+      <img src="bt-synth1-kicad.png" alt="BT-Synth-1V KiCad PCB layout">
+      <div class="photo-cap" data-i18n="photo2.cap">KiCad PCB layout — F.Cu rézréteg · 213 pad · 79 via · 742 track · 50 net · 0 unrouted</div>
+    </div>
+  </div>
+</div>
+
+<!-- LMX2595 deep dive -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.lmx">LMX23x6 sorozat — a PLL IC részletesen</div>
+
+  <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);padding:1.2rem 1.5rem;border-radius:2px;margin-bottom:.8rem;font-size:.95rem;line-height:1.8;" data-i18n="lmx.intro">
+    Az LMX2595 a Texas Instruments egyik legfejlettebb <strong>wideband frequency synthesizer IC-je</strong>.
+    Egyetlen chipen tartalmaz egy teljes PLL-t (Phase-Locked Loop), egy VCO-t (Voltage Controlled Oscillator),
+    programmable dividereket és egy delta-sigma modulátort törtszámú osztáshoz.
+    A chip <strong>10 MHz–19 GHz</strong> tartományon képes RF jelet generálni — ez egyedülálló egyetlen IC-nél.
+  </div>
+
+  <!-- Block diagram canvas -->
+  <div class="block-wrap">
+    <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.7rem;letter-spacing:.1em;text-transform:uppercase;">LMX2595 belső blokkdiagram</div>
+    <canvas id="block-canvas" height="200"></canvas>
+  </div>
+
+  <!-- Spec grid -->
+  <div class="spec-grid" style="margin-top:.8rem;">
+    <div class="spec-item"><div class="spec-key">Frekvenciatartomány</div><div class="spec-val">100 MHz – 1200 MHz</div><div class="spec-note">LMX2316; LMX2326: 100–2800 MHz</div></div>
+    <div class="spec-item"><div class="spec-key">Referencia bemenet</div><div class="spec-val">tipikusan 5–40 MHz</div><div class="spec-note">VCTCXO 13 MHz (P2 trimmerrel), vagy kvarcoszcillátor</div></div>
+    <div class="spec-item"><div class="spec-key">Fáziszaj (1 GHz-en)</div><div class="spec-val">referencia minőségétől függ</div><div class="spec-note">N/R arány sokszorozza a zajt</div></div>
+    <div class="spec-item"><div class="spec-key">Kommunikáció</div><div class="spec-val">SPI (3-wire, csak írás)</div><div class="spec-note">21 bites shift register, DATA+ADDRESS+FLAG</div></div>
+    <div class="spec-item"><div class="spec-key">Kimenet</div><spec-val></spec-val><div class="spec-val">1× RF kimenet a VCO-tól</div><div class="spec-note">0–5V hangolófeszültség a VCO-hoz</div></div>
+    <div class="spec-item"><div class="spec-key">Tápfeszültség</div><div class="spec-val">9–25V (tápvonal), 5V belső LDO</div><div class="spec-note">22 mA áramfelvétel kijelző nélkül</div></div>
+    <div class="spec-item"><div class="spec-key">Tok</div><div class="spec-val">20-pin SSOP</div><div class="spec-note">SMD tok, kézzel forrasztható</div></div>
+    <div class="spec-item"><div class="spec-key">Loop filter</div><div class="spec-val">Külső passzív elemek</div><div class="spec-note">R, C értékek sávszélességet meghatározzák</div></div>
+  </div>
+</div>
+
+<!-- PLL operation deep -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.pll">Hogyan működik a PLL — mélyen</div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pll1.t">A PLL alapelve és a lock folyamat</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pll1.b">
+      A PLL (Phase-Locked Loop) egy <strong>visszacsatolt frekvenciaszabályozó rendszer</strong>. Lényege:
+      <br><br>
+      1. A <strong>VCO</strong> (Voltage Controlled Oscillator) generál egy nagy frekvenciájú jelet
+      <br>2. Egy <strong>programozható osztó</strong> (N divider) leosztja a VCO kimenetét
+      <br>3. A <strong>fáziskomparátor</strong> (PFD) összehasonlítja az osztott jelet a referenciával
+      <br>4. A különbségből <strong>charge pump</strong> áramot generál
+      <br>5. A <strong>loop filter</strong> simítja ezt feszültséggé → ez vezérli a VCO-t
+      <br>6. A rendszer addig korrigál, míg a fázishiba nullává válik → <strong>lock állapot</strong>
+      <br><br>
+      Lock állapotban: <code>f_out = N × f_ref / R</code>, ahol R a referencia osztó.
+      Az LMX2595-ben N lehet törtszám (<strong>FRAC/MOD</strong> regiszter) — ez az, ami 1 Hz lépésközű hangolást tesz lehetővé GHz-es tartományban is.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pll2.t">Delta-sigma modulátor — törtszámú osztás</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pll2.b">
+      Az LMX2595 3. rendű <strong>delta-sigma modulátort</strong> tartalmaz a törtszámú N osztóhoz.
+      <br><br>
+      Egész osztóval pl. N=100 és f_ref=10 MHz → f_out = 1000 MHz. De mi van, ha 1001.5 MHz kell?
+      <br>N=100.15 nem létezik egész osztóban — ezért a delta-sigma modulátor <strong>időben váltogatja</strong>
+      N=100 és N=101 között, oly gyorsan, hogy az átlag pontosan 100.15 legyen.
+      <br><br>
+      A loop filter simítja ki a váltogatásból eredő zajt (<strong>fractional spurs</strong>).
+      Az LMX2595 egyedülálló <strong>FRAC_ORDER</strong> és <strong>DITHER</strong> beállításokkal
+      minimalizálja ezeket a spurious emissziókat.
+      <br><br>
+      Eredmény: <code>f_out = (N + FRAC/MOD) × f_PFD</code> — ahol FRAC/MOD akár 0.000001 is lehet.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pll3.t">Loop filter tervezés — a kritikus lépés</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pll3.b">
+      A loop filter a PLL egyik legtöbbet tervezett alkatrésze — <strong>passzív R és C elemek</strong>,
+      amelyek meghatározzák a rendszer dinamikáját.
+      <br><br>
+      <strong>Loop bandwidth (LBW)</strong> — pl. 10 kHz: ennél kisebb frekvenciájú zavarokat a PLL
+      korrigálja, ennél nagyobbakat nem. Kisebb LBW = jobb fáziszaj messze, de lassabb lock idő.
+      <br><br>
+      <strong>Phase margin</strong> — tipikusan 45–65°: a stabilitást jellemzi. Túl kicsi → oszcillál.
+      <br><br>
+      A TI <strong>WEBENCH PLL tervező eszközével</strong> számoltam ki az értékeket:
+      <br>• C1, C2, C3 — szűrő kondenzátorok a charge pump kimenetén
+      <br>• R2, R3 — a stabilitást biztosító rezisztorok
+      <br><br>
+      A loop filter elemei közvetlenül a chip mellé kerültek a NYÁKon — minél rövidebb a
+      vezető, annál kisebb a parazita induktivitás hatása.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pll4.t">SPI programozás — regisztertérkép</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pll4.b">
+      Az LMX2595 113 darab 32-bites regisztert tartalmaz (R0–R112). Programozáshoz:
+      <br>• <strong>CSB le</strong> (chip select aktív)
+      <br>• 32 bites adat soros átvitele: [R/W bit][6 bites cím][24 bites adat]
+      <br>• <strong>CSB fel</strong> → belső regiszter frissül
+      <br><br>
+      A legfontosabb regiszterek:
+      <br>• <code>R34 — PLL_NUM</code>: törtszám numerátor (FRAC)
+      <br>• <code>R35 — PLL_DEN</code>: törtszám nevező (MOD)
+      <br>• <code>R36 — PLL_N</code>: egész osztó értéke
+      <br>• <code>R44 — OUTA_PWR</code>: A kimenet teljesítményszintje
+      <br>• <code>R45 — OUTB_PWR</code>: B kimenet teljesítményszintje
+      <br>• <code>R0 — FCAL_EN</code>: kalibrációs ciklus indítása (kötelező a beállítás után!)
+      <br><br>
+      <strong>Fontos:</strong> az LMX2595-öt minden frekvenciaváltás után <strong>R0-val kell kalibrálni</strong>
+      (<code>FCAL_EN=1</code> bit), különben a VCO nem lock-ol megfelelően.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pll5.t">Fáziszaj és spurious — mire figyelj</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pll5.b">
+      A PLL kimeneti jel minőségét két szám jellemzi legjobban:
+      <br><br>
+      <strong>Fáziszaj (Phase Noise)</strong> — dBc/Hz egységben, offset frekvencia függvényében.
+      Pl. referencia minőségétől függ offset 1 GHz-en: a vivőtől 10 kHz-re az oldalnyáj 110 dB-lel
+      kisebb, mint a vivő. Minél negatívabb, annál jobb.
+      <br>Fáziszajt befolyásolja: referencia minősége, loop bandwidth, VCO belső zaj, tápvonal zaj.
+      <br><br>
+      <strong>Spurious emisszió</strong> — nem kívánt melléktermékek a spektrumban.
+      Forrásai: PFD frekvencia harmónikusai, frakcionális spurs (delta-sigma zajból),
+      tápvonal kicsatolás. Az LMX2595 DITHER beállítása segít csökkenteni.
+      <br><br>
+      <strong>Tervezési tanács:</strong> analóg és digitális tápvonalak szeparálása, decoupling
+      kondenzátorok minden táplábon (100nF + 10µF párhuzamosan), RF kimenet 50Ω-ra illesztése.
+    </div>
+  </div>
+</div>
+
+<!-- Register interactive -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.calc">Interaktív — frekvencia kalkulátor</div>
+  <div class="calc-box">
+    <div class="calc-row">
+      <span class="calc-label">f_ref (referencia)</span>
+      <input class="calc-input" type="number" id="c-ref" value="10" min="5" max="1400" step="0.001" oninput="calcFreq()">
+      <span class="calc-unit">MHz</span>
+    </div>
+    <div class="calc-row">
+      <span class="calc-label">N = B×32+A (osztó)</span>
+      <input class="calc-input" type="number" id="c-n" value="800" min="992" max="262143" oninput="calcFreq()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label">A (nyelőszámláló, 0–31)</span>
+      <input class="calc-input" type="number" id="c-frac" value="0" min="0" max="31" oninput="calcFreq()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label">B (programozható, 31–8191)</span>
+      <input class="calc-input" type="number" id="c-mod" value="25" min="31" max="8191" oninput="calcFreq()">
+    </div>
+    <div class="calc-row">
+      <span class="calc-label">RDIV (referencia osztó)</span>
+      <input class="calc-input" type="number" id="c-rdiv" value="1" min="1" max="4095" oninput="calcFreq()">
+    </div>
+    <div class="calc-result" id="freq-result"></div>
+  </div>
+</div>
+
+<!-- PCB design deep -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.pcb">NYÁKterv — KiCad, RF és EMC szempontok</div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pcb1.t">Rézrétegek és stack-up</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pcb1.b">
+      A BT-Synth-1V <strong>2 rétegű NYÁKon</strong> készült (F.Cu + B.Cu), FR4 alapanyagon.
+      <br><br>
+      • <strong>F.Cu (felső rézréteg)</strong> — aktív alkatrészek, RF vonalak, SPI busz, vezérlőlogika
+      <br>• <strong>B.Cu (alsó rézréteg)</strong> — összefüggő földsík (ground plane) az egész lapot lefedi
+      <br><br>
+      A folyamatos B.Cu ground plane kritikus RF szempontból: minimalizálja az impedanciáját
+      a visszatérő áramoknak, csökkenti a sugárzást és javítja a szignálintegritást.
+      <br><br>
+      <strong>Stack-up:</strong> FR4 1.6mm · Cu 35µm mindkét oldalon · HASL felület
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pcb2.t">Impedanciavezérelt RF vonalak — microstrip</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pcb2.b">
+      Az RF jel útján minden vezető <strong>50Ω karakterisztikus impedanciára</strong> van tervezve.
+      <br><br>
+      FR4 (εr ≈ 4.3) és 1.6mm vastagság esetén a <strong>microstrip formula</strong>:
+      <br><code>Z₀ = 87 / √(εr+1.41) × ln(5.98h / (0.8w+t))</code>
+      <br><br>
+      Ahol h = dielektrikum vastagsága, w = vezető szélessége, t = réz vastagsága.
+      1.6mm FR4-en ez kb. <strong>2.9mm széles vezető</strong> ad 50Ω-ot.
+      <br><br>
+      Az SMA csatlakozóktól az LMX2595 kimenetéig minden RF vonal ezen a szélességen fut.
+      Fordulóknál 45°-os chanfer (nem 90°!) csökkenti az impedanciaugrást.
+      A KiCad <strong>Interactive Router</strong> segít a nyomvonalak konzisztens szélességen tartásában.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pcb3.t">Decoupling és tápellátás tervezés</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pcb3.b">
+      Az LMX2595 érzékeny a tápvonal zajra — a VCC_VCO és VCC_SYNTH lábak szeparált
+      szűrést igényelnek.
+      <br><br>
+      <strong>Decoupling stratégia minden táplábon:</strong>
+      <br>• 100nF X7R 0402 (nagyfrekvenciás zaj szűrése) — a lap közvetlen mellé
+      <br>• 10µF tantal vagy elektrolit (alacsony frekvenciás stabilizálás)
+      <br>• Ferrit bead a digitális és analóg tápvonalak szétválasztásához
+      <br><br>
+      <strong>Tápvonal szeparáció:</strong> digitális (ATmega, LCD) és analóg (LMX2595, VCO)
+      tápvonalak fizikailag szét vannak választva, és csak egy ponton találkoznak (star point).
+      Ez megakadályozza, hogy a digitális switching zaj becsatoljon az analóg részbe.
+      <br><br>
+      A KiCad <strong>DRC (Design Rule Check)</strong> az összes clearance és via-méret
+      szabályt ellenőrzi — 0 hiba, 0 warning a végleges layoutban.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pcb4.t">Via és ground stitching</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pcb4.b">
+      A layoutban <strong>79 via</strong> van — ezek nagy része nem jelváltó, hanem
+      <strong>ground stitching via</strong>.
+      <br><br>
+      A ground stitching lényege: az F.Cu (felső) ground szigetek rendszeresen össze vannak
+      kötve a B.Cu ground plane-nel viákon keresztül. Ezzel:
+      <br>• Megszüntetjük a "floating ground" foltokat
+      <br>• Rövidítjük a visszatérő áramok útját
+      <br>• Csökkentjük a ground induktivitást RF frekvencián
+      <br><br>
+      Az LMX2595 <strong>thermal pad-je</strong> (középső GND pad) 9 via-val van összekötve
+      a B.Cu ground plane-nel — ez egyszerre biztosítja a termikus és RF-GND kapcsolatot.
+      <br><br>
+      A via-k átmérője: 0.6mm furat, 1.0mm réz annular ring — a gyártáshoz optimális arány.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="pcb5.t">Alkatrésztömbök, footprintek — KiCad workflow</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="pcb5.b">
+      A BT-Synth-1V designfolyamata:
+      <br><br>
+      1. <strong>Schematic (KiCad Schematic Editor)</strong> — az összes alkatrész és kapcsolat definiálása,
+      net-ek elnevezése, power flag-ek elhelyezése
+      <br>2. <strong>BOM + netlist generálás</strong> → PCB editorba importálva
+      <br>3. <strong>Footprint hozzárendelés</strong> — az LMX2595-höz saját WQFN-40 footprint,
+      0402 passzívokhoz standard KiCad könyvtár
+      <br>4. <strong>PCB layout</strong> — alkatrésztömb kritikus sorrendben:
+         LMX2595 első → loop filter mellé → decoupling kondik a lapok mellé → SMA connectors →
+         PIC16F876 + LCD → végül routing
+      <br>5. <strong>DRC + ERC</strong> — szabályok: 0.15mm clearance, 0.2mm min track width,
+         minden net lezárt
+      <br>6. <strong>Gerber generálás</strong> → gyártónak (JLCPCB vagy PCBWay)
+      <br><br>
+      A 3D render a KiCad beépített 3D viewer-éből készült — az összes alkatrésznek van 3D modellje
+      (STEP vagy WRL formátum).
+    </div>
+  </div>
+
+  <!-- PCB layers visual -->
+  <div class="layer-grid" style="margin-top:.8rem;">
+    <div class="layer-card"><span class="layer-dot" style="background:#c84040;"></span><span class="layer-name">F.Cu</span><div class="layer-desc">Aktív réteg, RF vonalak, vezérlés</div></div>
+    <div class="layer-card"><span class="layer-dot" style="background:#4040c8;"></span><span class="layer-name">B.Cu</span><div class="layer-desc">Összefüggő ground plane</div></div>
+    <div class="layer-card"><span class="layer-dot" style="background:#e0e0a0;"></span><span class="layer-name">F.Silkscreen</span><div class="layer-desc">Alkatrész jelölések, ref. designok</div></div>
+    <div class="layer-card"><span class="layer-dot" style="background:#a0c0a0;"></span><span class="layer-name">F.Mask</span><div class="layer-desc">Forrasztómaszk kivágások</div></div>
+    <div class="layer-card"><span class="layer-dot" style="background:#ffa0a0;"></span><span class="layer-name">Edge.Cuts</span><div class="layer-desc">NYÁKlap kontúr, méret</div></div>
+    <div class="layer-card"><span class="layer-dot" style="background:#7eb8a4;"></span><span class="layer-name">F.Courtyard</span><div class="layer-desc">Alkatrésztér, DRC ütközés</div></div>
+  </div>
+</div>
+
+<!-- experience -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.experience">Tapasztalat és tanulságok</div>
+  <div class="exp-box" data-i18n="experience.text">
+    A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és digitális részek egymás melletti
+    elhelyezése volt — a mikrocontroller SPI órajele és az LMX2595 RF kimenete ugyanazon a lapon osztozik.
+    A ground plane folyamatossága és a fizikai szeparáció együtt oldotta meg ezt.
+    Az LMX2595 dokumentációja 113 oldalas és rendkívül részletes — az FCAL kalibrációs lépés
+    hiányán sokat debuggoltam mielőtt rájöttem, hogy minden frekvenciaváltás után kötelező.
+    A KiCad-del való munka megmutatta, mennyire erős egy ingyenes EDA eszköz lehet — a 3D render,
+    az impedanciaszámítás és a DRC mind beépített, nincs szükség drága szoftverekre.
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span data-i18n="footer.tag">LMX2316 · PLL · KiCad · RF tervezés</span>
+</div>
+</div>
+
+<script>
+const T={hu:{
+"title":"BT-Synth-1V — <em>Frekvenciaszintézer</em> tervezése",
+"sub":"LMX2316 PLL · KiCad NYÁKterv · PIC16F876 vezérlés · SPI kommunikáció · VCO vezérlés",
+"sec.overview":"A projekt","overview.text":"A BT-Synth-1V egy <strong>saját tervezésű frekvenciaszintézer</strong> Texas Instruments LMX2316 PLL IC alapján. A tervezés célja egy stabil, széles sávban hangolható RF jelforrás, amely LCD kijelzőn mutatja a beállított frekvenciát és rotary encoderrel vezérelhető. A <strong>nyomtatott áramköri lapot KiCad-ben terveztem</strong> — gondosan megtervezett tápellátással, RF szeparációval és impedanciavezérelt vonalakkal.",
+"sec.photos":"Fotók — 3D render és KiCad layout",
+"photo1.cap":"KiCad 3D render — LCD + SMA csatlakozók + rotary encoder + LMX2316",
+"photo2.cap":"KiCad PCB layout — F.Cu rézréteg · 213 pad · 79 via · 742 track · 50 net · 0 unrouted",
+"sec.lmx":"LMX23x6 sorozat — a PLL IC részletesen",
+"lmx.intro":"Az LMX23x6 sorozat a Texas Instruments egy klasszikus, jól bevált <strong>PLL IC-sorozata</strong>. Három tagból áll: az LMX2306 (20–500 MHz), az LMX2316 (100–1200 MHz) és az LMX2326 (100–2800 MHz). Ebben a projektben <strong>LMX2316-ot</strong> használok. A chip tartalmazza a fázisdetektort, a charge pump-ot, a programozható N és R osztókat, valamint a 32/33-as előosztót a dupla modulusú technikához.",
+"sec.pll":"Hogyan működik a PLL — mélyen",
+"pll1.t":"A PLL alapelve és a lock folyamat","pll1.b":"A PLL egy visszacsatolt frekvenciaszabályozó rendszer. VCO generál RF jelet → osztó leosztja → fáziskomparátor (PFD) összehasonlítja a referenciával → charge pump → loop filter → VCO vezérlés. Lock állapotban: <code>f_out = N × f_ref / R</code>. Az LMX2595-ben N lehet törtszám — ez teszi lehetővé az 1 Hz lépésközű hangolást GHz-es tartományban.",
+"pll2.t":"Delta-sigma modulátor — törtszámú osztás","pll2.b":"3. rendű delta-sigma modulátor biztosítja a törtszámú N osztást. A modulátor időben váltogat N és N+1 között, hogy az átlag pontosan a kívánt törtszám legyen. Eredmény: <code>f_out = (N + FRAC/MOD) × f_PFD</code> — ahol FRAC/MOD akár 0.000001 is lehet.",
+"pll3.t":"Loop filter tervezés — a kritikus lépés","pll3.b":"A loop filter passzív R és C elemek amelyek meghatározzák a rendszer dinamikáját. Loop bandwidth (LBW) pl. 10 kHz: ennél kisebb zavarokat a PLL korrigálja. Phase margin tipikusan 45–65°: a stabilitást jellemzi. A TI WEBENCH PLL tervező eszközzel számoltam ki az értékeket. A loop filter elemei közvetlenül a chip mellé kerültek a NYÁKon.",
+"pll4.t":"SPI programozás — regisztertérkép","pll4.b":"Az LMX2595 113 darab 32-bites regisztert tartalmaz (R0–R112). Legfontosabbak: R34=PLL_NUM (FRAC), R35=PLL_DEN (MOD), R36=PLL_N (egész osztó), R44=OUTA_PWR, R45=OUTB_PWR, R0=FCAL_EN (kalibrációs ciklus). Fontos: minden frekvenciaváltás után R0-val kell kalibrálni!",
+"pll5.t":"Fáziszaj és spurious — mire figyelj","pll5.b":"Fáziszaj: dBc/Hz egységben — minél negatívabb annál jobb. Spurious emisszió: nemkívánt melléktermékek. Forrásai: PFD frekvencia harmónikusai, frakcionális spurs. Tervezési tanács: analóg és digitális tápvonalak szeparálása, decoupling minden táplábon, RF kimenet 50Ω-ra illesztése.",
+"sec.calc":"Interaktív — frekvencia kalkulátor",
+"sec.pcb":"NYÁKterv — KiCad, RF és EMC szempontok",
+"pcb1.t":"Rézrétegek és stack-up","pcb1.b":"2 rétegű NYÁKon (F.Cu + B.Cu), FR4. F.Cu: aktív alkatrészek, RF vonalak. B.Cu: összefüggő ground plane. Stack-up: FR4 1.6mm · Cu 35µm · HASL felület.",
+"pcb2.t":"Impedanciavezérelt RF vonalak — microstrip","pcb2.b":"Minden RF vezető 50Ω karakterisztikus impedanciára van tervezve. FR4 1.6mm esetén kb. 2.9mm széles vezető ad 50Ω-ot. Fordulóknál 45°-os chanfer. KiCad Interactive Router konzisztens szélességen tartja a nyomvonalakat.",
+"pcb3.t":"Decoupling és tápellátás tervezés","pcb3.b":"Minden táplábon: 100nF X7R 0402 (nagyfrekvenciás) + 10µF elektrolit (alacsony frekvenciás) + ferrit bead a digitális/analóg szeparációhoz. Digitális és analóg tápvonalak fizikailag szét vannak választva, csak egy ponton találkoznak (star point).",
+"pcb4.t":"Via és ground stitching","pcb4.b":"79 via a layoutban — nagy részük ground stitching. A ground stitching összekötí az F.Cu ground szigeteit a B.Cu ground plane-nel, csökkentve a ground induktivitást. Az LMX2595 thermal pad-je 9 via-val van összekötve a ground plane-nel.",
+"pcb5.t":"Alkatrésztömbök, footprintek — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint hozzárendelés (saját WQFN-40 footprint az LMX2595-höz) → PCB layout kritikus sorrendben → DRC + ERC → Gerber generálás. 0 hiba, 0 warning a végleges layoutban.",
+"sec.experience":"Tapasztalat és tanulságok",
+"experience.text":"A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és digitális részek egymás melletti elhelyezése volt. A ground plane folyamatossága és a fizikai szeparáció együtt oldotta meg. Az LMX2595 FCAL kalibrációs lépés hiányán sokat debuggoltam — minden frekvenciaváltás után kötelező. A KiCad megmutatta, mennyire erős egy ingyenes EDA eszköz — 3D render, impedanciaszámítás és DRC mind beépített.",
+"footer.tag":"LMX2316 · PLL · KiCad · RF tervezés"},
+en:{
+"title":"BT-Synth-1V — <em>Frequency Synthesizer</em> Design",
+"sub":"LMX2316 PLL · KiCad PCB Design · PIC16F876 Control · SPI Communication · VCO Control",
+"sec.overview":"The project","overview.text":"BT-Synth-1V is a <strong>custom-designed frequency synthesizer</strong> based on the Texas Instruments LMX2316 PLL IC. The goal: a stable, wideband-tunable RF source with LCD frequency display and rotary encoder control. The <strong>PCB was designed in KiCad</strong> — with impedance-controlled RF traces and carefully planned power delivery.",
+"sec.photos":"Photos — 3D render and KiCad layout",
+"photo1.cap":"KiCad 3D render — LCD + SMA connectors + rotary encoder + LMX2316",
+"photo2.cap":"KiCad PCB layout — F.Cu copper layer · 213 pads · 79 vias · 742 tracks · 50 nets · 0 unrouted",
+"sec.lmx":"LMX23x6 series — the PLL IC in detail",
+"lmx.intro":"The LMX23x6 series is a classic, well-proven <strong>PLL IC family</strong> from Texas Instruments. Three members: LMX2306 (20–500 MHz), LMX2316 (100–1200 MHz) and LMX2326 (100–2800 MHz). This project uses the <strong>LMX2316</strong>. The chip contains the phase detector, charge pump, programmable N and R dividers, and a 32/33 prescaler for dual-modulus operation.",
+"sec.pll":"How the PLL works — in depth",
+"pll1.t":"PLL principle and lock process","pll1.b":"PLL is a feedback frequency control system. VCO generates RF signal → divider divides down → PFD compares to reference → charge pump → loop filter → VCO control. Locked: <code>f_out = N × f_ref / R</code>. In the LMX2595, N can be fractional — enabling 1 Hz step tuning at GHz frequencies.",
+"pll2.t":"Delta-sigma modulator — fractional division","pll2.b":"The LMX2316 uses a <strong>dual-modulus prescaler</strong> (32/33) for fractional-like N division — this is the classic <strong>pulse-swallow</strong> technique, not delta-sigma. The prescaler divides by 33 for the first A pulses, then switches to 32. Result: <code>f_VCO = f_PFD × (B × 32 + A)</code>, where B is the programmable counter (13 bits) and A is the swallow counter (5 bits, A ≤ B). This allows the VCO to be tuned in f_PFD steps.",
+"pll3.t":"Loop filter design — the critical step","pll3.b":"The loop filter is passive R and C components that determine system dynamics. Loop bandwidth e.g. 10 kHz: disturbances below this are corrected by the PLL. Phase margin typically 45–65° for stability. Values calculated with TI WEBENCH PLL designer. Filter components placed immediately adjacent to the chip on the PCB.",
+"pll4.t":"SPI programming — register map","pll4.b":"LMX2595 contains 113 32-bit registers (R0–R112). Key registers: R34=PLL_NUM (FRAC), R35=PLL_DEN (MOD), R36=PLL_N, R44=OUTA_PWR, R45=OUTB_PWR, R0=FCAL_EN. Important: FCAL calibration must be run after every frequency change!",
+"pll5.t":"Phase noise and spurious — what to watch","pll5.b":"Phase noise: in dBc/Hz — more negative is better. Spurious: unwanted spectral products from PFD harmonics and fractional spurs. Design advice: separate analog/digital supplies, decouple every supply pin, match RF output to 50Ω.",
+"sec.calc":"Interactive — frequency calculator",
+"sec.pcb":"PCB Design — KiCad, RF and EMC considerations",
+"pcb1.t":"Copper layers and stack-up","pcb1.b":"2-layer PCB (F.Cu + B.Cu), FR4. F.Cu: active components, RF traces. B.Cu: continuous ground plane. Stack-up: FR4 1.6mm · Cu 35µm · HASL finish.",
+"pcb2.t":"Impedance-controlled RF traces — microstrip","pcb2.b":"All RF conductors designed for 50Ω characteristic impedance. On FR4 1.6mm: ~2.9mm wide trace gives 50Ω. 45° chamfers at turns. KiCad Interactive Router maintains consistent trace widths.",
+"pcb3.t":"Decoupling and power delivery design","pcb3.b":"Every supply pin: 100nF X7R 0402 (HF noise) + 10µF electrolytic (LF stability) + ferrite bead for analog/digital separation. Analog and digital supply planes physically separated, meeting at a single star point.",
+"pcb4.t":"Vias and ground stitching","pcb4.b":"79 vias in layout — most are ground stitching vias. Ground stitching connects F.Cu ground islands to B.Cu ground plane, reducing ground inductance at RF. LMX2595 thermal pad connected to ground plane with 9 vias.",
+"pcb5.t":"Component placement, footprints — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint assignment (custom WQFN-40 for LMX2595) → PCB layout in critical order → DRC + ERC → Gerber export. 0 errors, 0 warnings in final layout.",
+"sec.experience":"Experience and lessons learned",
+"experience.text":"The biggest challenge in designing BT-Synth-1V was placing RF and digital sections adjacently. Continuous ground plane and physical separation solved it together. The PIC microcontroller writes the N register via SPI for every frequency step — the LMX2316 re-locks automatically without any calibration sequence. KiCad showed how powerful a free EDA tool can be — 3D render, impedance calculation and DRC all built-in.",
+"footer.tag":"LMX2316 · PLL · KiCad · RF Design"},
+de:{
+"title":"BT-Synth-1V — <em>Frequenzsynthesizer</em> Design",
+"sub":"LMX2316 PLL · KiCad Leiterplattendesign · PIC16F876 Steuerung · SPI Kommunikation · VCO Steuerung",
+"sec.overview":"Das Projekt","overview.text":"BT-Synth-1V ist ein <strong>selbst entworfener Frequenzsynthesizer</strong> basierend auf dem Texas Instruments LMX2316 PLL IC. Ziel: eine stabile, breitbandig abstimmbare RF-Quelle mit LCD-Frequenzanzeige und Drehgeber-Steuerung. Die <strong>Leiterplatte wurde in KiCad entworfen</strong> — mit impedanzkontrollierten RF-Leiterbahnen.",
+"sec.photos":"Fotos — 3D-Render und KiCad-Layout",
+"photo1.cap":"KiCad 3D-Render — LCD + SMA-Buchsen + Drehgeber + LMX2316",
+"photo2.cap":"KiCad PCB-Layout — F.Cu Kupferlage · 213 Pads · 79 Vias · 742 Tracks · 50 Netze · 0 Unrouted",
+"sec.lmx":"LMX23x6-Serie — der PLL-IC im Detail",
+"lmx.intro":"Die LMX23x6-Serie ist eine klassische, bewährte <strong>PLL-IC-Familie</strong> von Texas Instruments. Drei Mitglieder: LMX2306 (20–500 MHz), LMX2316 (100–1200 MHz) und LMX2326 (100–2800 MHz). Dieses Projekt verwendet den <strong>LMX2316</strong>. Der Chip enthält Phasendetektor, Ladungspumpe, programmierbare N- und R-Teiler und einen 32/33-Vorteiler.",
+"sec.pll":"Wie die PLL funktioniert — in der Tiefe",
+"pll1.t":"PLL-Grundprinzip und Lock-Prozess","pll1.b":"PLL ist ein rückgekoppeltes Frequenzregelungssystem. VCO generiert RF → Teiler → PFD vergleicht mit Referenz → Ladungspumpe → Schleifenfilter → VCO-Steuerung. Im eingerasteten Zustand: <code>f_out = N × f_ref / R</code>.",
+"pll2.t":"Delta-Sigma-Modulator — gebrochene Teilung","pll2.b":"Der LMX2316 verwendet einen <strong>Dual-Modulus-Vorteiler</strong> (32/33) — klassische <strong>Pulse-Swallow</strong>-Technik, kein Delta-Sigma. Ergebnis: <code>f_VCO = f_PFD × (B × 32 + A)</code>, wobei B der programmierbare Teiler (13 Bit) und A der Schluckzähler (5 Bit) ist.",
+"pll3.t":"Schleifenfilter-Design — der kritische Schritt","pll3.b":"Passive R-und-C-Elemente bestimmen die Systemdynamik. Schleifenbandbreite z.B. 10 kHz, Phasenrand typisch 45–65°. Werte mit TI WEBENCH PLL Designer berechnet.",
+"pll4.t":"SPI-Programmierung — Registerkarte","pll4.b":"Der LMX2316 wird über SPI mit einem einzigen 21-Bit-Wort programmiert. Struktur: <code>[DATA 18 Bits][CTL 2 Bits][FLAG 1 Bit]</code>. Das FLAG-Bit wählt zwischen N- und R-Zähler. Im N-Register: obere 13 Bits = programmierbarer Teiler (B), untere 5 Bits = Schluckzähler (A).",
+"pll5.t":"Phasenrauschen und Spurs","pll5.b":"Phasenrauschen in dBc/Hz — negativer ist besser. Spurs: unerwünschte Spektralprodukte. Entwurfshinweis: Analog/Digital-Versorgung trennen, jede Versorgung entkoppeln, RF-Ausgang auf 50Ω anpassen.",
+"sec.calc":"Interaktiv — Frequenzrechner",
+"sec.pcb":"Leiterplattendesign — KiCad, RF und EMV",
+"pcb1.t":"Kupferlagen und Aufbau","pcb1.b":"2-lagige Leiterplatte (F.Cu + B.Cu), FR4 1.6mm. F.Cu: aktive Komponenten, RF-Leiterbahnen. B.Cu: durchgehende Massefläche.",
+"pcb2.t":"Impedanzkontrollierte RF-Leiterbahnen","pcb2.b":"Alle RF-Leiter für 50Ω ausgelegt. Auf FR4 1.6mm: ~2.9mm breite Leiterbahn. 45°-Fase an Kurven.",
+"pcb3.t":"Entkopplung und Stromversorgungsdesign","pcb3.b":"Jeder Versorgungspin: 100nF + 10µF + Ferritperle. Analoge und digitale Versorgung physisch getrennt.",
+"pcb4.t":"Vias und Ground Stitching","pcb4.b":"79 Vias — die meisten sind Ground-Stitching-Vias. Verbinden F.Cu-Masseflächen mit der B.Cu-Masseebene.",
+"pcb5.t":"Bauteilplatzierung, Footprints — KiCad-Workflow","pcb5.b":"Schaltplan → Stückliste → Footprint-Zuweisung (eigenes WQFN-40 für LMX2595) → PCB-Layout → DRC/ERC → Gerber-Export. 0 Fehler, 0 Warnungen.",
+"sec.experience":"Erfahrungen und Lektionen",
+"experience.text":"Die größte Herausforderung war die Platzierung von RF und digitalen Schaltungsteilen nebeneinander. Durchgehende Massefläche und physische Trennung lösten es gemeinsam. Der PIC-Mikrocontroller schreibt das N-Register per SPI bei jedem Frequenzschritt — der LMX2316 rastet automatisch ohne Kalibriersequenz wieder ein.",
+"footer.tag":"LMX2316 · PLL · KiCad · RF-Design"}};
+
+let lang='hu';
+function setLang(l){lang=l;document.documentElement.lang=l;const t=T[l];document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));calcFreq();}
+function toggleConfig(el){el.classList.toggle('open');}
+
+// ════ FREQUENCY CALCULATOR ════
+function calcFreq(){
+  const fref=parseFloat(document.getElementById('c-ref').value)||10;
+  const N=parseInt(document.getElementById('c-n').value)||100;
+  const frac=parseInt(document.getElementById('c-frac').value)||0;
+  const mod=parseInt(document.getElementById('c-mod').value)||1000000;
+  const rdiv=parseInt(document.getElementById('c-rdiv').value)||1;
+  const res=document.getElementById('freq-result'); if(!res) return;
+
+  const fpfd=fref/rdiv;
+  // LMX2316: f_VCO = (B*32 + A) * f_PFD, where N input = B*32+A combined
+  const nEff=N+(frac/mod);
+  const fout=nEff*fpfd;
+
+  let status='ok', msg='';
+  if(fpfd<5||fpfd>400){ status='warn'; msg='⚠ f_PFD ajánlott tartomány: 5–400 MHz'; }
+  if(fout<10||fout>19000){ status='err'; msg='✗ f_out kívül esik az LMX2595 tartományán (100 MHz – 1200 MHz)'; }
+  if(N<28||N>4095){ status='warn'; msg='⚠ N tipikus tartomány: 28–4095'; }
+
+  // R36, R34, R35 hex values
+  const r36=(N&0xFFF).toString(16).toUpperCase().padStart(4,'0');
+  const r34=(frac&0xFFFFFF).toString(16).toUpperCase().padStart(8,'0');
+  const r35=(mod&0xFFFFFF).toString(16).toUpperCase().padStart(8,'0');
+
+  res.innerHTML=`<span class="ok">f_PFD = ${fpfd.toFixed(4)} MHz</span>
+<span class="${status}">f_out = <strong>${fout<1000?fout.toFixed(6)+' MHz':(fout/1000).toFixed(6)+' GHz'}</strong></span>${msg?'<br><span class="'+status+'">'+msg+'</span>':''}
+<br><span style="color:var(--text-dim)">N_eff = ${nEff.toFixed(8)}&nbsp;&nbsp;|&nbsp;&nbsp;Lépésköz ≈ ${(fpfd/mod*1e6).toFixed(2)} Hz</span>
+<br><span style="color:var(--text-dim)">R36 (N) = 0x${r36}&nbsp;&nbsp;R34 (NUM) = 0x${r34}&nbsp;&nbsp;R35 (DEN) = 0x${r35}</span>`;
+}
+
+// ════ LMX2595 BLOCK DIAGRAM ════
+function drawBlock(){
+  const c=document.getElementById('block-canvas'); if(!c) return;
+  const W=c.parentElement.clientWidth-24||700;
+  const H=200, dpr=devicePixelRatio||1;
+  c.width=W*dpr; c.height=H*dpr; c.style.width=W+'px'; c.style.height=H+'px';
+  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr);
+  ctx.clearRect(0,0,W,H);
+
+  const blocks=[
+    {x:20,  y:70, w:70, h:40, label:'REF\nINPUT',  col:'#7eb8a4'},
+    {x:120, y:70, w:70, h:40, label:'R-DIV',        col:'#8878c8'},
+    {x:220, y:55, w:70, h:40, label:'PFD+CP',       col:'#c8a96e'},
+    {x:220, y:105,w:70, h:40, label:'Loop\nFilter', col:'#d4703a'},
+    {x:330, y:70, w:70, h:40, label:'VCO',          col:'#c05050'},
+    {x:440, y:35, w:70, h:35, label:'÷2/4/8',       col:'#5888c8'},
+    {x:440, y:80, w:70, h:40, label:'N-DIV\n(DSM)', col:'#8878c8'},
+    {x:W-80,y:70, w:80, h:35, label:'RF OUT\n100M–1.2G', col:'#28c898'},
+  ];
+
+  // Arrows
+  const arr=[
+    [90,90,120,90],[190,90,220,75],[255,95,255,105],[255,145,255,160],[350,90,330,90],
+    [400,90,440,55],[400,90,440,100],[510,75,W-80,88]
+  ];
+  ctx.strokeStyle='#3a5050'; ctx.lineWidth=1.2;
+  arr.forEach(([x1,y1,x2,y2])=>{
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    // arrowhead
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.beginPath(); ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-8*Math.cos(a-0.4),y2-8*Math.sin(a-0.4));
+    ctx.lineTo(x2-8*Math.cos(a+0.4),y2-8*Math.sin(a+0.4));
+    ctx.closePath(); ctx.fillStyle='#3a5050'; ctx.fill();
+  });
+
+  // Feedback arrow VCO→N-DIV
+  ctx.strokeStyle='#3a5050'; ctx.lineWidth=1.2; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.moveTo(365,110); ctx.lineTo(365,170); ctx.lineTo(475,170); ctx.lineTo(475,120); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#3a5050'; ctx.beginPath(); ctx.moveTo(475,120); ctx.lineTo(470,130); ctx.lineTo(480,130); ctx.closePath(); ctx.fill();
+  ctx.fillStyle='#3a6060'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('feedback',420,180);
+
+  // SPI label
+  ctx.fillStyle='#4a6868'; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('SPI (R0–R112)',W/2,194);
+
+  blocks.forEach(b=>{
+    ctx.fillStyle=b.col+'22'; ctx.strokeStyle=b.col+'88'; ctx.lineWidth=1.2;
+    ctx.beginPath(); ctx.roundRect(b.x,b.y,b.w,b.h,3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=b.col; ctx.font='8px DM Mono,monospace'; ctx.textAlign='center';
+    b.label.split('\n').forEach((ln,i,a)=>ctx.fillText(ln,b.x+b.w/2,b.y+b.h/2+(i-(a.length-1)/2)*11+1));
+  });
+}
+
+document.addEventListener('DOMContentLoaded',()=>{ setLang('hu'); calcFreq(); setTimeout(drawBlock,80); });
+window.addEventListener('resize',drawBlock);
+</script>
+</body>
+</html>
