@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saia Burgess PCD3.S100 — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f0f;--bg2:#151717;--bg3:#1c1f1f;--border:#2a2e2e;--accent:#c8a96e;--accent2:#7eb8a4;--text:#d8d4cc;--text-dim:#7a7870;--text-bright:#eeeae2;--orange:#d4703a;--purple:#8878c8;--red:#c05050;--saia:#e04040;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:960px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--saia);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:1.6rem;}
+.section{margin-top:2.6rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.overview-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--saia);padding:1.4rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;}
+.overview-box strong{color:var(--accent2);}
+
+/* photos */
+.photo-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+@media(max-width:600px){.photo-grid{grid-template-columns:1fr;}}
+.photo-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.photo-card img{width:100%;display:block;object-fit:cover;max-height:280px;}
+.photo-cap{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text-dim);padding:.5rem .8rem;letter-spacing:.06em;line-height:1.5;}
+
+/* spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+@media(max-width:560px){.spec-grid{grid-template-columns:1fr;}}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.spec-key{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.spec-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);}
+.spec-note{font-size:.78rem;color:var(--text-dim);margin-top:.15rem;}
+
+/* accordion */
+.config-item{background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;overflow:hidden;}
+.config-header{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.1rem;cursor:pointer;transition:background .15s;user-select:none;}
+.config-header:hover{background:var(--bg3);}
+.config-title{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent2);letter-spacing:.06em;}
+.config-arrow{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);transition:transform .2s;}
+.config-item.open .config-arrow{transform:rotate(90deg);}
+.config-body{display:none;padding:.9rem 1.2rem 1rem;border-top:1px solid var(--border);font-size:.87rem;color:var(--text-dim);line-height:1.8;}
+.config-item.open .config-body{display:block;}
+.config-body strong{color:var(--text);}
+.config-body code{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--bg3);padding:.1rem .35rem;border-radius:2px;color:var(--accent);}
+
+/* compare table */
+.comp-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:.7rem;margin-top:.6rem;}
+.comp-table th{padding:.5rem .8rem;text-align:left;border-bottom:1px solid var(--border);color:var(--accent);font-weight:500;letter-spacing:.08em;}
+.comp-table td{padding:.5rem .8rem;border-bottom:1px solid var(--bg3);color:var(--text-dim);vertical-align:top;line-height:1.6;}
+.comp-table td:first-child{color:var(--accent2);}
+.comp-table tr.hl td{background:rgba(224,64,64,.04);color:var(--text);}
+.good{color:var(--accent2);} .mid{color:var(--accent);} .bad{color:var(--red);}
+
+/* FBD program annotated */
+.program-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-top:.8rem;}
+.program-wrap img{width:100%;display:block;}
+.program-annotations{padding:.9rem 1.1rem;display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+@media(max-width:560px){.program-annotations{grid-template-columns:1fr;}}
+.ann-item{background:var(--bg3);border:1px solid var(--border);padding:.6rem .8rem;border-radius:2px;}
+.ann-label{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--saia);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.ann-text{font-size:.8rem;color:var(--text-dim);line-height:1.55;}
+
+.exp-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.95rem;line-height:1.85;}
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">Saia Burgess <em>PCD3.S100</em> — ipari PLC tapasztalatok</h1>
+<div class="proj-sub" data-i18n="sub">PCD3 sorozat · Saia Fupia Editor · FBD programozás · S-Net · Ethernet · Parkoló vezérlés</div>
+
+<!-- overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.overview">A Saia PCD3 sorozatról</div>
+  <div class="overview-box" data-i18n="overview.text">
+    A Saia Burgess PCD3 sorozat a svájci Saia-Burgess Controls (ma Honeywell) egyik legnépszerűbb
+    <strong>moduláris ipari PLC-je</strong>. A PCD3.S100 workshop változat oktatási és tesztkörnyezetbe
+    optimalizált — beépített I/O LED kijelzőkkel, kapcsolható bemenetekkel és analóg kimenetekkel,
+    amelyek kézzel is vezérelhetők. A programozás a <strong>Saia Fupia Editor</strong> szoftverben
+    történik, amely FBD (Function Block Diagram), IL (Instruction List) és Ladder nyelvet is támogat.
+    A PCD3-at főleg <strong>épületautomatizálásban, parkolórendszerekben és ipari folyamatvezérlésben</strong>
+    alkalmazzák — ahol a megbízhatóság és a rugalmas kommunikáció elsődleges szempont.
+  </div>
+</div>
+
+<!-- Photos -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.photos">Saját fotók — hardver és program</div>
+  <div class="photo-grid">
+    <div class="photo-card">
+      <img src="saia-pcd3-hw.jpg" alt="Saia PCD3.S100 workshop hardware">
+      <div class="photo-cap" data-i18n="photo1.cap">Saia PCD3/Workshop · PCD3.S100 · I0–I7 bemenetek · O16–O23 kimenetek · S-Net/MPI · USB · Ethernet · PCD3.M 5540 CPU</div>
+    </div>
+    <div class="photo-card">
+      <img src="saia-fupia-program.jpg" alt="Saia Fupia Editor FBD program">
+      <div class="photo-cap" data-i18n="photo2.cap">Saia Fupia Editor — FBD parkolóvezérlő program · Up/Down számláló · Komparátorok · Pulse generátorok · Sorompóvezérlés</div>
+    </div>
+  </div>
+</div>
+
+<!-- Program annotated -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.program">A program — parkolórendszer logika</div>
+  <div class="program-wrap">
+    <img src="saia-fupia-program.jpg" alt="Saia Fupia FBD program részlet" style="max-height:340px;object-fit:cover;object-position:top;">
+    <div class="program-annotations">
+      <div class="ann-item">
+        <div class="ann-label">Up/Down számláló</div>
+        <div class="ann-text">Auto_BE (beengedés) és Auto_KI (kiengedés) jelekkel vezérelt fel/le számláló. A 0–60 közötti érték mutatja az éppen parkoló autók számát.</div>
+      </div>
+      <div class="ann-item">
+        <div class="ann-label">Komparátorok (Cmp >=)</div>
+        <div class="ann-text">A számláló értékét több küszöbhöz hasonlítja: ≥2 → Foglalt_2, ≥4 → Foglalt_4, ≥6 → Foglalt_6, ≥8 → Foglalt_8. Ezek vezérlik a kijelző LED-eket.</div>
+      </div>
+      <div class="ann-item">
+        <div class="ann-label">Timer (0|-|T) — Vilagitas</div>
+        <div class="ann-text">Impulzusgenerátor a Vilagitas kimenethez: a parkoló teli állapotát jelző lámpa az O19-es kimeneten villog, nem csak statikusan ég.</div>
+      </div>
+      <div class="ann-item">
+        <div class="ann-label">Pulse — Sorompo_LE / FEL</div>
+        <div class="ann-text">Két Pulse funkciómblokk vezérli a sorompó le- és felnyitó motorját. Az impulzus hossza megadja a motorvezérlő jelváltás idejét (tipikusan 0.5–1 s).</div>
+      </div>
+      <div class="ann-item">
+        <div class="ann-label">Megtelt kimenet (O20)</div>
+        <div class="ann-text">Ha a számláló eléri a 60-at (teli), a Megtelt output aktív lesz — ez a bejáratnál jelzi, hogy nincs szabad hely.</div>
+      </div>
+      <div class="ann-item">
+        <div class="ann-label">Cmp >= 50 — előfigyelmeztetés</div>
+        <div class="ann-text">50 autó felett aktiválódik a figyelmeztető jelzés, hogy közel van a teli állapot. A parkoló üzemeltetői felkészülhetnek.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Specs -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.specs">PCD3.S100 — műszaki adatok</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-key">CPU</div><div class="spec-val">PCD3.M 5540</div><div class="spec-note">32-bites RISC, 512 KB RAM, 4 MB Flash</div></div>
+    <div class="spec-item"><div class="spec-key">Digitális I/O</div><div class="spec-val">I0–I7 · O16–O23</div><div class="spec-note">8 DI + 8 DO alapkártyán, relé kimenet</div></div>
+    <div class="spec-item"><div class="spec-key">Analóg I/O</div><div class="spec-val">CH0–CH3 (W400)</div><div class="spec-note">0–10V analóg kimenetek, kézzel állítható potméterrel</div></div>
+    <div class="spec-item"><div class="spec-key">Kommunikáció</div><div class="spec-val">Ethernet · USB · S-Net/MPI</div><div class="spec-note">HTTP szerver, Modbus TCP, BACnet/IP natívan</div></div>
+    <div class="spec-item"><div class="spec-key">Programozás</div><div class="spec-val">Saia Fupia Editor</div><div class="spec-note">FBD, IL, Ladder, SFC — IEC 61131-3 kompatibilis</div></div>
+    <div class="spec-item"><div class="spec-key">Bővíthetőség</div><div class="spec-val">PCD3 modulok</div><div class="spec-note">Analóg, digitális, kommunikációs modulok sorba fűzhetők</div></div>
+    <div class="spec-item"><div class="spec-key">Tápfeszültség</div><div class="spec-val">24V DC</div><div class="spec-note">Beépített tápegység, széles tartományú bemenet</div></div>
+    <div class="spec-item"><div class="spec-key">Workshop funkció</div><div class="spec-val">Beépített panel</div><div class="spec-note">I/O kapcsolók és LED-ek közvetlen teszteléshez, oktatáshoz</div></div>
+  </div>
+</div>
+
+<!-- Deep sections -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.deep">Részletes ismertetők</div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="d1.t">Saia Fupia Editor — programozási környezet</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="d1.b">
+      A Saia Fupia Editor az IEC 61131-3 szabványt követi, és a következő programnyelvet támogatja:
+      <br><br>
+      • <strong>FBD (Function Block Diagram)</strong> — grafikus, funkcioblokk alapú programozás. Ezt használom leginkább: blokkokat húzunk a vászonra, összekötjük a jeleket. Nagyon átlátható komplex logikánál is.
+      <br>• <strong>IL (Instruction List)</strong> — szöveges, assemblyszerű language. Régebbi programoknál vagy teljesítménykritikus részeknél hasznos.
+      <br>• <strong>Ladder Diagram</strong> — ha valaki Siemens vagy Omron háttérből jön, ez az ismerős. FBD-vel vegyes programban is alkalmazható.
+      <br>• <strong>SFC (Sequential Function Chart)</strong> — állapotgép alapú, egymás után következő lépések vezérlésére.
+      <br><br>
+      A Fupia Editor egyik erőssége az <strong>online monitoring</strong>: csatlakoztatva a PLC-hez, a blokkokban valós idejű értékek jelennek meg — látod, hogy melyik funkcioblokk aktív, milyen értéket tárol épp a számláló. Debug módban egy adott szimbólum értéke force-olható is.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="d2.t">S-Net, Ethernet, BACnet — kommunikáció</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="d2.b">
+      A Saia PCD3 kommunikációs képességei kiemelkedők az árfekvéséhez képest:
+      <br><br>
+      • <strong>Ethernet (RJ45)</strong> — Modbus TCP master/slave, BACnet/IP (épületautomatizálás standard protokollja), HTTP szerver beépítve. A PLC webszerverén keresztül böngészőből is monitorozható a rendszer állapota.
+      <br>• <strong>S-Net / MPI (DB9)</strong> — Saia saját hálózati protokollja, elosztott PLC rendszerekhez. Több PCD3 master-slave topológiában kommunikálhat.
+      <br>• <strong>USB</strong> — programozáshoz, firmware frissítéshez.
+      <br><br>
+      A <strong>BACnet/IP</strong> protokoll megkülönbözteti a Saia PCD-t a legtöbb kis/közepes PLC-től: ez az épületautomatizálás iparági szabványa, amelyen HVAC rendszerek, tűzjelzők és biztonságtechnikai rendszerek kommunikálnak. Ezért alkalmazzák a Saia PCD-t irodaházakban, szállodákban és kórházakban.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="d3.t">Memóriaterületek és adatkezelés</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="d3.b">
+      A Saia PCD memóriastruktúrája más mint a Siemens vagy Omron megközelítés:
+      <br><br>
+      • <strong>Register (R)</strong> — 32-bites egész számok, 0–9999-ig. Számlálók, mérési értékek, setpointok tárolására. A programban <code>R0</code>, <code>R100</code> stb. hivatkozással érhető el.
+      <br>• <strong>Flag (F)</strong> — 1 bites logikai változók, belső jelzésekhez. <code>F0</code>–<code>F8191</code>
+      <br>• <strong>Input / Output (I / O)</strong> — fizikai I/O csatornák. <code>I0</code>–<code>I7</code> az alapkártyán, bővítőkkel tovább.
+      <br>• <strong>DB (Data Block)</strong> — strukturált adatterületek, pl. receptek, mérési napló tárolásához.
+      <br>• <strong>Timer (T) / Counter (C)</strong> — dedikált időzítő és számláló területek, <code>T0</code>–<code>T2047</code>, <code>C0</code>–<code>C2047</code>
+      <br><br>
+      A <strong>remanens (power-fail safe)</strong> területek külön konfigurálhatók — áramkimaradás után ezek megmaradnak. Fontos például egy parkolórendszernél, ahol a pillanatnyi autószám nem nullázódhat le véletlenül.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="d4.t">FBD funkcioblokkok — amit a programban látunk</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="d4.b">
+      A Fupia Editor FBD könyvtárának leggyakrabban használt blokkjai:
+      <br><br>
+      • <strong>Up/Down Counter (CTUD)</strong> — felfelé és lefelé számol, Set előbeállítható értékre ugrik, IC (initial count) nulláz. A kimenet <code>Q</code> 1, ha a számláló ≥ preset.
+      <br>• <strong>Comparator (Cmp >=)</strong> — két érték összehasonlítása. Ha az első ≥ a másodiknak, a kimenet 1. Több komparátor lépcsőzésével fokozatos kijelzés valósítható meg (pl. parkolótelítettség 25%, 50%, 75%, 100%).
+      <br>• <strong>Timer (TON / TOF / TP)</strong> — bekapcsolási, kikapcsolási késleltetés, vagy impulzusgenerátor. A TV (time value) a beállított idő, t a már eltelt idő.
+      <br>• <strong>Pulse</strong> — egyetlen impulzust generál a bemenet felfutó élére. Sorompóvezérlésnél: egy gombnyomás = egyetlen rövid motorvezérlő jel.
+      <br>• <strong>SR / RS Flip-flop</strong> — Set-Reset memória. Akkor hasznos, amikor egy állapotot meg kell tartani, amíg valaki szándékosan nem törli.
+      <br><br>
+      A blokkok között a <strong>signal flow</strong> (jelfolyam) vonalakkal van összekapcsolva. A Fupia Editor automatikusan kezeli a végrehajtási sorrendet — a blokkokat sorban hajtja végre bal→jobb, felülről lefelé.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="d5.t">PCD3 vs. más PLC-k — mikor válaszd?</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="d5.b">
+      A Saia PCD3 nem véletlenül él él még ma is az épületautomatizálási piacon:
+      <br><br>
+      • <strong>BACnet/IP natívan</strong> — más PLC-knél (Siemens, Omron) ez drága add-on. Saia-nál beépített.
+      <br>• <strong>Webszerver beépítve</strong> — böngészőből elérhető monitoring és vezérlés IT infrastruktúra nélkül.
+      <br>• <strong>Workshop tábla</strong> — az S100 tanulási célra ideális: a beépített kapcsolók és LED-ek lehetővé teszik, hogy valódi kimeneteket láss, fizikai berendezés nélkül is.
+      <br>• <strong>Hosszú rendelkezésre állás</strong> — a Saia PCD3 modulok 10+ éve elérhetők, visszafelé kompatibilis a régi programokkal.
+      <br><br>
+      <strong>Ahol nem a legjobb választás:</strong> gyors mozgásvezérléshez (ms alatti ciklus kell), kis I/O-ra (CP1L olcsóbb), ha a Siemens TIA Portal ökoszisztéma fontos.
+    </div>
+  </div>
+</div>
+
+<!-- Comparison table -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.compare">PCD3.S100 vs. CP1L vs. S7-1200</div>
+  <table class="comp-table">
+    <thead><tr><th data-i18n="th.param">Szempont</th><th>Saia PCD3</th><th>Omron CP1L</th><th>Siemens S7-1200</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>BACnet/IP</td><td class="good">natív</td><td class="bad">nincs</td><td class="mid">add-on modul</td></tr>
+      <tr><td>Webszerver</td><td class="good">beépített</td><td class="bad">nincs</td><td class="mid">opcionális</td></tr>
+      <tr><td>Programozás</td><td class="mid">Fupia Editor</td><td class="good">CX-Programmer</td><td class="good">TIA Portal</td></tr>
+      <tr class="hl"><td>Ár (CPU)</td><td class="mid">€400–800</td><td class="good">€150–400</td><td class="mid">€300–600</td></tr>
+      <tr><td>Mozgásvezérlés</td><td class="bad">nem erőssége</td><td class="good">pulse output</td><td class="good">motion modul</td></tr>
+      <tr><td>Épületautomatizálás</td><td class="good">elsődleges piac</td><td class="mid">használható</td><td class="mid">használható</td></tr>
+      <tr class="hl"><td>Oktatási változat</td><td class="good">PCD3/Workshop</td><td class="mid">nincs dedikált</td><td class="mid">SIMATIC ET200</td></tr>
+      <tr><td>Ökoszisztéma</td><td class="mid">Saia/Honeywell</td><td class="mid">Omron</td><td class="good">nagyon széles</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- experience -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.experience">Személyes tapasztalat</div>
+  <div class="exp-box" data-i18n="experience.text">
+    A Saia PCD3-mal való munka megmutatta, hogy az FBD programozás milyen hatékonyan alkalmazható
+    komplex vezérlési logikánál. A parkolórendszer programban egy fel/le számláló, négy komparátor
+    és két pulse blokk együttesen valósítja meg a teljes sorompó- és kijelzővezérlést — áttekinthető,
+    karbantartható kód, amit más mérnök is könnyen megért. A Fupia Editor online monitoring módja
+    élesben különösen hasznos: anélkül hogy a gépet leállítanád, látod mit csinál épp a program.
+    A Saia PCD3 Workshop tábla pedig ideális volt arra, hogy a programot valódi I/O-n tudjam tesztelni
+    — a beépített kapcsolók és LED-ek tökéletesen helyettesítik a szenzorokat és aktuátorokat egy
+    fejlesztési fázisban.
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span data-i18n="footer.tag">Saia PCD3 · Fupia Editor · FBD · Épületautomatizálás</span>
+</div>
+</div>
+
+<script>
+const T={
+hu:{
+"title":"Saia Burgess <em>PCD3.S100</em> — ipari PLC tapasztalatok",
+"sub":"PCD3 sorozat · Saia Fupia Editor · FBD programozás · S-Net · Ethernet · Parkoló vezérlés",
+"sec.overview":"A Saia PCD3 sorozatról",
+"overview.text":"A Saia Burgess PCD3 sorozat a svájci Saia-Burgess Controls (ma Honeywell) egyik legnépszerűbb <strong>moduláris ipari PLC-je</strong>. A PCD3.S100 workshop változat oktatási és tesztkörnyezetbe optimalizált. A programozás a <strong>Saia Fupia Editor</strong> szoftverben történik, amely FBD, IL és Ladder nyelvet is támogat. Főleg <strong>épületautomatizálásban, parkolórendszerekben és ipari folyamatvezérlésben</strong> alkalmazzák.",
+"sec.photos":"Saját fotók — hardver és program",
+"photo1.cap":"Saia PCD3/Workshop · PCD3.S100 · I0–I7 bemenetek · O16–O23 kimenetek · S-Net/MPI · USB · Ethernet · PCD3.M 5540 CPU",
+"photo2.cap":"Saia Fupia Editor — FBD parkolóvezérlő program · Up/Down számláló · Komparátorok · Pulse generátorok · Sorompóvezérlés",
+"sec.program":"A program — parkolórendszer logika",
+"sec.specs":"PCD3.S100 — műszaki adatok",
+"sec.deep":"Részletes ismertetők",
+"d1.t":"Saia Fupia Editor — programozási környezet",
+"d1.b":"Az Fupia Editor IEC 61131-3 kompatibilis: FBD, IL, Ladder, SFC. Online monitoring módban valós idejű értékek láthatók a blokkokban. Force módban szimbólum értéke kézzel állítható — ez élesben hibakeresésnél életmentő.",
+"d2.t":"S-Net, Ethernet, BACnet — kommunikáció",
+"d2.b":"Ethernet: Modbus TCP, BACnet/IP (épületautomatizálás szabványa), beépített HTTP szerver. S-Net/MPI: Saia saját hálózati protokollja elosztott rendszerekhez. A BACnet/IP megkülönbözteti a PCD3-at a legtöbb kis/közepes PLC-től — más gyártóknál drága add-on.",
+"d3.t":"Memóriaterületek és adatkezelés",
+"d3.b":"Register (R): 32-bites egészek számlálókhoz, mérési adatokhoz. Flag (F): 1-bites logikai változók. Timer (T) / Counter (C): dedikált területek. Remanens területek konfigurálhatók áramkimaradás utáni megmaradáshoz — parkolórendszernél ez kritikus.",
+"d4.t":"FBD funkcioblokkok — amit a programban látunk",
+"d4.b":"CTUD: fel/le számláló, IC nulláz. Cmp >=: összehasonlító, fokozatos kijelzéshez. TON/TOF/TP: időzítők. Pulse: felfutó élre egyetlen impulzus — sorompóvezérléshez ideális. SR flip-flop: állapotmemória. A blokkokat jelfolyam-vonalak kötik össze, végrehajtás bal→jobb.",
+"d5.t":"PCD3 vs. más PLC-k — mikor válaszd?",
+"d5.b":"BACnet/IP natívan, webszerver beépítve, Workshop tábla oktatáshoz, hosszú rendelkezésre állás. Nem erőssége: gyors mozgásvezérlés, kis I/O projektek ahol a CP1L jobb ár-érték.",
+"sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
+"th.param":"Szempont",
+"sec.experience":"Személyes tapasztalat",
+"experience.text":"A parkolórendszer programban egy fel/le számláló, négy komparátor és két pulse blokk együttesen valósítja meg a teljes sorompó- és kijelzővezérlést — áttekinthető, karbantartható kód. A Fupia Editor online monitoring módja élesben különösen hasznos: anélkül hogy leállítanád a gépet, látod mit csinál a program. A Workshop tábla tökéletesen helyettesíti a szenzorokat fejlesztés közben.",
+"footer.tag":"Saia PCD3 · Fupia Editor · FBD · Épületautomatizálás"},
+en:{
+"title":"Saia Burgess <em>PCD3.S100</em> — industrial PLC experience",
+"sub":"PCD3 series · Saia Fupia Editor · FBD programming · S-Net · Ethernet · Car park control",
+"sec.overview":"About the Saia PCD3 series",
+"overview.text":"The Saia Burgess PCD3 series is one of the most popular <strong>modular industrial PLCs</strong> from Swiss Saia-Burgess Controls (now Honeywell). The PCD3.S100 workshop version is optimised for training. Programming is done in <strong>Saia Fupia Editor</strong>, supporting FBD, IL and Ladder. Primarily used in <strong>building automation, car park systems and industrial process control</strong>.",
+"sec.photos":"Own photos — hardware and program",
+"photo1.cap":"Saia PCD3/Workshop · PCD3.S100 · I0–I7 inputs · O16–O23 outputs · S-Net/MPI · USB · Ethernet · PCD3.M 5540 CPU",
+"photo2.cap":"Saia Fupia Editor — FBD car park control program · Up/Down counter · Comparators · Pulse generators · Barrier control",
+"sec.program":"The program — car park control logic",
+"sec.specs":"PCD3.S100 — technical data",
+"sec.deep":"Detailed sections",
+"d1.t":"Saia Fupia Editor — programming environment",
+"d1.b":"IEC 61131-3 compliant: FBD, IL, Ladder, SFC. Online monitoring shows real-time values in blocks. Force mode allows manual override of any symbol — invaluable for live fault-finding.",
+"d2.t":"S-Net, Ethernet, BACnet — communication",
+"d2.b":"Ethernet: Modbus TCP, BACnet/IP (building automation standard), built-in HTTP server. S-Net/MPI: Saia's own distributed PLC protocol. BACnet/IP is what sets PCD3 apart — it's a costly add-on on most competing PLCs.",
+"d3.t":"Memory areas and data handling",
+"d3.b":"Register (R): 32-bit integers for counters and process values. Flag (F): 1-bit logic variables. Timer (T) / Counter (C): dedicated areas. Retentive areas configurable for power-fail safe operation — critical for car park systems.",
+"d4.t":"FBD function blocks — what we see in the program",
+"d4.b":"CTUD: up/down counter, IC resets. Cmp >=: comparator for stepped indication. TON/TOF/TP: timers. Pulse: single impulse on rising edge — perfect for barrier control. SR flip-flop: state memory. Blocks connected by signal flow lines, executed left-to-right.",
+"d5.t":"PCD3 vs. other PLCs — when to choose it",
+"d5.b":"Native BACnet/IP, built-in web server, Workshop board for training, long product availability. Not ideal for: fast motion control, small I/O projects where CP1L is better value.",
+"sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
+"th.param":"Criterion",
+"sec.experience":"Personal experience",
+"experience.text":"In the car park program, one up/down counter, four comparators and two pulse blocks together implement the complete barrier and display control — readable, maintainable code. The Fupia Editor online monitoring is especially useful in live systems: you see exactly what the program is doing without stopping the machine. The Workshop board perfectly substitutes sensors during development.",
+"footer.tag":"Saia PCD3 · Fupia Editor · FBD · Building Automation"},
+de:{
+"title":"Saia Burgess <em>PCD3.S100</em> — Industrie-SPS Erfahrungen",
+"sub":"PCD3-Serie · Saia Fupia Editor · FBD-Programmierung · S-Net · Ethernet · Parkhausterung",
+"sec.overview":"Über die Saia PCD3-Serie",
+"overview.text":"Die Saia Burgess PCD3-Serie ist eine der beliebtesten <strong>modularen Industrie-SPSen</strong> von Saia-Burgess Controls (heute Honeywell). Programmierung im <strong>Saia Fupia Editor</strong> mit FBD, IL und Leiterplan. Hauptsächlich in <strong>Gebäudeautomatisierung, Parkhaussystemen und Prozesssteuerung</strong> eingesetzt.",
+"sec.photos":"Eigene Fotos — Hardware und Programm",
+"photo1.cap":"Saia PCD3/Workshop · PCD3.S100 · I0–I7 Eingänge · O16–O23 Ausgänge · S-Net/MPI · USB · Ethernet · PCD3.M 5540 CPU",
+"photo2.cap":"Saia Fupia Editor — FBD Parkhaus-Steuerprogramm · Auf/Ab-Zähler · Komparatoren · Pulsgeneratoren · Schrankensteuerung",
+"sec.program":"Das Programm — Parkhaussteuerungslogik",
+"sec.specs":"PCD3.S100 — Technische Daten",
+"sec.deep":"Detaillierte Abschnitte",
+"d1.t":"Saia Fupia Editor — Programmierumgebung",
+"d1.b":"IEC 61131-3 kompatibel: FBD, IL, Leiterplan, SFC. Online-Monitoring zeigt Echtzeit-Werte in Blöcken. Force-Modus ermöglicht manuelle Überschreibung — unverzichtbar bei der Live-Fehlersuche.",
+"d2.t":"S-Net, Ethernet, BACnet — Kommunikation",
+"d2.b":"Ethernet: Modbus TCP, BACnet/IP (Gebäudeautomatisierungsstandard), eingebauter HTTP-Server. S-Net/MPI: Saias eigenes Netzwerkprotokoll. BACnet/IP ist bei den meisten Wettbewerbern ein teures Add-on.",
+"d3.t":"Speicherbereiche und Datenverwaltung",
+"d3.b":"Register (R): 32-Bit-Ganzzahlen. Flag (F): 1-Bit-Logik. Timer (T) / Counter (C): dedizierte Bereiche. Remanente Bereiche konfigurierbar — kritisch für Parkhaussysteme.",
+"d4.t":"FBD-Funktionsblöcke — was wir im Programm sehen",
+"d4.b":"CTUD: Auf/Ab-Zähler. Cmp >=: Komparator für gestufte Anzeige. TON/TOF/TP: Timer. Pulse: Einzelimpuls bei steigender Flanke — ideal für Schrankensteuerung. SR-Flipflop: Zustandsspeicher.",
+"d5.t":"PCD3 vs. andere SPSen — wann wählen?",
+"d5.b":"Natives BACnet/IP, eingebauter Webserver, Workshop-Platine für Ausbildung. Nicht ideal für: schnelle Bewegungssteuerung, kleine I/O-Projekte.",
+"sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
+"th.param":"Kriterium",
+"sec.experience":"Persönliche Erfahrung",
+"experience.text":"Im Parkhaussystem realisieren ein Auf/Ab-Zähler, vier Komparatoren und zwei Pulsblöcke gemeinsam die gesamte Schranken- und Anzeigesteuerung — lesbarer, wartbarer Code. Das Online-Monitoring des Fupia Editors ist besonders wertvoll: Sie sehen genau, was das Programm tut, ohne die Maschine anzuhalten.",
+"footer.tag":"Saia PCD3 · Fupia Editor · FBD · Gebäudeautomatisierung"}
+};
+
+let lang='hu';
+function setLang(l){lang=l;document.documentElement.lang=l;const t=T[l];document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));}
+function toggleConfig(el){el.classList.toggle('open');}
+document.addEventListener('DOMContentLoaded',()=>setLang('hu'));
+</script>
+</body>
+</html>
