@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XP Power BCC400PS28 javítás — Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f0f;--bg2:#151717;--bg3:#1c1f1f;--border:#2a2e2e;--accent:#c8a96e;--accent2:#7eb8a4;--text:#d8d4cc;--text-dim:#7a7870;--text-bright:#eeeae2;--orange:#d4703a;--purple:#8878c8;--red:#c05050;--green:#3a8060;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:960px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--accent);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:1.6rem;}
+.section{margin-top:2.6rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.overview-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--orange);padding:1.4rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;}
+.overview-box strong{color:var(--accent2);}
+
+/* photo layouts */
+.photo-3{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+.photo-3 .photo-full{grid-column:1/-1;}
+@media(max-width:600px){.photo-3{grid-template-columns:1fr;}}
+.photo-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.photo-card img{width:100%;display:block;object-fit:cover;}
+.photo-card img.tall{max-height:320px;}
+.photo-card img.short{max-height:240px;}
+.photo-cap{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text-dim);padding:.45rem .8rem;letter-spacing:.06em;line-height:1.5;}
+
+/* highlight box */
+.highlight-box{display:flex;gap:1.1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--accent2);border-radius:2px;padding:1.2rem 1.4rem;margin-top:.8rem;}
+.highlight-icon{font-size:2rem;flex-shrink:0;}
+.highlight-text{font-size:.92rem;line-height:1.8;}
+.highlight-text strong{color:var(--accent2);}
+
+/* spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+@media(max-width:560px){.spec-grid{grid-template-columns:1fr;}}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.spec-key{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.spec-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);}
+.spec-note{font-size:.78rem;color:var(--text-dim);margin-top:.15rem;}
+
+/* accordion */
+.config-item{background:var(--bg2);border:1px solid var(--border);border-radius:2px;margin-bottom:.4rem;overflow:hidden;}
+.config-header{display:flex;justify-content:space-between;align-items:center;padding:.85rem 1.1rem;cursor:pointer;transition:background .15s;user-select:none;}
+.config-header:hover{background:var(--bg3);}
+.config-title{font-family:'DM Mono',monospace;font-size:.72rem;color:var(--accent2);letter-spacing:.06em;}
+.config-arrow{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);transition:transform .2s;}
+.config-item.open .config-arrow{transform:rotate(90deg);}
+.config-body{display:none;padding:.9rem 1.2rem 1rem;border-top:1px solid var(--border);font-size:.87rem;color:var(--text-dim);line-height:1.8;}
+.config-item.open .config-body{display:block;}
+.config-body strong{color:var(--text);}
+.config-body code{font-family:'DM Mono',monospace;font-size:.75rem;background:var(--bg3);padding:.1rem .35rem;border-radius:2px;color:var(--accent);}
+
+/* repair timeline */
+.timeline{margin-top:.8rem;display:flex;flex-direction:column;gap:.4rem;}
+.tl-item{display:flex;gap:1rem;align-items:flex-start;padding:.8rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:2px;}
+.tl-step{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);min-width:28px;padding-top:.15rem;letter-spacing:.06em;}
+.tl-text{font-size:.88rem;color:var(--text-dim);line-height:1.65;}
+.tl-text strong{color:var(--text);}
+.tl-item.success{border-color:rgba(58,128,96,.4);}
+.tl-item.success .tl-step{color:var(--green);}
+
+/* canvas for SMPS diagram */
+.diag-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1rem;margin-top:.8rem;}
+canvas{display:block;width:100%;}
+
+.exp-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.95rem;line-height:1.85;}
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">XP Power BCC400PS28 — <em>kapcsolóüzemű tápegység</em> javítása</h1>
+<div class="proj-sub" data-i18n="sub">SMPS javítás · L4981B PFC vezérlő · IC csere · Leválasztó transzformátor · Mérési folyamat</div>
+
+<!-- overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.overview">A feladat</div>
+  <div class="overview-box" data-i18n="overview.text">
+    Az <strong>XP Power BCC400PS28</strong> egy 400 W-os, 28V-os kapcsolóüzemű tápegység —
+    ipari berendezésekben, orvostechnikai eszközökben és mérőrendszerekben alkalmazzák.
+    A hibás egység nem indult: a kimeneten nulla volt mérhető, de a primer oldal feszültsége
+    rendben volt. A diagnosztika a <strong>PFC (Power Factor Correction) fokozatra</strong>
+    mutatott — az L4981B típusú PFC vezérlő IC tönkrement.
+    A javítás egy leválasztó transzformátoros mérőpadon, szisztematikus hibakeresés
+    és precíz SMD forrasztás kombinációja volt.
+  </div>
+</div>
+
+<!-- Photos -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.photos">Saját fotók</div>
+  <div class="photo-3">
+    <div class="photo-card photo-full">
+      <img src="psu-board.jpg" alt="XP Power BCC400PS28 panel" class="tall">
+      <div class="photo-cap" data-i18n="photo1.cap">XP Power BCC400PS28 — nyomtatott áramköri lap kinyitva · Látható: PFC induktivitás (piros toroid), bulk kondenzátor (kék), EMI szűrő (bal), főkapcsoló MOSFET-ek · TP.01-223 Issue 3</div>
+    </div>
+    <div class="photo-card">
+      <img src="psu-testbench.png" alt="Mérőpad leválasztó transzformátorral" class="short">
+      <div class="photo-cap" data-i18n="photo2.cap">Mérőpad — szabályozható leválasztó transzformátor · UNI-T UT33A+ multiméter · –1.810 V olvasatnál PFC kimeneti ellenőrzés · Ipari labor</div>
+    </div>
+    <div class="photo-card">
+      <img src="psu-l4981-macro.png" alt="L4981AD IC makrofotó" class="short">
+      <div class="photo-cap" data-i18n="photo3.cap">L4981AD IC makrofotó — lupén keresztül · ST Microelectronics · TQFP-32 tok · R10–R12 SMD ellenállások mellette · Látható a forrasztási minőség</div>
+    </div>
+  </div>
+</div>
+
+<!-- PSU overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.psu">XP Power BCC400PS28 — a tápegységről</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-key">Típus</div><div class="spec-val">BCC400PS28</div><div class="spec-note">AC/DC kapcsolóüzemű, 1U rack</div></div>
+    <div class="spec-item"><div class="spec-key">Teljesítmény</div><div class="spec-val">400 W</div><div class="spec-note">Csúcsteljesítmény: 480 W (10 s)</div></div>
+    <div class="spec-item"><div class="spec-key">Kimenet</div><div class="spec-val">28V DC / 14.3 A</div><div class="spec-note">±1% feszültségstabilitás</div></div>
+    <div class="spec-item"><div class="spec-key">Bemenet</div><div class="spec-val">85–264V AC</div><div class="spec-note">Univerzális hálózati bemenet, 47–63 Hz</div></div>
+    <div class="spec-item"><div class="spec-key">PFC</div><div class="spec-val">Aktív PFC &gt; 0.95</div><div class="spec-note">L4981B vezérlő, boost topológia</div></div>
+    <div class="spec-item"><div class="spec-key">Hatásfok</div><div class="spec-val">~89%</div><div class="spec-note">Teljes terhelésen, 230V bemeneten</div></div>
+    <div class="spec-item"><div class="spec-key">Hűtés</div><div class="spec-val">Kényszerhűtés (ventilátor)</div><div class="spec-note">Hőmérséklet-vezérelt fordulatszám</div></div>
+    <div class="spec-item"><div class="spec-key">Védelmek</div><div class="spec-val">OVP · OCP · OTP · SCP</div><div class="spec-note">Túlfeszültség, áram, hőmérséklet, rövidzár</div></div>
+  </div>
+</div>
+
+<!-- SMPS topology diagram -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.topo">Kapcsolóüzemű tápegység — topológia</div>
+  <div class="diag-wrap">
+    <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-bottom:.7rem;letter-spacing:.1em;text-transform:uppercase;">BCC400PS28 belső felépítés — blokkvázlat</div>
+    <canvas id="smps-canvas" height="180"></canvas>
+  </div>
+</div>
+
+<!-- L4981B deep -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.ic">L4981B — a kicserélt IC részletesen</div>
+
+  <div class="highlight-box">
+    <span class="highlight-icon">🔬</span>
+    <div class="highlight-text" data-i18n="ic.intro">
+      Az <strong>L4981B</strong> (ST Microelectronics) egy <strong>aktív PFC vezérlő IC</strong>,
+      amelyet kifejezetten boost topológiájú teljesítménytényező-javító fokozatokhoz terveztek.
+      Feladata: a hálózati áramfelvételt szinuszos alakúra kényszeríteni, hogy a tápegység
+      ne terhelje felesleges reaktív teljesítménnyel a hálózatot. Enélkül a kapcsolóüzemű
+      tápegység erősen torzított, csúcsos áramot venne fel — amit az EMC szabványok tiltanak.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)" style="margin-top:.7rem;">
+    <div class="config-header"><span class="config-title" data-i18n="ic1.t">Mi az a PFC és miért kell?</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="ic1.b">
+      A <strong>Power Factor Correction (PFC)</strong> — teljesítménytényező-javítás — azt oldja meg,
+      hogy egy kapcsolóüzemű tápegység ne csupán a szinuszos feszültség csúcsainál vegyen fel áramot,
+      hanem folyamatosan, a feszültséggel szinkronban.
+      <br><br>
+      <strong>Miért gond a torzított áram?</strong>
+      <br>• A hálózati transzformátorok és kábelek feleslegesen melegszenek (reaktív veszteség)
+      <br>• Az EMC előírások (EN 61000-3-2) korlátozzák a harmonikus áramokat
+      <br>• Ipari alkalmazásban a teljesítményszámla nő rossz cos(φ) esetén
+      <br><br>
+      Az aktív PFC boost fokozat a hálózati egyenirányított feszültséget (kb. 325V csúcs)
+      egy <strong>~400V-os DC buszra</strong> emeli, miközben az áramfelvételt szinuszossá alakítja.
+      Az L4981B ehhez vezérli a boost MOSFET-et — folyamatosan méri a hálózati feszültséget,
+      az induktivitás áramát és a kimeneti feszültséget, majd ezek alapján modulálja a kapcsolási ciklust.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="ic2.t">L4981B belső felépítése és lábkiosztása</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="ic2.b">
+      Az L4981B egy <strong>TQFP-32 tokozású IC</strong>, 32 lábbal. Főbb belső blokkjai:
+      <br><br>
+      • <strong>Sokszorozó (Multiplier)</strong> — a hálózati feszültség szinuszos mintájával
+        megszorozza az áramhiba-jelet, így az áramerősség-referencia követi a feszültség alakját
+      <br>• <strong>Hibaerősítő (Error Amplifier)</strong> — a 400V-os DC busz és a referencia
+        különbségéből vezérlőjelet generál. Külső RC hálózat állítja be a hurokstabilitást.
+      <br>• <strong>PWM komparátor</strong> — az áramvisszacsatolást és a fűrészjelet hasonlítja össze,
+        meghatározva a kapcsolási pillanatot
+      <br>• <strong>Gate driver</strong> — a boost MOSFET vezérlőelektródáját hajtja meg
+        (tipikusan 0.5–1 A csúcsárammal)
+      <br>• <strong>Szinkron generátor</strong> — fix vagy szinkronizálható kapcsolási frekvencia
+        (tipikusan 50–200 kHz tartomány)
+      <br>• <strong>Soft start</strong> — bekapcsoláskor fokozatosan emeli a terhelést,
+        elkerüli az induktivitás telítési tranziensét
+      <br>• <strong>Védelmek</strong>: OVP (túlfeszültség), OCP (túláram), undervoltage lockout
+      <br><br>
+      Az <strong>L4981A és L4981B különbsége</strong>: az A változat average current mode,
+      a B változat peak current mode vezérlésű — utóbbi egyszerűbb külső hálózatot igényel,
+      de érzékenyebb az induktivitás áramcsúcsaira.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="ic3.t">Hogyan azonosítottuk a hibát?</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="ic3.b">
+      A diagnosztika lépései a leválasztó transzformátoros mérőpadon:
+      <br><br>
+      <strong>1. Vizuális ellenőrzés</strong> — felpuffadt kondenzátor? Leégett nyomvonal?
+      Forrasztási hiba? A BCC400PS28 lapján semmi látható sérülés nem volt.
+      <br><br>
+      <strong>2. Primer oldal ellenőrzése</strong> — a leválasztó transzformátorral fokozatosan
+      emeltük a bemeneti feszültséget (nem egyszerre 230V!). A primer egyenirányító és
+      az EMI szűrő rendben volt.
+      <br><br>
+      <strong>3. PFC busz mérése</strong> — normálisan ~400V DC-nek kellene megjelennie
+      a bulk kondenzátoron. Nulla volt — a PFC fokozat nem indult.
+      <br><br>
+      <strong>4. L4981B tápfeszültsége</strong> — az IC VCC lába (15V) rendben volt.
+      De az IC gate driver kimenete (GATE láb) nem adott PWM jelet — oszcilloszkóppal mérve
+      teljesen lapos volt a jel.
+      <br><br>
+      <strong>5. Statikus mérés</strong> — az IC kivételével (in-circuit) mérve a lábak
+      közötti ellenállások rendellenesek voltak, belső törésre utalva.
+      <br><br>
+      <strong>Diagnózis: L4981B belső meghibásodás</strong> — az IC cserére szorul.
+    </div>
+  </div>
+
+  <div class="config-item" onclick="toggleConfig(this)">
+    <div class="config-header"><span class="config-title" data-i18n="ic4.t">Az IC csere folyamata — SMD forrasztás</span><span class="config-arrow">▸</span></div>
+    <div class="config-body" data-i18n="ic4.b">
+      A TQFP-32 tok SMD forrasztása nem triviális — 32 finom láb, 0.8mm lépésközzel.
+      <br><br>
+      <strong>Eltávolítás:</strong>
+      <br>• Forrasztópáka hőlégfúvóval (hot air rework station) — 320–350°C, közepes légsebesség
+      <br>• Az IC mind a 4 oldalát egyenletesen melegíteni kell, amíg az ón megolvad
+      <br>• Csipesszel emeljük ki — nem húzzuk, csak emeljük, különben a pad-ek megsérülnek
+      <br><br>
+      <strong>Pad tisztítás:</strong>
+      <br>• Forrasztócsúccsal és ónszívóval eltávolítjuk a maradék ónt
+      <br>• Izopropil-alkohollal (IPA) tisztítjuk a fluxust
+      <br>• Lupéval ellenőrizzük: nincs-e hideg forrasztás, felszakadt pad?
+      <br><br>
+      <strong>Beültetés:</strong>
+      <br>• Az új IC-t fluxtással a pad-ekre helyezzük, pontosan illesztve (pin 1 jelölés!)
+      <br>• Először a 4 saroklábot rögzítjük, hogy ne csússzon el
+      <br>• Lábankénti forrasztás vékony ónnal (0.5mm), vagy "drag soldering" technikával
+      <br>• Végül IPA-s tisztítás, vizuális és elektromos ellenőrzés
+    </div>
+  </div>
+</div>
+
+<!-- Repair timeline -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.repair">Javítási folyamat — lépések</div>
+  <div class="timeline">
+    <div class="tl-item"><span class="tl-step">01</span><div class="tl-text"><strong>Befogadás és tünetek rögzítése</strong> — kimenet: 0V, bemeneti biztosíték ép, ventilator nem indul</div></div>
+    <div class="tl-item"><span class="tl-step">02</span><div class="tl-text"><strong>Leválasztó transzformátor beállítása</strong> — fokozatosan 0→230V, áramkorlátozással. Biztonságos módszer ismeretlen hibánál.</div></div>
+    <div class="tl-item"><span class="tl-step">03</span><div class="tl-text"><strong>Primer oldal ellenőrzése</strong> — EMI szűrő, egyenirányító, bulk kondenzátor (kék, jól látható a fotón). PFC busz: 0V.</div></div>
+    <div class="tl-item"><span class="tl-step">04</span><div class="tl-text"><strong>L4981B diagnosztika</strong> — VCC OK (15V), de GATE kimenet lapos (oszcilloszkóp). In-circuit ellenállások rendellenesek.</div></div>
+    <div class="tl-item"><span class="tl-step">05</span><div class="tl-text"><strong>IC azonosítás és alkatrész rendelés</strong> — L4981B (nem L4981A!), TQFP-32. Eredeti ST Microelectronics forrásból.</div></div>
+    <div class="tl-item"><span class="tl-step">06</span><div class="tl-text"><strong>Hot-air rework</strong> — régi IC eltávolítása, pad tisztítás. Makrofotón jól látható az eredmény (lupéval ellenőrizve).</div></div>
+    <div class="tl-item"><span class="tl-step">07</span><div class="tl-text"><strong>Új L4981B beültetése</strong> — TQFP-32 forrasztás, lábankénti ellenőrzés, IPA tisztítás, vizuális audit.</div></div>
+    <div class="tl-item success"><span class="tl-step">✓</span><div class="tl-text"><strong>Első indítás — sikeres!</strong> PFC busz: 398V DC, kimenet: 28.1V / terhelés alatt stabil. Multiméter: –1.810A áramfelvétel mérése.</div></div>
+  </div>
+</div>
+
+<!-- experience -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.exp">Tapasztalat és tanulságok</div>
+  <div class="exp-box" data-i18n="exp.text">
+    A BCC400PS28 javítása megmutatta, hogy egy kapcsolóüzemű tápegység hibakeresése szisztematikus
+    megközelítést igényel — a véletlenszerű alkatrészcsere helyett mindig a jelfolyamot kell követni.
+    A leválasztó transzformátor itt nem opcionális: 400W-os SMPS-nél az ismeretlen hiba melletti
+    közvetlen hálózati csatlakoztatás komoly kockázatot jelent mind az eszköznek, mind a mérőfelszerelésnek.
+    Az L4981B-t azért találtuk meg viszonylag gyorsan, mert a PFC busz feszültsége (0V) egyértelműen
+    a boost fokozatra mutatott — és ott az IC gate jele volt a kulcs.
+    Az SMD rework fontos tanulsága: a pad-ek kímélete és a pontos illesztés fontosabb a sebességnél.
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span data-i18n="footer.tag">SMPS javítás · L4981B · PFC · XP Power · SMD rework</span>
+</div>
+</div>
+
+<script>
+const T={
+hu:{
+"title":"XP Power BCC400PS28 — <em>kapcsolóüzemű tápegység</em> javítása",
+"sub":"SMPS javítás · L4981B PFC vezérlő · IC csere · Leválasztó transzformátor · Mérési folyamat",
+"sec.overview":"A feladat",
+"overview.text":"Az <strong>XP Power BCC400PS28</strong> egy 400 W-os, 28V-os kapcsolóüzemű tápegység — ipari berendezésekben alkalmazzák. A hibás egység nem indult: a kimeneten nulla volt. A diagnosztika a <strong>PFC fokozatra</strong> mutatott — az L4981B típusú PFC vezérlő IC tönkrement. Leválasztó transzformátoros mérőpadon, szisztematikus hibakereséssel és SMD forrasztással sikerült megjavítani.",
+"sec.photos":"Saját fotók",
+"photo1.cap":"XP Power BCC400PS28 — nyomtatott áramköri lap kinyitva · PFC induktivitás (piros toroid), bulk kondenzátor (kék), EMI szűrő · TP.01-223 Issue 3",
+"photo2.cap":"Mérőpad — szabályozható leválasztó transzformátor · UNI-T UT33A+ multiméter · PFC kimeneti ellenőrzés · Ipari labor",
+"photo3.cap":"L4981AD IC makrofotó lupén keresztül · ST Microelectronics · TQFP-32 tok · R10–R12 SMD ellenállások · Forrasztási minőség ellenőrzés",
+"sec.psu":"XP Power BCC400PS28 — a tápegységről",
+"sec.topo":"Kapcsolóüzemű tápegység — topológia",
+"sec.ic":"L4981B — a kicserélt IC részletesen",
+"ic.intro":"Az <strong>L4981B</strong> (ST Microelectronics) egy <strong>aktív PFC vezérlő IC</strong>, amelyet boost topológiájú teljesítménytényező-javító fokozatokhoz terveztek. Feladata: a hálózati áramfelvételt szinuszos alakúra kényszeríteni. Enélkül a kapcsolóüzemű tápegység erősen torzított, csúcsos áramot venne fel — amit az EMC szabványok tiltanak.",
+"ic1.t":"Mi az a PFC és miért kell?",
+"ic1.b":"A PFC azt oldja meg, hogy a tápegység ne csupán a szinuszos feszültség csúcsainál vegyen fel áramot. Reaktív veszteség, EMC előírások (EN 61000-3-2) és ipari teljesítményszámla szempontjából kritikus. Az aktív PFC boost fokozat ~400V DC buszra emeli az egyenirányított feszültséget, miközben az áramfelvételt szinuszossá alakítja. Az L4981B ehhez vezérli a boost MOSFET-et.",
+"ic2.t":"L4981B belső felépítése és lábkiosztása",
+"ic2.b":"TQFP-32 tok, 32 láb. Főbb blokkok: Sokszorozó (áramreferencia szinuszos alakítása), Hibaerősítő (400V busz szabályozása), PWM komparátor (kapcsolási pillanat), Gate driver (MOSFET vezérlése), Soft start, OVP/OCP védelmek. L4981A (average current mode) vs. L4981B (peak current mode) — utóbbi egyszerűbb külső hálózat, de érzékenyebb áramcsúcsokra.",
+"ic3.t":"Hogyan azonosítottuk a hibát?",
+"ic3.b":"1. Vizuális ellenőrzés — semmi látható sérülés. 2. Fokozatos bemeneti feszültségemelés leválasztó transzformátorral. 3. PFC busz: 0V (normálisan ~400V kellene). 4. L4981B VCC OK (15V), de GATE kimenet lapos oszcilloszkóppal. 5. In-circuit ellenállások rendellenesek → belső törés. Diagnózis: L4981B csere.",
+"ic4.t":"Az IC csere folyamata — SMD forrasztás",
+"ic4.b":"Eltávolítás: hot-air rework station 320–350°C, egyenletes melegítés mind a 4 oldalon, csipesszel emelés. Pad tisztítás: ónszívó + IPA, lupéval ellenőrzés. Beültetés: pin 1 illesztés, 4 sarokláb rögzítése, lábankénti forrasztás vékony ónnal, IPA tisztítás, vizuális audit.",
+"sec.repair":"Javítási folyamat — lépések",
+"sec.exp":"Tapasztalat és tanulságok",
+"exp.text":"A BCC400PS28 javítása megmutatta, hogy SMPS hibakeresése szisztematikus megközelítést igényel — a jelfolyamot kell követni. A leválasztó transzformátor nem opcionális: 400W-os SMPS-nél az ismeretlen hiba melletti közvetlen hálózati csatlakoztatás komoly kockázat. Az L4981B-t a PFC busz 0V-ja egyértelműen jelezte. SMD rework tanulság: a pad-ek kímélete fontosabb a sebességnél.",
+"footer.tag":"SMPS javítás · L4981B · PFC · XP Power · SMD rework"},
+en:{
+"title":"XP Power BCC400PS28 — <em>switch-mode power supply</em> repair",
+"sub":"SMPS repair · L4981B PFC controller · IC replacement · Isolation transformer · Measurement process",
+"sec.overview":"The task",
+"overview.text":"The <strong>XP Power BCC400PS28</strong> is a 400 W, 28V switch-mode power supply used in industrial equipment. The faulty unit produced no output. Diagnostics pointed to the <strong>PFC stage</strong> — the L4981B PFC controller IC had failed. Repaired on an isolation transformer bench using systematic fault-finding and SMD rework.",
+"sec.photos":"Own photos",
+"photo1.cap":"XP Power BCC400PS28 — PCB opened · PFC inductor (red toroid), bulk capacitor (blue), EMI filter · TP.01-223 Issue 3",
+"photo2.cap":"Test bench — variable isolation transformer · UNI-T UT33A+ multimeter · PFC output verification · Industrial lab",
+"photo3.cap":"L4981AD IC macro photo through magnifier · ST Microelectronics · TQFP-32 package · R10–R12 SMD resistors · Solder quality inspection",
+"sec.psu":"XP Power BCC400PS28 — about the PSU",
+"sec.topo":"Switch-mode power supply — topology",
+"sec.ic":"L4981B — the replaced IC in detail",
+"ic.intro":"The <strong>L4981B</strong> (ST Microelectronics) is an <strong>active PFC controller IC</strong> designed for boost-topology power factor correction stages. Its job: force the mains current draw to be sinusoidal. Without it, the SMPS draws highly distorted, peaky current — prohibited by EMC standards.",
+"ic1.t":"What is PFC and why is it needed?",
+"ic1.b":"PFC ensures the PSU draws current continuously rather than only at voltage peaks. Critical for: reactive losses in transformers and cables, EMC regulations (EN 61000-3-2), and industrial power billing with poor cos(φ). The active PFC boost stage raises the rectified mains to ~400V DC while shaping the current draw sinusoidally. The L4981B controls the boost MOSFET to achieve this.",
+"ic2.t":"L4981B internal structure and pinout",
+"ic2.b":"TQFP-32 package, 32 pins. Key blocks: Multiplier (sinusoidal current reference), Error amplifier (400V bus regulation), PWM comparator (switching instant), Gate driver (MOSFET drive), Soft start, OVP/OCP protections. L4981A (average current mode) vs. L4981B (peak current mode) — B requires simpler external network but is more sensitive to current peaks.",
+"ic3.t":"How did we identify the fault?",
+"ic3.b":"1. Visual inspection — no visible damage. 2. Gradual mains voltage ramp via isolation transformer. 3. PFC bus: 0V (should be ~400V). 4. L4981B VCC OK (15V) but GATE output flat on oscilloscope. 5. In-circuit resistances abnormal → internal failure. Diagnosis: L4981B replacement.",
+"ic4.t":"The IC replacement process — SMD soldering",
+"ic4.b":"Removal: hot-air rework station 320–350°C, even heating on all 4 sides, lift with tweezers. Pad cleaning: solder wick + IPA, inspect under magnifier. Fitting: pin 1 alignment, secure 4 corner pins first, per-leg soldering with fine solder wire, IPA cleaning, visual audit.",
+"sec.repair":"Repair process — steps",
+"sec.exp":"Experience and lessons learned",
+"exp.text":"Repairing the BCC400PS28 showed that SMPS fault-finding requires a systematic approach — follow the signal flow. The isolation transformer is not optional: with a 400W SMPS and unknown fault, direct mains connection is a serious risk. The PFC bus reading 0V clearly pointed to the L4981B. SMD rework lesson: preserving the pads matters more than speed.",
+"footer.tag":"SMPS repair · L4981B · PFC · XP Power · SMD rework"},
+de:{
+"title":"XP Power BCC400PS28 — Reparatur eines <em>Schaltnetzteils</em>",
+"sub":"SMPS-Reparatur · L4981B PFC-Regler · IC-Tausch · Trenntransformator · Messprozess",
+"sec.overview":"Die Aufgabe",
+"overview.text":"Das <strong>XP Power BCC400PS28</strong> ist ein 400-W-, 28-V-Schaltnetzteil für Industriegeräte. Das defekte Gerät erzeugte keine Ausgangsspannung. Die Diagnose zeigte auf die <strong>PFC-Stufe</strong> — der L4981B PFC-Regler-IC war ausgefallen. Reparatur am Trenntransformator-Prüfstand mit systematischer Fehlersuche und SMD-Lötarbeit.",
+"sec.photos":"Eigene Fotos",
+"photo1.cap":"XP Power BCC400PS28 — Leiterplatte geöffnet · PFC-Induktivität (roter Ringkern), Pufferkondensator (blau), EMV-Filter · TP.01-223 Issue 3",
+"photo2.cap":"Prüfstand — regelbarer Trenntransformator · UNI-T UT33A+ Multimeter · PFC-Ausgangsprüfung · Industrielabor",
+"photo3.cap":"L4981AD IC Makrofoto durch Lupe · ST Microelectronics · TQFP-32 Gehäuse · R10–R12 SMD-Widerstände · Lötqualitätsprüfung",
+"sec.psu":"XP Power BCC400PS28 — das Netzteil",
+"sec.topo":"Schaltnetzteil — Topologie",
+"sec.ic":"L4981B — der getauschte IC im Detail",
+"ic.intro":"Der <strong>L4981B</strong> (ST Microelectronics) ist ein <strong>aktiver PFC-Regler-IC</strong> für Boost-Topologie-Leistungsfaktorkorrektur. Aufgabe: den Netzstrom sinusförmig zu formen. Ohne ihn nimmt das Schaltnetzteil stark verzerrten, spitzigen Strom auf — verboten durch EMV-Normen.",
+"ic1.t":"Was ist PFC und warum wird es benötigt?",
+"ic1.b":"PFC sorgt dafür, dass das Netzteil kontinuierlich und nicht nur an den Spannungsscheiteln Strom aufnimmt. Wichtig für: Blindleistungsverluste, EMV-Vorschriften (EN 61000-3-2) und Industriestromrechnungen. Die aktive PFC-Boost-Stufe hebt die gleichgerichtete Netzspannung auf ~400V DC und formt den Stromverlauf sinusförmig.",
+"ic2.t":"L4981B Innenaufbau und Pinbelegung",
+"ic2.b":"TQFP-32 Gehäuse, 32 Pins. Hauptblöcke: Multiplizierer, Fehlerverstärker (400V-Bus), PWM-Komparator, Gate-Treiber, Soft-Start, OVP/OCP-Schutz. L4981A (Average-Current-Mode) vs. L4981B (Peak-Current-Mode) — B braucht einfacheres externes Netzwerk.",
+"ic3.t":"Wie haben wir den Fehler identifiziert?",
+"ic3.b":"1. Sichtprüfung — kein sichtbarer Schaden. 2. Schrittweise Netzspannungserhöhung über Trenntransformator. 3. PFC-Bus: 0V (sollte ~400V sein). 4. L4981B VCC OK (15V), aber GATE-Ausgang flach am Oszilloskop. 5. In-circuit Widerstände anomal → innerer Defekt. Diagnose: L4981B tauschen.",
+"ic4.t":"Der IC-Tauschprozess — SMD-Löten",
+"ic4.b":"Ausbau: Heißluft-Reworkstation 320–350°C, gleichmäßiges Erhitzen aller 4 Seiten, Herausheben mit Pinzette. Padbereinigung: Entlötlitze + IPA, Sichtprüfung unter Lupe. Einbau: Pin-1-Ausrichtung, 4 Eckbeine zuerst fixieren, beinweises Löten mit feinem Lötzinn, IPA-Reinigung, Sichtabnahme.",
+"sec.repair":"Reparaturprozess — Schritte",
+"sec.exp":"Erfahrungen und Lektionen",
+"exp.text":"Die Reparatur des BCC400PS28 zeigte, dass SMPS-Fehlersuche systematischen Ansatz erfordert — dem Signalfluss folgen. Der Trenntransformator ist nicht optional. Der PFC-Bus mit 0V zeigte klar auf den L4981B. SMD-Rework-Lektion: Pad-Schonung ist wichtiger als Geschwindigkeit.",
+"footer.tag":"SMPS-Reparatur · L4981B · PFC · XP Power · SMD-Rework"}
+};
+
+let lang='hu';
+function setLang(l){lang=l;document.documentElement.lang=l;const t=T[l];document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.getAttribute('data-i18n');if(t[k]!==undefined)el.innerHTML=t[k];});document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));}
+function toggleConfig(el){el.classList.toggle('open');}
+
+// ════ SMPS BLOCK DIAGRAM ════
+function drawSMPS(){
+  const c=document.getElementById('smps-canvas'); if(!c) return;
+  const LW=680, LH=180, dpr=devicePixelRatio||1;
+  c.width=LW*dpr; c.height=LH*dpr; c.style.width=LW+'px'; c.style.height=LH+'px'; c.style.maxWidth='100%';
+  const ctx=c.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,LW,LH);
+
+  function box(x,y,w,h,lbl,col,sub){
+    ctx.fillStyle=col+'18'; ctx.strokeStyle=col+'88'; ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.roundRect(x,y,w,h,3); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=col; ctx.font='bold 8.5px DM Mono,monospace'; ctx.textAlign='center';
+    const ls=lbl.split('\n'), mid=y+h/2;
+    ls.forEach((l,i)=>ctx.fillText(l,x+w/2,mid+(i-(ls.length-1)/2)*11));
+    if(sub){ctx.fillStyle=col+'66';ctx.font='7px DM Mono,monospace';ctx.fillText(sub,x+w/2,y+h-5);}
+  }
+  function arr(x1,y1,x2,y2,col){
+    ctx.strokeStyle=col||'#2a4040';ctx.lineWidth=1.2;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+    const a=Math.atan2(y2-y1,x2-x1);
+    ctx.fillStyle=col||'#2a4040';ctx.beginPath();ctx.moveTo(x2,y2);
+    ctx.lineTo(x2-7*Math.cos(a-.4),y2-7*Math.sin(a-.4));
+    ctx.lineTo(x2-7*Math.cos(a+.4),y2-7*Math.sin(a+.4));ctx.closePath();ctx.fill();
+  }
+  function lbl(x,y,t,col){ctx.fillStyle=col||'#3a5060';ctx.font='7px DM Mono,monospace';ctx.textAlign='center';ctx.fillText(t,x,y);}
+
+  const y=65, h=45;
+  // Blocks
+  box(8,  y, 68, h, 'AC\nBemenet',    '#7eb8a4','85–264V');
+  box(90, y, 58, h, 'EMI\nszűrő',     '#8878c8','LC filter');
+  box(162,y, 62, h, 'Egyenirányító\nPFC boost','#c8a96e','L4981B ★');
+  box(238,y-20,50,h+20,'~400V\nDC busz','#d4703a','bulk C');
+  box(302,y, 68, h, 'Főkonverter\nPWM','#5888c8','LLC/flyback');
+  box(384,y, 60, h, 'Kimenet\nszűrő', '#7eb8a4','LC');
+  box(458,y, 68, h, '28V DC\nKimenet', '#28c898','14.3A max');
+  // Feedback
+  box(302,y+68,68,32,'Visszacsatolás','#8878c8','optocoupler');
+
+  arr(76,y+22,90,y+22);
+  arr(148,y+22,162,y+22);
+  arr(224,y+22,238,y+22,'#d4703a');
+  arr(288,y+22,302,y+22,'#d4703a');
+  arr(370,y+22,384,y+22);
+  arr(444,y+22,458,y+22);
+  // Feedback arrow
+  ctx.strokeStyle='#8878c8aa';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+  ctx.beginPath();ctx.moveTo(492,y+h);ctx.lineTo(492,y+84);ctx.lineTo(370,y+84);ctx.stroke();
+  ctx.setLineDash([]);
+  arr(370,y+84,302,y+84,'#8878c8');
+
+  lbl(260,y-8,'~400V DC','#d4703a');
+  lbl(200,y+h+12,'★ L4981B — kicserélt IC','#c8a96e');
+}
+
+document.addEventListener('DOMContentLoaded',()=>{setLang('hu');setTimeout(drawSMPS,80);});
+window.addEventListener('resize',drawSMPS);
+</script>
+</body>
+</html>
