@@ -377,54 +377,117 @@ function toggleConfig(el){el.classList.toggle('open');}
 // ════ SMPS BLOCK DIAGRAM ════
 function drawSMPS(){
   const c=document.getElementById('smps-canvas'); if(!c) return;
-  const LW=680, LH=180, dpr=devicePixelRatio||1;
-  c.width=LW*dpr; c.height=LH*dpr; c.style.width=LW+'px'; c.style.height=LH+'px'; c.style.maxWidth='100%';
+  const LW=700, LH=200, dpr=devicePixelRatio||1;
+  c.width=LW*dpr; c.height=LH*dpr;
+  c.style.width=LW+'px'; c.style.height=LH+'px'; c.style.maxWidth='100%';
   const ctx=c.getContext('2d'); ctx.scale(dpr,dpr); ctx.clearRect(0,0,LW,LH);
 
-  function box(x,y,w,h,lbl,col,sub){
+  // ── helpers ──
+  function box(x,y,w,h,lines,col,sub){
     ctx.fillStyle=col+'18'; ctx.strokeStyle=col+'88'; ctx.lineWidth=1.3;
     ctx.beginPath(); ctx.roundRect(x,y,w,h,3); ctx.fill(); ctx.stroke();
+    const ls=Array.isArray(lines)?lines:[lines];
+    const cy=y+h/2-(sub?5:0);
     ctx.fillStyle=col; ctx.font='bold 8.5px DM Mono,monospace'; ctx.textAlign='center';
-    const ls=lbl.split('\n'), mid=y+h/2;
-    ls.forEach((l,i)=>ctx.fillText(l,x+w/2,mid+(i-(ls.length-1)/2)*11));
-    if(sub){ctx.fillStyle=col+'66';ctx.font='7px DM Mono,monospace';ctx.fillText(sub,x+w/2,y+h-5);}
+    ls.forEach((l,i)=>ctx.fillText(l, x+w/2, cy+(i-(ls.length-1)/2)*12));
+    if(sub){ ctx.fillStyle=col+'77'; ctx.font='7px DM Mono,monospace';
+             ctx.fillText(sub, x+w/2, y+h-6); }
   }
-  function arr(x1,y1,x2,y2,col){
-    ctx.strokeStyle=col||'#2a4040';ctx.lineWidth=1.2;ctx.setLineDash([]);
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
-    const a=Math.atan2(y2-y1,x2-x1);
-    ctx.fillStyle=col||'#2a4040';ctx.beginPath();ctx.moveTo(x2,y2);
+  function horiz(x1,y1,x2,col){
+    ctx.strokeStyle=col||'#2a4040'; ctx.lineWidth=1.2; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y1); ctx.stroke();
+    const a=x2>x1?0:Math.PI;
+    ctx.fillStyle=col||'#2a4040';
+    ctx.beginPath(); ctx.moveTo(x2,y1);
+    ctx.lineTo(x2-7*Math.cos(a-.4),y1-7*Math.sin(a-.4));
+    ctx.lineTo(x2-7*Math.cos(a+.4),y1-7*Math.sin(a+.4));
+    ctx.closePath(); ctx.fill();
+  }
+  function vert(x,y1,y2,col){
+    ctx.strokeStyle=col||'#2a4040'; ctx.lineWidth=1.2; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x,y1); ctx.lineTo(x,y2); ctx.stroke();
+  }
+  function elbow(x1,y1,x2,y2,col,dashed){
+    ctx.strokeStyle=col||'#2a4040'; ctx.lineWidth=1.1;
+    ctx.setLineDash(dashed?[4,3]:[]);
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    const a=y2>y1?Math.PI/2:-Math.PI/2;
+    ctx.fillStyle=col||'#2a4040';
+    ctx.beginPath(); ctx.moveTo(x2,y2);
     ctx.lineTo(x2-7*Math.cos(a-.4),y2-7*Math.sin(a-.4));
-    ctx.lineTo(x2-7*Math.cos(a+.4),y2-7*Math.sin(a+.4));ctx.closePath();ctx.fill();
+    ctx.lineTo(x2-7*Math.cos(a+.4),y2-7*Math.sin(a+.4));
+    ctx.closePath(); ctx.fill();
   }
-  function lbl(x,y,t,col){ctx.fillStyle=col||'#3a5060';ctx.font='7px DM Mono,monospace';ctx.textAlign='center';ctx.fillText(t,x,y);}
+  function lbl(x,y,t,col){ ctx.fillStyle=col||'#3a5868';
+    ctx.font='7px DM Mono,monospace'; ctx.textAlign='center'; ctx.fillText(t,x,y); }
 
-  const y=65, h=45;
-  // Blocks
-  box(8,  y, 68, h, 'AC\nBemenet',    '#7eb8a4','85–264V');
-  box(90, y, 58, h, 'EMI\nszűrő',     '#8878c8','LC filter');
-  box(162,y, 62, h, 'Egyenirányító\nPFC boost','#c8a96e','L4981B ★');
-  box(238,y-20,50,h+20,'~400V\nDC busz','#d4703a','bulk C');
-  box(302,y, 68, h, 'Főkonverter\nPWM','#5888c8','LLC/flyback');
-  box(384,y, 60, h, 'Kimenet\nszűrő', '#7eb8a4','LC');
-  box(458,y, 68, h, '28V DC\nKimenet', '#28c898','14.3A max');
-  // Feedback
-  box(302,y+68,68,32,'Visszacsatolás','#8878c8','optocoupler');
+  // ── Layout: all blocks on ONE horizontal line ──
+  // BW = block width, GAP = gap between blocks
+  const BH=44, BY=68;             // block height & Y
+  const BW=78, GAP=10;
+  const xs=[8, 96, 184, 272, 360, 448, 538]; // 7 block x positions
+  // shrink last few to fit
+  const widths=[78,78,80,70,78,68,78];
 
-  arr(76,y+22,90,y+22);
-  arr(148,y+22,162,y+22);
-  arr(224,y+22,238,y+22,'#d4703a');
-  arr(288,y+22,302,y+22,'#d4703a');
-  arr(370,y+22,384,y+22);
-  arr(444,y+22,458,y+22);
-  // Feedback arrow
-  ctx.strokeStyle='#8878c8aa';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-  ctx.beginPath();ctx.moveTo(492,y+h);ctx.lineTo(492,y+84);ctx.lineTo(370,y+84);ctx.stroke();
+  const cols=['#7eb8a4','#8878c8','#c8a96e','#d4703a','#5888c8','#7eb8a4','#28c898'];
+  const labels=[
+    ['AC','Bemenet'], ['EMI','szűrő'], ['Egyenirányító','PFC boost'],
+    ['~400V','DC busz'], ['Főkonverter','PWM'], ['Kimenet','szűrő'], ['28V DC','Kimenet']
+  ];
+  const subs=['85–264V','LC szűrő','L4981B ★','bulk C','LLC/flyback','LC','14.3A max'];
+
+  // Draw boxes
+  xs.forEach((x,i)=>box(x, BY, widths[i], BH, labels[i], cols[i], subs[i]));
+
+  // Horizontal arrows between boxes
+  for(let i=0;i<6;i++){
+    const x1=xs[i]+widths[i], x2=xs[i+1];
+    const mid=(x1+x2)/2, y=BY+BH/2;
+    // wire
+    ctx.strokeStyle='#2a4040'; ctx.lineWidth=1.2; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(x1,y); ctx.lineTo(x2,y); ctx.stroke();
+    // arrowhead
+    ctx.fillStyle='#2a4040';
+    ctx.beginPath(); ctx.moveTo(x2,y);
+    ctx.lineTo(x2-7*Math.cos(-.4),y-7*Math.sin(-.4));
+    ctx.lineTo(x2-7*Math.cos(.4), y+7*Math.sin(.4));
+    ctx.closePath(); ctx.fill();
+  }
+
+  // ── Feedback: from output (right side of box 6) → down → left → up → into error amp area (box 2-3 junction) ──
+  const fbCol='#8878c8bb';
+  const fbX1=xs[6]+widths[6]/2;  // bottom centre of output box
+  const fbY1=BY+BH;               // bottom of boxes
+  const fbY2=BY+BH+34;            // down to feedback rail
+  const fbX2=xs[2]+widths[2]/2;   // back up at PFC box
+
+  // Feedback box
+  const fbBW=74, fbBH=28;
+  const fbBX=fbX2-fbBW/2;
+  const fbBY=fbY2+2;
+  box(fbBX, fbBY, fbBW, fbBH, 'Visszacsatolás', '#8878c8', 'optocoupler');
+
+  // Lines
+  ctx.strokeStyle=fbCol; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  // down from output
+  ctx.beginPath(); ctx.moveTo(fbX1, fbY1); ctx.lineTo(fbX1, fbY2); ctx.stroke();
+  // horizontal rail left
+  ctx.beginPath(); ctx.moveTo(fbX1, fbY2); ctx.lineTo(fbBX+fbBW, fbY2); ctx.stroke();
+  // up into feedback box
+  ctx.beginPath(); ctx.moveTo(fbBX+fbBW/2, fbY2); ctx.lineTo(fbBX+fbBW/2, fbBY+fbBH); ctx.stroke();
+  // from feedback box left to PFC input
+  ctx.beginPath(); ctx.moveTo(fbBX, fbBY+fbBH/2);
+  ctx.lineTo(xs[2]+widths[2]/2, fbBY+fbBH/2);
+  ctx.lineTo(xs[2]+widths[2]/2, fbY1); ctx.stroke();
   ctx.setLineDash([]);
-  arr(370,y+84,302,y+84,'#8878c8');
 
-  lbl(260,y-8,'~400V DC','#d4703a');
-  lbl(200,y+h+12,'★ L4981B — kicserélt IC','#c8a96e');
+  // ── Labels ──
+  lbl(xs[2]+widths[2]/2, BY+BH+14, '★ L4981B — kicserélt IC', '#c8a96e');
+
+  // ── Voltage annotations above 400V bus ──
+  ctx.fillStyle='#d4703a88'; ctx.font='7px DM Mono,monospace'; ctx.textAlign='center';
+  ctx.fillText('~400V DC', xs[3]+widths[3]/2, BY-6);
 }
 
 document.addEventListener('DOMContentLoaded',()=>{setLang('hu');setTimeout(drawSMPS,80);});
