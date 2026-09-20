@@ -122,15 +122,15 @@ canvas{display:block;}
   </div>
 </div>
 
-<!-- LMX2595 deep dive -->
+<!-- LMX23x6 deep dive -->
 <div class="section">
   <div class="section-label" data-i18n="sec.lmx">LMX23x6 sorozat — a PLL IC részletesen</div>
 
   <div style="background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--blue);padding:1.2rem 1.5rem;border-radius:2px;margin-bottom:.8rem;font-size:.95rem;line-height:1.8;" data-i18n="lmx.intro">
-    Az LMX2595 a Texas Instruments egyik legfejlettebb <strong>wideband frequency synthesizer IC-je</strong>.
-    Egyetlen chipen tartalmaz egy teljes PLL-t (Phase-Locked Loop), egy VCO-t (Voltage Controlled Oscillator),
-    programmable dividereket és egy delta-sigma modulátort törtszámú osztáshoz.
-    A chip <strong>10 MHz–19 GHz</strong> tartományon képes RF jelet generálni — ez egyedülálló egyetlen IC-nél.
+    Az LMX23x6 sorozat a Texas Instruments klasszikus, jól bevált <strong>PLL IC-sorozata</strong>:
+    LMX2306 (20–500 MHz), LMX2316 (100–1200 MHz), LMX2326 (100–2800 MHz).
+    Ebben a projektben <strong>LMX2316</strong> van. A chip tartalmazza a fázisdetektort, a charge pump-ot,
+    a programozható N és R osztókat és a 32/33-as előosztót — VCO-t nem, azt külön kell hozzátenni.
   </div>
 
   <!-- Block diagram canvas -->
@@ -143,11 +143,11 @@ canvas{display:block;}
   <div class="spec-grid" style="margin-top:.8rem;">
     <div class="spec-item"><div class="spec-key">Frekvenciatartomány</div><div class="spec-val">100 MHz – 1200 MHz</div><div class="spec-note">LMX2316; LMX2326: 100–2800 MHz</div></div>
     <div class="spec-item"><div class="spec-key">Referencia bemenet</div><div class="spec-val">tipikusan 5–40 MHz</div><div class="spec-note">VCTCXO 13 MHz (P2 trimmerrel), vagy kvarcoszcillátor</div></div>
-    <div class="spec-item"><div class="spec-key">Fáziszaj (1 GHz-en)</div><div class="spec-val">referencia minőségétől függ</div><div class="spec-note">N/R arány sokszorozza a zajt</div></div>
+    <div class="spec-item"><div class="spec-key">Fáziszaj</div><div class="spec-val">a referencia minőségétől függ</div><div class="spec-note">a PLL a referencia zaját 20·log(N)-nel sokszorozza</div></div>
     <div class="spec-item"><div class="spec-key">Kommunikáció</div><div class="spec-val">SPI (3-wire, csak írás)</div><div class="spec-note">21 bites shift register, DATA+ADDRESS+FLAG</div></div>
-    <div class="spec-item"><div class="spec-key">Kimenet</div><spec-val></spec-val><div class="spec-val">1× RF kimenet a VCO-tól</div><div class="spec-note">0–5V hangolófeszültség a VCO-hoz</div></div>
+    <div class="spec-item"><div class="spec-key">Kimenet</div><div class="spec-val">1× RF kimenet a VCO-tól</div><div class="spec-note">0–5V hangolófeszültség a VCO-hoz</div></div>
     <div class="spec-item"><div class="spec-key">Tápfeszültség</div><div class="spec-val">9–25V (tápvonal), 5V belső LDO</div><div class="spec-note">22 mA áramfelvétel kijelző nélkül</div></div>
-    <div class="spec-item"><div class="spec-key">Tok</div><div class="spec-val">20-pin SSOP</div><div class="spec-note">SMD tok, kézzel forrasztható</div></div>
+    <div class="spec-item"><div class="spec-key">Tok</div><div class="spec-val">SMD</div><div class="spec-note">kézzel forrasztható</div></div>
     <div class="spec-item"><div class="spec-key">Loop filter</div><div class="spec-val">Külső passzív elemek</div><div class="spec-note">R, C értékek sávszélességet meghatározzák</div></div>
   </div>
 </div>
@@ -169,24 +169,23 @@ canvas{display:block;}
       <br>6. A rendszer addig korrigál, míg a fázishiba nullává válik → <strong>lock állapot</strong>
       <br><br>
       Lock állapotban: <code>f_out = N × f_ref / R</code>, ahol R a referencia osztó.
-      Az LMX2595-ben N lehet törtszám (<strong>FRAC/MOD</strong> regiszter) — ez az, ami 1 Hz lépésközű hangolást tesz lehetővé GHz-es tartományban is.
+      Az LMX2316-ban N egész szám: a 32/33-as előosztóval <code>N = 32·B + A</code>, így a hangolás
+      lépésköze pontosan a fáziskomparátor-frekvencia (f_PFD = f_ref / R).
     </div>
   </div>
 
   <div class="config-item" onclick="toggleConfig(this)">
-    <div class="config-header"><span class="config-title" data-i18n="pll2.t">Delta-sigma modulátor — törtszámú osztás</span><span class="config-arrow">▸</span></div>
+    <div class="config-header"><span class="config-title" data-i18n="pll2.t">Kettős modulusú előosztó — pulse swallow</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="pll2.b">
-      Az LMX2595 3. rendű <strong>delta-sigma modulátort</strong> tartalmaz a törtszámú N osztóhoz.
+      Az LMX2316 nem törtszámú (fractional-N) PLL: a nagy osztásarányt <strong>32/33-as kettős modulusú
+      előosztó</strong> és a hozzá tartozó pulse-swallow technika adja.
       <br><br>
-      Egész osztóval pl. N=100 és f_ref=10 MHz → f_out = 1000 MHz. De mi van, ha 1001.5 MHz kell?
-      <br>N=100.15 nem létezik egész osztóban — ezért a delta-sigma modulátor <strong>időben váltogatja</strong>
-      N=100 és N=101 között, oly gyorsan, hogy az átlag pontosan 100.15 legyen.
+      Az előosztó az első A darab impulzusnál 33-mal, utána 32-vel oszt, így
+      <code>N = 32·B + A</code>, ahol B a programozható számláló (13 bit), A a nyelőszámláló (5 bit, A ≤ B).
       <br><br>
-      A loop filter simítja ki a váltogatásból eredő zajt (<strong>fractional spurs</strong>).
-      Az LMX2595 egyedülálló <strong>FRAC_ORDER</strong> és <strong>DITHER</strong> beállításokkal
-      minimalizálja ezeket a spurious emissziókat.
-      <br><br>
-      Eredmény: <code>f_out = (N + FRAC/MOD) × f_PFD</code> — ahol FRAC/MOD akár 0.000001 is lehet.
+      Példa: f_ref = 13 MHz, R = 13 → f_PFD = 1 MHz. N = 1000 esetén f_out = 1000 MHz, és a hangolás
+      lépésköze 1 MHz. Finomabb lépésköz csak kisebb f_PFD-vel érhető el — ennek ára a nagyobb N,
+      vagyis rosszabb fáziszaj (20·log(N)) és lassabb lock.
     </div>
   </div>
 
@@ -213,21 +212,19 @@ canvas{display:block;}
   <div class="config-item" onclick="toggleConfig(this)">
     <div class="config-header"><span class="config-title" data-i18n="pll4.t">SPI programozás — regisztertérkép</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="pll4.b">
-      Az LMX2595 113 darab 32-bites regisztert tartalmaz (R0–R112). Programozáshoz:
-      <br>• <strong>CSB le</strong> (chip select aktív)
-      <br>• 32 bites adat soros átvitele: [R/W bit][6 bites cím][24 bites adat]
-      <br>• <strong>CSB fel</strong> → belső regiszter frissül
+      Az LMX2316 programozása egyszerű, <strong>csak írható 3 vezetékes soros porton</strong> megy
+      (CLK, DATA, LE). Egy átvitel 21 bit: adatmező + 2 bit cím, amit a LE felfutó éle tölt be
+      a megfelelő belső regiszterbe.
       <br><br>
-      A legfontosabb regiszterek:
-      <br>• <code>R34 — PLL_NUM</code>: törtszám numerátor (FRAC)
-      <br>• <code>R35 — PLL_DEN</code>: törtszám nevező (MOD)
-      <br>• <code>R36 — PLL_N</code>: egész osztó értéke
-      <br>• <code>R44 — OUTA_PWR</code>: A kimenet teljesítményszintje
-      <br>• <code>R45 — OUTB_PWR</code>: B kimenet teljesítményszintje
-      <br>• <code>R0 — FCAL_EN</code>: kalibrációs ciklus indítása (kötelező a beállítás után!)
+      A három regiszter:
+      <br>• <code>R</code> — referencia osztó: <code>f_PFD = f_ref / R</code>
+      <br>• <code>N</code> — B (13 bit) és A (5 bit) számláló: <code>N = 32·B + A</code>
+      <br>• <code>F</code> (function) — charge pump áram, fáziskomparátor polaritása, power-down,
+      FoLD kimenet módja
       <br><br>
-      <strong>Fontos:</strong> az LMX2595-öt minden frekvenciaváltás után <strong>R0-val kell kalibrálni</strong>
-      (<code>FCAL_EN=1</code> bit), különben a VCO nem lock-ol megfelelően.
+      <strong>Frekvenciaváltáskor elég az N regisztert újraírni</strong> — kalibrációs ciklus nincs,
+      a hurok magától újra belock-ol. A PIC16F876 SPI-n írja a regisztereket, a beállított
+      frekvencia az LCD-n látszik.
     </div>
   </div>
 
@@ -236,14 +233,15 @@ canvas{display:block;}
     <div class="config-body" data-i18n="pll5.b">
       A PLL kimeneti jel minőségét két szám jellemzi legjobban:
       <br><br>
-      <strong>Fáziszaj (Phase Noise)</strong> — dBc/Hz egységben, offset frekvencia függvényében.
-      Pl. referencia minőségétől függ offset 1 GHz-en: a vivőtől 10 kHz-re az oldalnyáj 110 dB-lel
-      kisebb, mint a vivő. Minél negatívabb, annál jobb.
+      <strong>Fáziszaj (Phase Noise)</strong> — dBc/Hz egységben, az offset frekvencia függvényében.
+      A −100 dBc/Hz @ 10 kHz offset azt jelenti, hogy 10 kHz-re a vivőtől, 1 Hz sávszélességben
+      a zajteljesítmény 100 dB-lel a vivő alatt van. Minél negatívabb, annál jobb.
       <br>Fáziszajt befolyásolja: referencia minősége, loop bandwidth, VCO belső zaj, tápvonal zaj.
       <br><br>
       <strong>Spurious emisszió</strong> — nem kívánt melléktermékek a spektrumban.
-      Forrásai: PFD frekvencia harmónikusai, frakcionális spurs (delta-sigma zajból),
-      tápvonal kicsatolás. Az LMX2595 DITHER beállítása segít csökkenteni.
+      Forrásai: a PFD-frekvencia és harmonikusai, a tápvonalon becsatolt digitális zaj, és a
+      referencia melléktermékei. Egész osztós PLL-nél a PFD-spur a jellemző — a loop bandwidth
+      és a jó tápszűrés csökkenti.
       <br><br>
       <strong>Tervezési tanács:</strong> analóg és digitális tápvonalak szeparálása, decoupling
       kondenzátorok minden táplábon (100nF + 10µF párhuzamosan), RF kimenet 50Ω-ra illesztése.
@@ -269,7 +267,7 @@ canvas{display:block;}
       <input class="calc-input" type="number" id="c-frac" value="0" min="0" max="31" oninput="calcFreq()">
     </div>
     <div class="calc-row">
-      <span class="calc-label">B (programozható, 31–8191)</span>
+      <span class="calc-label">B (programozható, 3–8191, B ≥ A)</span>
       <input class="calc-input" type="number" id="c-mod" value="25" min="31" max="8191" oninput="calcFreq()">
     </div>
     <div class="calc-row">
@@ -310,7 +308,7 @@ canvas{display:block;}
       Ahol h = dielektrikum vastagsága, w = vezető szélessége, t = réz vastagsága.
       1.6mm FR4-en ez kb. <strong>2.9mm széles vezető</strong> ad 50Ω-ot.
       <br><br>
-      Az SMA csatlakozóktól az LMX2595 kimenetéig minden RF vonal ezen a szélességen fut.
+      Az SMA csatlakozóktól a PLL IC kimenetéig minden RF vonal ezen a szélességen fut.
       Fordulóknál 45°-os chanfer (nem 90°!) csökkenti az impedanciaugrást.
       A KiCad <strong>Interactive Router</strong> segít a nyomvonalak konzisztens szélességen tartásában.
     </div>
@@ -319,7 +317,7 @@ canvas{display:block;}
   <div class="config-item" onclick="toggleConfig(this)">
     <div class="config-header"><span class="config-title" data-i18n="pcb3.t">Decoupling és tápellátás tervezés</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="pcb3.b">
-      Az LMX2595 érzékeny a tápvonal zajra — a VCC_VCO és VCC_SYNTH lábak szeparált
+      A PLL IC és a VCO érzékeny a tápvonal zajra — az analóg és digitális tápágak szeparált
       szűrést igényelnek.
       <br><br>
       <strong>Decoupling stratégia minden táplábon:</strong>
@@ -327,7 +325,7 @@ canvas{display:block;}
       <br>• 10µF tantal vagy elektrolit (alacsony frekvenciás stabilizálás)
       <br>• Ferrit bead a digitális és analóg tápvonalak szétválasztásához
       <br><br>
-      <strong>Tápvonal szeparáció:</strong> digitális (ATmega, LCD) és analóg (LMX2595, VCO)
+      <strong>Tápvonal szeparáció:</strong> digitális (PIC16F876, LCD) és analóg (PLL IC, VCO)
       tápvonalak fizikailag szét vannak választva, és csak egy ponton találkoznak (star point).
       Ez megakadályozza, hogy a digitális switching zaj becsatoljon az analóg részbe.
       <br><br>
@@ -348,8 +346,8 @@ canvas{display:block;}
       <br>• Rövidítjük a visszatérő áramok útját
       <br>• Csökkentjük a ground induktivitást RF frekvencián
       <br><br>
-      Az LMX2595 <strong>thermal pad-je</strong> (középső GND pad) 9 via-val van összekötve
-      a B.Cu ground plane-nel — ez egyszerre biztosítja a termikus és RF-GND kapcsolatot.
+      A PLL IC és a VCO alatti GND-szigetek több viával vannak levarrva a B.Cu ground plane-re —
+      ez egyszerre termikus és RF-GND kapcsolat.
       <br><br>
       A via-k átmérője: 0.6mm furat, 1.0mm réz annular ring — a gyártáshoz optimális arány.
     </div>
@@ -363,10 +361,10 @@ canvas{display:block;}
       1. <strong>Schematic (KiCad Schematic Editor)</strong> — az összes alkatrész és kapcsolat definiálása,
       net-ek elnevezése, power flag-ek elhelyezése
       <br>2. <strong>BOM + netlist generálás</strong> → PCB editorba importálva
-      <br>3. <strong>Footprint hozzárendelés</strong> — az LMX2595-höz saját WQFN-40 footprint,
+      <br>3. <strong>Footprint hozzárendelés</strong> — a PLL IC-hez saját footprint,
       0402 passzívokhoz standard KiCad könyvtár
       <br>4. <strong>PCB layout</strong> — alkatrésztömb kritikus sorrendben:
-         LMX2595 első → loop filter mellé → decoupling kondik a lapok mellé → SMA connectors →
+         PLL IC először → loop filter mellé → decoupling kondik a lapok mellé → SMA connectors →
          PIC16F876 + LCD → végül routing
       <br>5. <strong>DRC + ERC</strong> — szabályok: 0.15mm clearance, 0.2mm min track width,
          minden net lezárt
@@ -392,18 +390,20 @@ canvas{display:block;}
 <div class="section">
   <div class="section-label" data-i18n="sec.experience">Tapasztalat és tanulságok</div>
   <div class="exp-box" data-i18n="experience.text">
-    A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és digitális részek egymás melletti
-    elhelyezése volt — a mikrocontroller SPI órajele és az LMX2595 RF kimenete ugyanazon a lapon osztozik.
-    A ground plane folyamatossága és a fizikai szeparáció együtt oldotta meg ezt.
-    Az LMX2595 dokumentációja 113 oldalas és rendkívül részletes — az FCAL kalibrációs lépés
-    hiányán sokat debuggoltam mielőtt rájöttem, hogy minden frekvenciaváltás után kötelező.
+    A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és a digitális rész egymás melletti
+    elhelyezése volt — a mikrovezérlő SPI órajele és a PLL RF kimenete ugyanazon a lapon osztozik.
+    A folyamatos ground plane és a fizikai szeparáció együtt oldotta meg ezt.
+    <br><br>
+    A vezérlés oldaláról a tanulság az volt, hogy egy integer-N PLL-nél a frekvenciaváltás egyetlen
+    regiszterírás: a PIC16F876 SPI-n kiírja az új N szót, és a hurok magától újra belock-ol.
+    <br><br>
     A KiCad-del való munka megmutatta, mennyire erős egy ingyenes EDA eszköz lehet — a 3D render,
-    az impedanciaszámítás és a DRC mind beépített, nincs szükség drága szoftverekre.
+    az impedanciaszámítás és a DRC mind beépített.
   </div>
 </div>
 
 <div class="page-footer">
-  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span>Bódis Tamás · Budapest</span>
   <span data-i18n="footer.tag">LMX2316 · PLL · KiCad · RF tervezés</span>
 </div>
 </div>
@@ -419,20 +419,20 @@ const T={hu:{
 "sec.lmx":"LMX23x6 sorozat — a PLL IC részletesen",
 "lmx.intro":"Az LMX23x6 sorozat a Texas Instruments egy klasszikus, jól bevált <strong>PLL IC-sorozata</strong>. Három tagból áll: az LMX2306 (20–500 MHz), az LMX2316 (100–1200 MHz) és az LMX2326 (100–2800 MHz). Ebben a projektben <strong>LMX2316-ot</strong> használok. A chip tartalmazza a fázisdetektort, a charge pump-ot, a programozható N és R osztókat, valamint a 32/33-as előosztót a dupla modulusú technikához.",
 "sec.pll":"Hogyan működik a PLL — mélyen",
-"pll1.t":"A PLL alapelve és a lock folyamat","pll1.b":"A PLL egy visszacsatolt frekvenciaszabályozó rendszer. VCO generál RF jelet → osztó leosztja → fáziskomparátor (PFD) összehasonlítja a referenciával → charge pump → loop filter → VCO vezérlés. Lock állapotban: <code>f_out = N × f_ref / R</code>. Az LMX2595-ben N lehet törtszám — ez teszi lehetővé az 1 Hz lépésközű hangolást GHz-es tartományban.",
-"pll2.t":"Delta-sigma modulátor — törtszámú osztás","pll2.b":"3. rendű delta-sigma modulátor biztosítja a törtszámú N osztást. A modulátor időben váltogat N és N+1 között, hogy az átlag pontosan a kívánt törtszám legyen. Eredmény: <code>f_out = (N + FRAC/MOD) × f_PFD</code> — ahol FRAC/MOD akár 0.000001 is lehet.",
+"pll1.t":"A PLL alapelve és a lock folyamat","pll1.b":"A PLL egy visszacsatolt frekvenciaszabályozó rendszer. VCO generál RF jelet → osztó leosztja → fáziskomparátor (PFD) összehasonlítja a referenciával → charge pump → loop filter → VCO vezérlés. Lock állapotban: <code>f_out = N × f_ref / R</code>. Az LMX2316-ban N egész: a 32/33-as előosztóval N = 32·B + A, a lépésköz f_PFD = f_ref / R.",
+"pll2.t":"Kettős modulusú előosztó — pulse swallow","pll2.b":"Az LMX2316 nem fractional-N PLL: 32/33-as kettős modulusú előosztót használ (pulse swallow). Az előosztó az első A impulzusnál 33-mal, utána 32-vel oszt, így <code>N = 32·B + A</code> — B a programozható számláló (13 bit), A a nyelőszámláló (5 bit, A ≤ B). A hangolás lépésköze f_PFD.",
 "pll3.t":"Loop filter tervezés — a kritikus lépés","pll3.b":"A loop filter passzív R és C elemek amelyek meghatározzák a rendszer dinamikáját. Loop bandwidth (LBW) pl. 10 kHz: ennél kisebb zavarokat a PLL korrigálja. Phase margin tipikusan 45–65°: a stabilitást jellemzi. A TI WEBENCH PLL tervező eszközzel számoltam ki az értékeket. A loop filter elemei közvetlenül a chip mellé kerültek a NYÁKon.",
-"pll4.t":"SPI programozás — regisztertérkép","pll4.b":"Az LMX2595 113 darab 32-bites regisztert tartalmaz (R0–R112). Legfontosabbak: R34=PLL_NUM (FRAC), R35=PLL_DEN (MOD), R36=PLL_N (egész osztó), R44=OUTA_PWR, R45=OUTB_PWR, R0=FCAL_EN (kalibrációs ciklus). Fontos: minden frekvenciaváltás után R0-val kell kalibrálni!",
+"pll4.t":"SPI programozás — regisztertérkép","pll4.b":"Az LMX2316-ot 3 vezetékes, csak írható soros porton (CLK, DATA, LE) kell programozni. Egy átvitel 21 bit: adatmező + 2 bit cím. Három regiszter van: R (referencia osztó), N (B és A számláló, N = 32·B + A) és F (function: charge pump áram, PFD-polaritás, power-down, FoLD). Frekvenciaváltáskor elég az N regisztert újraírni, kalibrációs ciklus nincs.",
 "pll5.t":"Fáziszaj és spurious — mire figyelj","pll5.b":"Fáziszaj: dBc/Hz egységben — minél negatívabb annál jobb. Spurious emisszió: nemkívánt melléktermékek. Forrásai: PFD frekvencia harmónikusai, frakcionális spurs. Tervezési tanács: analóg és digitális tápvonalak szeparálása, decoupling minden táplábon, RF kimenet 50Ω-ra illesztése.",
 "sec.calc":"Interaktív — frekvencia kalkulátor",
 "sec.pcb":"NYÁKterv — KiCad, RF és EMC szempontok",
 "pcb1.t":"Rézrétegek és stack-up","pcb1.b":"2 rétegű NYÁKon (F.Cu + B.Cu), FR4. F.Cu: aktív alkatrészek, RF vonalak. B.Cu: összefüggő ground plane. Stack-up: FR4 1.6mm · Cu 35µm · HASL felület.",
 "pcb2.t":"Impedanciavezérelt RF vonalak — microstrip","pcb2.b":"Minden RF vezető 50Ω karakterisztikus impedanciára van tervezve. FR4 1.6mm esetén kb. 2.9mm széles vezető ad 50Ω-ot. Fordulóknál 45°-os chanfer. KiCad Interactive Router konzisztens szélességen tartja a nyomvonalakat.",
 "pcb3.t":"Decoupling és tápellátás tervezés","pcb3.b":"Minden táplábon: 100nF X7R 0402 (nagyfrekvenciás) + 10µF elektrolit (alacsony frekvenciás) + ferrit bead a digitális/analóg szeparációhoz. Digitális és analóg tápvonalak fizikailag szét vannak választva, csak egy ponton találkoznak (star point).",
-"pcb4.t":"Via és ground stitching","pcb4.b":"79 via a layoutban — nagy részük ground stitching. A ground stitching összekötí az F.Cu ground szigeteit a B.Cu ground plane-nel, csökkentve a ground induktivitást. Az LMX2595 thermal pad-je 9 via-val van összekötve a ground plane-nel.",
-"pcb5.t":"Alkatrésztömbök, footprintek — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint hozzárendelés (saját WQFN-40 footprint az LMX2595-höz) → PCB layout kritikus sorrendben → DRC + ERC → Gerber generálás. 0 hiba, 0 warning a végleges layoutban.",
+"pcb4.t":"Via és ground stitching","pcb4.b":"79 via a layoutban — nagy részük ground stitching. A ground stitching összekötí az F.Cu ground szigeteit a B.Cu ground plane-nel, csökkentve a ground induktivitást. A PLL IC és a VCO alatti GND-szigetek több viával vannak levarrva a ground plane-re.",
+"pcb5.t":"Alkatrésztömbök, footprintek — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint hozzárendelés (saját footprint a PLL IC-hez) → PCB layout kritikus sorrendben → DRC + ERC → Gerber generálás. 0 hiba, 0 warning a végleges layoutban.",
 "sec.experience":"Tapasztalat és tanulságok",
-"experience.text":"A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és digitális részek egymás melletti elhelyezése volt. A ground plane folyamatossága és a fizikai szeparáció együtt oldotta meg. Az LMX2595 FCAL kalibrációs lépés hiányán sokat debuggoltam — minden frekvenciaváltás után kötelező. A KiCad megmutatta, mennyire erős egy ingyenes EDA eszköz — 3D render, impedanciaszámítás és DRC mind beépített.",
+"experience.text":"A BT-Synth-1V tervezése során a legnagyobb kihívás az RF és digitális rész egymás melletti elhelyezése volt. A ground plane folyamatossága és a fizikai szeparáció együtt oldotta meg. Integer-N PLL-nél a frekvenciaváltás egyetlen regiszterírás: a PIC16F876 SPI-n kiírja az új N szót, és a hurok magától újra belock-ol. A KiCad megmutatta, mennyire erős egy ingyenes EDA eszköz — 3D render, impedanciaszámítás és DRC mind beépített.",
 "footer.tag":"LMX2316 · PLL · KiCad · RF tervezés"},
 en:{
 "title":"BT-Synth-1V — <em>Frequency Synthesizer</em> Design",
@@ -444,18 +444,18 @@ en:{
 "sec.lmx":"LMX23x6 series — the PLL IC in detail",
 "lmx.intro":"The LMX23x6 series is a classic, well-proven <strong>PLL IC family</strong> from Texas Instruments. Three members: LMX2306 (20–500 MHz), LMX2316 (100–1200 MHz) and LMX2326 (100–2800 MHz). This project uses the <strong>LMX2316</strong>. The chip contains the phase detector, charge pump, programmable N and R dividers, and a 32/33 prescaler for dual-modulus operation.",
 "sec.pll":"How the PLL works — in depth",
-"pll1.t":"PLL principle and lock process","pll1.b":"PLL is a feedback frequency control system. VCO generates RF signal → divider divides down → PFD compares to reference → charge pump → loop filter → VCO control. Locked: <code>f_out = N × f_ref / R</code>. In the LMX2595, N can be fractional — enabling 1 Hz step tuning at GHz frequencies.",
-"pll2.t":"Delta-sigma modulator — fractional division","pll2.b":"The LMX2316 uses a <strong>dual-modulus prescaler</strong> (32/33) for fractional-like N division — this is the classic <strong>pulse-swallow</strong> technique, not delta-sigma. The prescaler divides by 33 for the first A pulses, then switches to 32. Result: <code>f_VCO = f_PFD × (B × 32 + A)</code>, where B is the programmable counter (13 bits) and A is the swallow counter (5 bits, A ≤ B). This allows the VCO to be tuned in f_PFD steps.",
+"pll1.t":"PLL principle and lock process","pll1.b":"PLL is a feedback frequency control system. VCO generates RF signal → divider divides down → PFD compares to reference → charge pump → loop filter → VCO control. Locked: <code>f_out = N × f_ref / R</code>. In the LMX2316 N is an integer: with the 32/33 prescaler N = 32·B + A, so the tuning step is f_PFD = f_ref / R.",
+"pll2.t":"Dual-modulus prescaler — pulse swallow","pll2.b":"The LMX2316 uses a <strong>dual-modulus prescaler</strong> (32/33) for fractional-like N division — this is the classic <strong>pulse-swallow</strong> technique, not delta-sigma. The prescaler divides by 33 for the first A pulses, then switches to 32. Result: <code>f_VCO = f_PFD × (B × 32 + A)</code>, where B is the programmable counter (13 bits) and A is the swallow counter (5 bits, A ≤ B). This allows the VCO to be tuned in f_PFD steps.",
 "pll3.t":"Loop filter design — the critical step","pll3.b":"The loop filter is passive R and C components that determine system dynamics. Loop bandwidth e.g. 10 kHz: disturbances below this are corrected by the PLL. Phase margin typically 45–65° for stability. Values calculated with TI WEBENCH PLL designer. Filter components placed immediately adjacent to the chip on the PCB.",
-"pll4.t":"SPI programming — register map","pll4.b":"LMX2595 contains 113 32-bit registers (R0–R112). Key registers: R34=PLL_NUM (FRAC), R35=PLL_DEN (MOD), R36=PLL_N, R44=OUTA_PWR, R45=OUTB_PWR, R0=FCAL_EN. Important: FCAL calibration must be run after every frequency change!",
+"pll4.t":"SPI programming — register map","pll4.b":"The LMX2316 is programmed over a write-only 3-wire serial port (CLK, DATA, LE). Each transfer is 21 bits: data field plus a 2-bit address. Three registers: R (reference divider), N (B and A counters, N = 32·B + A) and F (function: charge pump current, PFD polarity, power-down, FoLD). A frequency change only needs a new N word — there is no calibration cycle.",
 "pll5.t":"Phase noise and spurious — what to watch","pll5.b":"Phase noise: in dBc/Hz — more negative is better. Spurious: unwanted spectral products from PFD harmonics and fractional spurs. Design advice: separate analog/digital supplies, decouple every supply pin, match RF output to 50Ω.",
 "sec.calc":"Interactive — frequency calculator",
 "sec.pcb":"PCB Design — KiCad, RF and EMC considerations",
 "pcb1.t":"Copper layers and stack-up","pcb1.b":"2-layer PCB (F.Cu + B.Cu), FR4. F.Cu: active components, RF traces. B.Cu: continuous ground plane. Stack-up: FR4 1.6mm · Cu 35µm · HASL finish.",
 "pcb2.t":"Impedance-controlled RF traces — microstrip","pcb2.b":"All RF conductors designed for 50Ω characteristic impedance. On FR4 1.6mm: ~2.9mm wide trace gives 50Ω. 45° chamfers at turns. KiCad Interactive Router maintains consistent trace widths.",
 "pcb3.t":"Decoupling and power delivery design","pcb3.b":"Every supply pin: 100nF X7R 0402 (HF noise) + 10µF electrolytic (LF stability) + ferrite bead for analog/digital separation. Analog and digital supply planes physically separated, meeting at a single star point.",
-"pcb4.t":"Vias and ground stitching","pcb4.b":"79 vias in layout — most are ground stitching vias. Ground stitching connects F.Cu ground islands to B.Cu ground plane, reducing ground inductance at RF. LMX2595 thermal pad connected to ground plane with 9 vias.",
-"pcb5.t":"Component placement, footprints — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint assignment (custom WQFN-40 for LMX2595) → PCB layout in critical order → DRC + ERC → Gerber export. 0 errors, 0 warnings in final layout.",
+"pcb4.t":"Vias and ground stitching","pcb4.b":"79 vias in layout — most are ground stitching vias. Ground stitching connects F.Cu ground islands to B.Cu ground plane, reducing ground inductance at RF. The ground islands under the PLL IC and the VCO are stitched to the ground plane with several vias.",
+"pcb5.t":"Component placement, footprints — KiCad workflow","pcb5.b":"Schematic → BOM/netlist → footprint assignment (custom footprint for the PLL IC) → PCB layout in critical order → DRC + ERC → Gerber export. 0 errors, 0 warnings in final layout.",
 "sec.experience":"Experience and lessons learned",
 "experience.text":"The biggest challenge in designing BT-Synth-1V was placing RF and digital sections adjacently. Continuous ground plane and physical separation solved it together. The PIC microcontroller writes the N register via SPI for every frequency step — the LMX2316 re-locks automatically without any calibration sequence. KiCad showed how powerful a free EDA tool can be — 3D render, impedance calculation and DRC all built-in.",
 "footer.tag":"LMX2316 · PLL · KiCad · RF Design"},
@@ -470,7 +470,7 @@ de:{
 "lmx.intro":"Die LMX23x6-Serie ist eine klassische, bewährte <strong>PLL-IC-Familie</strong> von Texas Instruments. Drei Mitglieder: LMX2306 (20–500 MHz), LMX2316 (100–1200 MHz) und LMX2326 (100–2800 MHz). Dieses Projekt verwendet den <strong>LMX2316</strong>. Der Chip enthält Phasendetektor, Ladungspumpe, programmierbare N- und R-Teiler und einen 32/33-Vorteiler.",
 "sec.pll":"Wie die PLL funktioniert — in der Tiefe",
 "pll1.t":"PLL-Grundprinzip und Lock-Prozess","pll1.b":"PLL ist ein rückgekoppeltes Frequenzregelungssystem. VCO generiert RF → Teiler → PFD vergleicht mit Referenz → Ladungspumpe → Schleifenfilter → VCO-Steuerung. Im eingerasteten Zustand: <code>f_out = N × f_ref / R</code>.",
-"pll2.t":"Delta-Sigma-Modulator — gebrochene Teilung","pll2.b":"Der LMX2316 verwendet einen <strong>Dual-Modulus-Vorteiler</strong> (32/33) — klassische <strong>Pulse-Swallow</strong>-Technik, kein Delta-Sigma. Ergebnis: <code>f_VCO = f_PFD × (B × 32 + A)</code>, wobei B der programmierbare Teiler (13 Bit) und A der Schluckzähler (5 Bit) ist.",
+"pll2.t":"Dual-Modulus-Vorteiler — Pulse Swallow","pll2.b":"Der LMX2316 verwendet einen <strong>Dual-Modulus-Vorteiler</strong> (32/33) — klassische <strong>Pulse-Swallow</strong>-Technik, kein Delta-Sigma. Ergebnis: <code>f_VCO = f_PFD × (B × 32 + A)</code>, wobei B der programmierbare Teiler (13 Bit) und A der Schluckzähler (5 Bit) ist.",
 "pll3.t":"Schleifenfilter-Design — der kritische Schritt","pll3.b":"Passive R-und-C-Elemente bestimmen die Systemdynamik. Schleifenbandbreite z.B. 10 kHz, Phasenrand typisch 45–65°. Werte mit TI WEBENCH PLL Designer berechnet.",
 "pll4.t":"SPI-Programmierung — Registerkarte","pll4.b":"Der LMX2316 wird über SPI mit einem einzigen 21-Bit-Wort programmiert. Struktur: <code>[DATA 18 Bits][CTL 2 Bits][FLAG 1 Bit]</code>. Das FLAG-Bit wählt zwischen N- und R-Zähler. Im N-Register: obere 13 Bits = programmierbarer Teiler (B), untere 5 Bits = Schluckzähler (A).",
 "pll5.t":"Phasenrauschen und Spurs","pll5.b":"Phasenrauschen in dBc/Hz — negativer ist besser. Spurs: unerwünschte Spektralprodukte. Entwurfshinweis: Analog/Digital-Versorgung trennen, jede Versorgung entkoppeln, RF-Ausgang auf 50Ω anpassen.",
@@ -480,7 +480,7 @@ de:{
 "pcb2.t":"Impedanzkontrollierte RF-Leiterbahnen","pcb2.b":"Alle RF-Leiter für 50Ω ausgelegt. Auf FR4 1.6mm: ~2.9mm breite Leiterbahn. 45°-Fase an Kurven.",
 "pcb3.t":"Entkopplung und Stromversorgungsdesign","pcb3.b":"Jeder Versorgungspin: 100nF + 10µF + Ferritperle. Analoge und digitale Versorgung physisch getrennt.",
 "pcb4.t":"Vias und Ground Stitching","pcb4.b":"79 Vias — die meisten sind Ground-Stitching-Vias. Verbinden F.Cu-Masseflächen mit der B.Cu-Masseebene.",
-"pcb5.t":"Bauteilplatzierung, Footprints — KiCad-Workflow","pcb5.b":"Schaltplan → Stückliste → Footprint-Zuweisung (eigenes WQFN-40 für LMX2595) → PCB-Layout → DRC/ERC → Gerber-Export. 0 Fehler, 0 Warnungen.",
+"pcb5.t":"Bauteilplatzierung, Footprints — KiCad-Workflow","pcb5.b":"Schaltplan → Stückliste → Footprint-Zuweisung (eigener Footprint für das PLL-IC) → PCB-Layout → DRC/ERC → Gerber-Export. 0 Fehler, 0 Warnungen.",
 "sec.experience":"Erfahrungen und Lektionen",
 "experience.text":"Die größte Herausforderung war die Platzierung von RF und digitalen Schaltungsteilen nebeneinander. Durchgehende Massefläche und physische Trennung lösten es gemeinsam. Der PIC-Mikrocontroller schreibt das N-Register per SPI bei jedem Frequenzschritt — der LMX2316 rastet automatisch ohne Kalibriersequenz wieder ein.",
 "footer.tag":"LMX2316 · PLL · KiCad · RF-Design"}};
@@ -505,7 +505,7 @@ function calcFreq(){
 
   let status='ok', msg='';
   if(fpfd<5||fpfd>400){ status='warn'; msg='⚠ f_PFD ajánlott tartomány: 5–400 MHz'; }
-  if(fout<10||fout>19000){ status='err'; msg='✗ f_out kívül esik az LMX2595 tartományán (100 MHz – 1200 MHz)'; }
+  if(fout<100||fout>1200){ status='err'; msg='✗ f_out kívül esik az LMX2316 tartományán (100 MHz – 1200 MHz)'; }
   if(N<28||N>4095){ status='warn'; msg='⚠ N tipikus tartomány: 28–4095'; }
 
   // R36, R34, R35 hex values

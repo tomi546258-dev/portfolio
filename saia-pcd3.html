@@ -82,7 +82,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <button class="lang-btn" onclick="setLang('de')">DE</button>
 </div>
 
-<h1 class="proj-title" data-i18n="title">Saia Burgess <em>PCD3.S100</em> — ipari PLC tapasztalatok</h1>
+<h1 class="proj-title" data-i18n="title">Saia Burgess <em>PCD3.S100</em> — FBD programozás workshop-táblán</h1>
 <div class="proj-sub" data-i18n="sub">PCD3 sorozat · Saia Fupla Editor · FBD programozás · S-Net · Ethernet · Parkoló vezérlés</div>
 
 <!-- overview -->
@@ -155,7 +155,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="spec-item"><div class="spec-key">CPU</div><div class="spec-val">PCD3.M 5540</div><div class="spec-note">32-bites RISC, 512 KB RAM, 4 MB Flash</div></div>
     <div class="spec-item"><div class="spec-key">Digitális I/O</div><div class="spec-val">I0–I7 · O16–O23</div><div class="spec-note">8 DI + 8 DO alapkártyán, relé kimenet</div></div>
     <div class="spec-item"><div class="spec-key">Analóg I/O</div><div class="spec-val">CH0–CH3 (W400)</div><div class="spec-note">0–10V analóg kimenetek, kézzel állítható potméterrel</div></div>
-    <div class="spec-item"><div class="spec-key">Kommunikáció</div><div class="spec-val">Ethernet · USB · S-Net/MPI</div><div class="spec-note">HTTP szerver, Modbus TCP, BACnet/IP natívan</div></div>
+    <div class="spec-item"><div class="spec-key">Kommunikáció</div><div class="spec-val">Ethernet · USB · S-Net/MPI</div><div class="spec-note">HTTP szerver, Modbus TCP; BACnet/IP opcióval (modul/licenc)</div></div>
     <div class="spec-item"><div class="spec-key">Programozás</div><div class="spec-val">Saia Fupla Editor</div><div class="spec-note">FBD, IL, Ladder, SFC — IEC 61131-3 kompatibilis</div></div>
     <div class="spec-item"><div class="spec-key">Bővíthetőség</div><div class="spec-val">PCD3 modulok</div><div class="spec-note">Analóg, digitális, kommunikációs modulok sorba fűzhetők</div></div>
     <div class="spec-item"><div class="spec-key">Tápfeszültség</div><div class="spec-val">24V DC</div><div class="spec-note">Beépített tápegység, széles tartományú bemenet</div></div>
@@ -186,11 +186,11 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="config-body" data-i18n="d2.b">
       A Saia PCD3 kommunikációs képességei kiemelkedők az árfekvéséhez képest:
       <br><br>
-      • <strong>Ethernet (RJ45)</strong> — Modbus TCP master/slave, BACnet/IP (épületautomatizálás standard protokollja), HTTP szerver beépítve. A PLC webszerverén keresztül böngészőből is monitorozható a rendszer állapota.
+      • <strong>Ethernet (RJ45)</strong> — Modbus TCP master/slave és beépített HTTP szerver; BACnet/IP a PCD3-on opciós modullal/licenccel érhető el. A PLC webszerverén keresztül böngészőből is monitorozható a rendszer állapota.
       <br>• <strong>S-Net / MPI (DB9)</strong> — Saia saját hálózati protokollja, elosztott PLC rendszerekhez. Több PCD3 master-slave topológiában kommunikálhat.
       <br>• <strong>USB</strong> — programozáshoz, firmware frissítéshez.
       <br><br>
-      A <strong>BACnet/IP</strong> protokoll megkülönbözteti a Saia PCD-t a legtöbb kis/közepes PLC-től: ez az épületautomatizálás iparági szabványa, amelyen HVAC rendszerek, tűzjelzők és biztonságtechnikai rendszerek kommunikálnak. Ezért alkalmazzák a Saia PCD-t irodaházakban, szállodákban és kórházakban.
+      A <strong>BACnet/IP</strong> támogatás (opcióként) megkülönbözteti a Saia PCD-t a legtöbb kis/közepes PLC-től: ez az épületautomatizálás iparági szabványa, amelyen HVAC rendszerek, tűzjelzők és biztonságtechnikai rendszerek kommunikálnak. Ezért alkalmazzák a Saia PCD-t irodaházakban, szállodákban és kórházakban.
     </div>
   </div>
 
@@ -199,7 +199,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
     <div class="config-body" data-i18n="d3.b">
       A Saia PCD memóriastruktúrája más mint a Siemens vagy Omron megközelítés:
       <br><br>
-      • <strong>Register (R)</strong> — 32-bites egész számok, 0–9999-ig. Számlálók, mérési értékek, setpointok tárolására. A programban <code>R0</code>, <code>R100</code> stb. hivatkozással érhető el.
+      • <strong>Register (R)</strong> — 32 bites egész regiszterek. Számlálók, mérési értékek, setpointok tárolására. A programban <code>R0</code>, <code>R100</code> stb. hivatkozással érhető el.
       <br>• <strong>Flag (F)</strong> — 1 bites logikai változók, belső jelzésekhez. <code>F0</code>–<code>F8191</code>
       <br>• <strong>Input / Output (I / O)</strong> — fizikai I/O csatornák. <code>I0</code>–<code>I7</code> az alapkártyán, bővítőkkel tovább.
       <br>• <strong>DB (Data Block)</strong> — strukturált adatterületek, pl. receptek, mérési napló tárolásához.
@@ -227,9 +227,9 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="config-item" onclick="toggleConfig(this)">
     <div class="config-header"><span class="config-title" data-i18n="d5.t">PCD3 vs. más PLC-k — mikor válaszd?</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="d5.b">
-      A Saia PCD3 nem véletlenül él él még ma is az épületautomatizálási piacon:
+      A Saia PCD3 nem véletlenül él még ma is az épületautomatizálási piacon:
       <br><br>
-      • <strong>BACnet/IP natívan</strong> — más PLC-knél (Siemens, Omron) ez drága add-on. Saia-nál beépített.
+      • <strong>BACnet/IP</strong> — a PCD3-on opciós modullal/licenccel elérhető; más kis PLC-knél jellemzően drágább add-on.
       <br>• <strong>Webszerver beépítve</strong> — böngészőből elérhető monitoring és vezérlés IT infrastruktúra nélkül.
       <br>• <strong>Workshop tábla</strong> — az S100 tanulási célra ideális: a beépített kapcsolók és LED-ek lehetővé teszik, hogy valódi kimeneteket láss, fizikai berendezés nélkül is.
       <br>• <strong>Hosszú rendelkezésre állás</strong> — a Saia PCD3 modulok 10+ éve elérhetők, visszafelé kompatibilis a régi programokkal.
@@ -245,13 +245,13 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <table class="comp-table">
     <thead><tr><th data-i18n="th.param">Szempont</th><th>Saia PCD3</th><th>Omron CP1L</th><th>Siemens S7-1200</th></tr></thead>
     <tbody>
-      <tr class="hl"><td>BACnet/IP</td><td class="good">natív</td><td class="bad">nincs</td><td class="mid">add-on modul</td></tr>
+      <tr class="hl"><td>BACnet/IP</td><td class="good">opció (modul/licenc)</td><td class="bad">nincs</td><td class="mid">add-on modul</td></tr>
       <tr><td>Webszerver</td><td class="good">beépített</td><td class="bad">nincs</td><td class="mid">opcionális</td></tr>
       <tr><td>Programozás</td><td class="mid">Fupla Editor</td><td class="good">CX-Programmer</td><td class="good">TIA Portal</td></tr>
       <tr class="hl"><td>Ár (CPU)</td><td class="mid">€400–800</td><td class="good">€150–400</td><td class="mid">€300–600</td></tr>
       <tr><td>Mozgásvezérlés</td><td class="bad">nem erőssége</td><td class="good">pulse output</td><td class="good">motion modul</td></tr>
       <tr><td>Épületautomatizálás</td><td class="good">elsődleges piac</td><td class="mid">használható</td><td class="mid">használható</td></tr>
-      <tr class="hl"><td>Oktatási változat</td><td class="good">PCD3/Workshop</td><td class="mid">nincs dedikált</td><td class="mid">SIMATIC ET200</td></tr>
+      <tr class="hl"><td>Oktatási változat</td><td class="good">PCD3/Workshop</td><td class="mid">nincs dedikált</td><td class="mid">nincs dedikált</td></tr>
       <tr><td>Ökoszisztéma</td><td class="mid">Saia/Honeywell</td><td class="mid">Omron</td><td class="good">nagyon széles</td></tr>
     </tbody>
   </table>
@@ -262,7 +262,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
   <div class="section-label" data-i18n="sec.experience">Személyes tapasztalat</div>
   <div class="exp-box" data-i18n="experience.text">
     A Saia PCD3-mal való munka megmutatta, hogy az FBD programozás milyen hatékonyan alkalmazható
-    komplex vezérlési logikánál. A parkolórendszer programban egy fel/le számláló, négy komparátor
+    komplex vezérlési logikánál. A parkolórendszer programban egy fel/le számláló, több komparátor
     és két pulse blokk együttesen valósítja meg a teljes sorompó- és kijelzővezérlést — áttekinthető,
     karbantartható kód, amit más mérnök is könnyen megért. A Fupla Editor online monitoring módja
     élesben különösen hasznos: anélkül hogy a gépet leállítanád, látod mit csinál épp a program.
@@ -273,7 +273,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 </div>
 
 <div class="page-footer">
-  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span>Bódis Tamás · Budapest</span>
   <span data-i18n="footer.tag">Saia PCD3 · Fupla Editor · FBD · Épületautomatizálás</span>
 </div>
 </div>
@@ -281,7 +281,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 <script>
 const T={
 hu:{
-"title":"Saia Burgess <em>PCD3.S100</em> — ipari PLC tapasztalatok",
+"title":"Saia Burgess <em>PCD3.S100</em> — FBD programozás workshop-táblán",
 "sub":"PCD3 sorozat · Saia Fupla Editor · FBD programozás · S-Net · Ethernet · Parkoló vezérlés",
 "sec.overview":"A Saia PCD3 sorozatról",
 "overview.text":"A Saia Burgess PCD3 sorozat a svájci Saia-Burgess Controls (ma Honeywell) egyik legnépszerűbb <strong>moduláris ipari PLC-je</strong>. A PCD3.S100 workshop változat oktatási és tesztkörnyezetbe optimalizált. A programozás a <strong>Saia Fupla Editor</strong> szoftverben történik, amely FBD, IL és Ladder nyelvet is támogat. Főleg <strong>épületautomatizálásban, parkolórendszerekben és ipari folyamatvezérlésben</strong> alkalmazzák.",
@@ -294,20 +294,20 @@ hu:{
 "d1.t":"Saia Fupla Editor — programozási környezet",
 "d1.b":"Az Fupla Editor IEC 61131-3 kompatibilis: FBD, IL, Ladder, SFC. Online monitoring módban valós idejű értékek láthatók a blokkokban. Force módban szimbólum értéke kézzel állítható — ez élesben hibakeresésnél életmentő.",
 "d2.t":"S-Net, Ethernet, BACnet — kommunikáció",
-"d2.b":"Ethernet: Modbus TCP, BACnet/IP (épületautomatizálás szabványa), beépített HTTP szerver. S-Net/MPI: Saia saját hálózati protokollja elosztott rendszerekhez. A BACnet/IP megkülönbözteti a PCD3-at a legtöbb kis/közepes PLC-től — más gyártóknál drága add-on.",
+"d2.b":"Ethernet: Modbus TCP, BACnet/IP opcióval (épületautomatizálás szabványa), beépített HTTP szerver. S-Net/MPI: Saia saját hálózati protokollja elosztott rendszerekhez. A BACnet/IP megkülönbözteti a PCD3-at a legtöbb kis/közepes PLC-től — más gyártóknál drága add-on.",
 "d3.t":"Memóriaterületek és adatkezelés",
 "d3.b":"Register (R): 32-bites egészek számlálókhoz, mérési adatokhoz. Flag (F): 1-bites logikai változók. Timer (T) / Counter (C): dedikált területek. Remanens területek konfigurálhatók áramkimaradás utáni megmaradáshoz — parkolórendszernél ez kritikus.",
 "d4.t":"FBD funkcioblokkok — amit a programban látunk",
 "d4.b":"CTUD: fel/le számláló, IC nulláz. Cmp >=: összehasonlító, fokozatos kijelzéshez. TON/TOF/TP: időzítők. Pulse: felfutó élre egyetlen impulzus — sorompóvezérléshez ideális. SR flip-flop: állapotmemória. A blokkokat jelfolyam-vonalak kötik össze, végrehajtás bal→jobb.",
 "d5.t":"PCD3 vs. más PLC-k — mikor válaszd?",
-"d5.b":"BACnet/IP natívan, webszerver beépítve, Workshop tábla oktatáshoz, hosszú rendelkezésre állás. Nem erőssége: gyors mozgásvezérlés, kis I/O projektek ahol a CP1L jobb ár-érték.",
+"d5.b":"BACnet/IP opcióval, webszerver beépítve, Workshop tábla oktatáshoz, hosszú rendelkezésre állás. Nem erőssége: gyors mozgásvezérlés, kis I/O projektek ahol a CP1L jobb ár-érték.",
 "sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
 "th.param":"Szempont",
 "sec.experience":"Személyes tapasztalat",
-"experience.text":"A parkolórendszer programban egy fel/le számláló, négy komparátor és két pulse blokk együttesen valósítja meg a teljes sorompó- és kijelzővezérlést — áttekinthető, karbantartható kód. A Fupla Editor online monitoring módja élesben különösen hasznos: anélkül hogy leállítanád a gépet, látod mit csinál a program. A Workshop tábla tökéletesen helyettesíti a szenzorokat fejlesztés közben.",
+"experience.text":"A parkolórendszer programban egy fel/le számláló, több komparátor és két pulse blokk együttesen valósítja meg a teljes sorompó- és kijelzővezérlést — áttekinthető, karbantartható kód. A Fupla Editor online monitoring módja élesben különösen hasznos: anélkül hogy leállítanád a gépet, látod mit csinál a program. A Workshop tábla tökéletesen helyettesíti a szenzorokat fejlesztés közben.",
 "footer.tag":"Saia PCD3 · Fupla Editor · FBD · Épületautomatizálás"},
 en:{
-"title":"Saia Burgess <em>PCD3.S100</em> — industrial PLC experience",
+"title":"Saia Burgess <em>PCD3.S100</em> — FBD programming on a workshop board",
 "sub":"PCD3 series · Saia Fupla Editor · FBD programming · S-Net · Ethernet · Car park control",
 "sec.overview":"About the Saia PCD3 series",
 "overview.text":"The Saia Burgess PCD3 series is one of the most popular <strong>modular industrial PLCs</strong> from Swiss Saia-Burgess Controls (now Honeywell). The PCD3.S100 workshop version is optimised for training. Programming is done in <strong>Saia Fupla Editor</strong>, supporting FBD, IL and Ladder. Primarily used in <strong>building automation, car park systems and industrial process control</strong>.",
@@ -330,10 +330,10 @@ en:{
 "sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
 "th.param":"Criterion",
 "sec.experience":"Personal experience",
-"experience.text":"In the car park program, one up/down counter, four comparators and two pulse blocks together implement the complete barrier and display control — readable, maintainable code. The Fupla Editor online monitoring is especially useful in live systems: you see exactly what the program is doing without stopping the machine. The Workshop board perfectly substitutes sensors during development.",
+"experience.text":"In the car park program, one up/down counter, several comparators and two pulse blocks together implement the complete barrier and display control — readable, maintainable code. The Fupla Editor online monitoring is especially useful in live systems: you see exactly what the program is doing without stopping the machine. The Workshop board perfectly substitutes sensors during development.",
 "footer.tag":"Saia PCD3 · Fupla Editor · FBD · Building Automation"},
 de:{
-"title":"Saia Burgess <em>PCD3.S100</em> — Industrie-SPS Erfahrungen",
+"title":"Saia Burgess <em>PCD3.S100</em> — FBS-Programmierung auf dem Workshop-Board",
 "sub":"PCD3-Serie · Saia Fupla Editor · FBD-Programmierung · S-Net · Ethernet · Parkhausterung",
 "sec.overview":"Über die Saia PCD3-Serie",
 "overview.text":"Die Saia Burgess PCD3-Serie ist eine der beliebtesten <strong>modularen Industrie-SPSen</strong> von Saia-Burgess Controls (heute Honeywell). Programmierung im <strong>Saia Fupla Editor</strong> mit FBD, IL und Leiterplan. Hauptsächlich in <strong>Gebäudeautomatisierung, Parkhaussystemen und Prozesssteuerung</strong> eingesetzt.",
@@ -356,7 +356,7 @@ de:{
 "sec.compare":"PCD3.S100 vs. CP1L vs. S7-1200",
 "th.param":"Kriterium",
 "sec.experience":"Persönliche Erfahrung",
-"experience.text":"Im Parkhaussystem realisieren ein Auf/Ab-Zähler, vier Komparatoren und zwei Pulsblöcke gemeinsam die gesamte Schranken- und Anzeigesteuerung — lesbarer, wartbarer Code. Das Online-Monitoring des Fupla Editors ist besonders wertvoll: Sie sehen genau, was das Programm tut, ohne die Maschine anzuhalten.",
+"experience.text":"Im Parkhaussystem realisieren ein Auf/Ab-Zähler, mehrere Komparatoren und zwei Pulsblöcke gemeinsam die gesamte Schranken- und Anzeigesteuerung — lesbarer, wartbarer Code. Das Online-Monitoring des Fupla Editors ist besonders wertvoll: Sie sehen genau, was das Programm tut, ohne die Maschine anzuhalten.",
 "footer.tag":"Saia PCD3 · Fupla Editor · FBD · Gebäudeautomatisierung"}
 };
 

@@ -114,11 +114,11 @@ canvas{display:block;width:100%;}
     </div>
     <div class="photo-card">
       <img src="psu-testbench.png" alt="Mérőpad leválasztó transzformátorral" class="short">
-      <div class="photo-cap" data-i18n="photo2.cap">Mérőpad — szabályozható leválasztó transzformátor · UNI-T UT33A+ multiméter · –1.810 V olvasatnál PFC kimeneti ellenőrzés · Ipari labor</div>
+      <div class="photo-cap" data-i18n="photo2.cap">Mérőpad — szabályozható leválasztó transzformátor · UNI-T UT33A+ multiméter · mérés a leválasztó transzformátoros mérőpadon</div>
     </div>
     <div class="photo-card">
       <img src="psu-l4981-macro.png" alt="L4981AD IC makrofotó" class="short">
-      <div class="photo-cap" data-i18n="photo3.cap">L4981AD IC makrofotó — lupén keresztül · ST Microelectronics · TQFP-32 tok · R10–R12 SMD ellenállások mellette · Látható a forrasztási minőség</div>
+      <div class="photo-cap" data-i18n="photo3.cap">L4981AD IC makrofotó — lupén keresztül · ST Microelectronics · SO-20 tok · R10–R12 SMD ellenállások mellette · Látható a forrasztási minőség</div>
     </div>
   </div>
 </div>
@@ -184,7 +184,7 @@ canvas{display:block;width:100%;}
   <div class="config-item" onclick="toggleConfig(this)">
     <div class="config-header"><span class="config-title" data-i18n="ic2.t">L4981B belső felépítése és lábkiosztása</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="ic2.b">
-      Az L4981B egy <strong>TQFP-32 tokozású IC</strong>, 32 lábbal. Főbb belső blokkjai:
+      Az L4981 <strong>SO-20 tokban</strong> van (a lapon lévő példány jelölése L4981AD). Főbb belső blokkjai:
       <br><br>
       • <strong>Sokszorozó (Multiplier)</strong> — a hálózati feszültség szinuszos mintájával
         megszorozza az áramhiba-jelet, így az áramerősség-referencia követi a feszültség alakját
@@ -200,9 +200,9 @@ canvas{display:block;width:100%;}
         elkerüli az induktivitás telítési tranziensét
       <br>• <strong>Védelmek</strong>: OVP (túlfeszültség), OCP (túláram), undervoltage lockout
       <br><br>
-      Az <strong>L4981A és L4981B különbsége</strong>: az A változat average current mode,
-      a B változat peak current mode vezérlésű — utóbbi egyszerűbb külső hálózatot igényel,
-      de érzékenyebb az induktivitás áramcsúcsaira.
+      Az <strong>L4981A és L4981B</strong> egyaránt átlagáram-szabályozású (average current mode) PFC vezérlő;
+      a B változat ezen felül frekvenciamodulációt is tud, ami szétteríti a kapcsolási spektrumot és
+      csökkenti az EMI-szűrő igényét.
     </div>
   </div>
 
@@ -218,24 +218,26 @@ canvas{display:block;width:100%;}
       emeltük a bemeneti feszültséget (nem egyszerre 230V!). A primer egyenirányító és
       az EMI szűrő rendben volt.
       <br><br>
-      <strong>3. PFC busz mérése</strong> — normálisan ~400V DC-nek kellene megjelennie
-      a bulk kondenzátoron. Nulla volt — a PFC fokozat nem indult.
+      <strong>3. PFC busz mérése</strong> — üzemszerűen ~400 V DC-nek kell megjelennie a bulk kondenzátoron.
+      A mért feszültség ezt nem érte el. (Fontos: ha csak a vezérlő nem kapcsol, a bulk kondin akkor is
+      megjelenik a hálózati csúcsfeszültség, kb. 325 V — a teljes hiányzó feszültség a boost ág
+      megszakadására utalna.)
       <br><br>
-      <strong>4. L4981B tápfeszültsége</strong> — az IC VCC lába (15V) rendben volt.
+      <strong>4. Az L4981 tápfeszültsége</strong> — az IC VCC lába (15V) rendben volt.
       De az IC gate driver kimenete (GATE láb) nem adott PWM jelet — oszcilloszkóppal mérve
       teljesen lapos volt a jel.
       <br><br>
       <strong>5. Statikus mérés</strong> — az IC kivételével (in-circuit) mérve a lábak
       közötti ellenállások rendellenesek voltak, belső törésre utalva.
       <br><br>
-      <strong>Diagnózis: L4981B belső meghibásodás</strong> — az IC cserére szorul.
+      <strong>Diagnózis: az L4981 belső meghibásodása</strong> — az IC cserére szorul.
     </div>
   </div>
 
   <div class="config-item" onclick="toggleConfig(this)">
     <div class="config-header"><span class="config-title" data-i18n="ic4.t">Az IC csere folyamata — SMD forrasztás</span><span class="config-arrow">▸</span></div>
     <div class="config-body" data-i18n="ic4.b">
-      A TQFP-32 tok SMD forrasztása nem triviális — 32 finom láb, 0.8mm lépésközzel.
+      A 20 lábú SO tok SMD forrasztása gyakorlatot kíván — 1,27 mm lábtávolság, de a pad-ek könnyen sérülnek.
       <br><br>
       <strong>Eltávolítás:</strong>
       <br>• Forrasztópáka hőlégfúvóval (hot air rework station) — 320–350°C, közepes légsebesség
@@ -262,12 +264,12 @@ canvas{display:block;width:100%;}
   <div class="timeline">
     <div class="tl-item"><span class="tl-step">01</span><div class="tl-text"><strong>Befogadás és tünetek rögzítése</strong> — kimenet: 0V, bemeneti biztosíték ép, ventilator nem indul</div></div>
     <div class="tl-item"><span class="tl-step">02</span><div class="tl-text"><strong>Leválasztó transzformátor beállítása</strong> — fokozatosan 0→230V, áramkorlátozással. Biztonságos módszer ismeretlen hibánál.</div></div>
-    <div class="tl-item"><span class="tl-step">03</span><div class="tl-text"><strong>Primer oldal ellenőrzése</strong> — EMI szűrő, egyenirányító, bulk kondenzátor (kék, jól látható a fotón). PFC busz: 0V.</div></div>
-    <div class="tl-item"><span class="tl-step">04</span><div class="tl-text"><strong>L4981B diagnosztika</strong> — VCC OK (15V), de GATE kimenet lapos (oszcilloszkóp). In-circuit ellenállások rendellenesek.</div></div>
-    <div class="tl-item"><span class="tl-step">05</span><div class="tl-text"><strong>IC azonosítás és alkatrész rendelés</strong> — L4981B (nem L4981A!), TQFP-32. Eredeti ST Microelectronics forrásból.</div></div>
+    <div class="tl-item"><span class="tl-step">03</span><div class="tl-text"><strong>Primer oldal ellenőrzése</strong> — EMI szűrő, egyenirányító, bulk kondenzátor (kék, jól látható a fotón). A PFC busz nem érte el a névleges ~400 V-ot.</div></div>
+    <div class="tl-item"><span class="tl-step">04</span><div class="tl-text"><strong>L4981 diagnosztika</strong> — VCC OK (15V), de GATE kimenet lapos (oszcilloszkóp). In-circuit ellenállások rendellenesek.</div></div>
+    <div class="tl-item"><span class="tl-step">05</span><div class="tl-text"><strong>IC azonosítás és alkatrész rendelés</strong> — a tokon lévő jelölés alapján (L4981AD), majd alkatrészrendelés eredeti ST-forrásból.</div></div>
     <div class="tl-item"><span class="tl-step">06</span><div class="tl-text"><strong>Hot-air rework</strong> — régi IC eltávolítása, pad tisztítás. Makrofotón jól látható az eredmény (lupéval ellenőrizve).</div></div>
-    <div class="tl-item"><span class="tl-step">07</span><div class="tl-text"><strong>Új L4981B beültetése</strong> — TQFP-32 forrasztás, lábankénti ellenőrzés, IPA tisztítás, vizuális audit.</div></div>
-    <div class="tl-item success"><span class="tl-step">✓</span><div class="tl-text"><strong>Első indítás — sikeres!</strong> PFC busz: 398V DC, kimenet: 28.1V / terhelés alatt stabil. Multiméter: –1.810A áramfelvétel mérése.</div></div>
+    <div class="tl-item"><span class="tl-step">07</span><div class="tl-text"><strong>Új IC beültetése</strong> — SO-20 forrasztás, lábankénti ellenőrzés, IPA tisztítás, vizuális audit.</div></div>
+    <div class="tl-item success"><span class="tl-step">✓</span><div class="tl-text"><strong>Első indítás — sikeres!</strong> PFC busz: 398V DC, kimenet: 28.1V / terhelés alatt stabil.</div></div>
   </div>
 </div>
 
@@ -279,14 +281,14 @@ canvas{display:block;width:100%;}
     megközelítést igényel — a véletlenszerű alkatrészcsere helyett mindig a jelfolyamot kell követni.
     A leválasztó transzformátor itt nem opcionális: 400W-os SMPS-nél az ismeretlen hiba melletti
     közvetlen hálózati csatlakoztatás komoly kockázatot jelent mind az eszköznek, mind a mérőfelszerelésnek.
-    Az L4981B-t azért találtuk meg viszonylag gyorsan, mert a PFC busz feszültsége (0V) egyértelműen
-    a boost fokozatra mutatott — és ott az IC gate jele volt a kulcs.
+    A hibás IC-t azért találtuk meg viszonylag gyorsan, mert a PFC busz feszültsége a boost fokozatra
+    mutatott — és ott a vezérlő gate jele volt a kulcs: VCC megvolt, kapcsolás nem.
     Az SMD rework fontos tanulsága: a pad-ek kímélete és a pontos illesztés fontosabb a sebességnél.
   </div>
 </div>
 
 <div class="page-footer">
-  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span>Bódis Tamás · Budapest</span>
   <span data-i18n="footer.tag">SMPS javítás · L4981B · PFC · XP Power · SMD rework</span>
 </div>
 </div>
@@ -301,7 +303,7 @@ hu:{
 "sec.photos":"Saját fotók",
 "photo1.cap":"XP Power BCC400PS28 — nyomtatott áramköri lap kinyitva · PFC induktivitás (piros toroid), bulk kondenzátor (kék), EMI szűrő · TP.01-223 Issue 3",
 "photo2.cap":"Mérőpad — szabályozható leválasztó transzformátor · UNI-T UT33A+ multiméter · PFC kimeneti ellenőrzés · Ipari labor",
-"photo3.cap":"L4981AD IC makrofotó lupén keresztül · ST Microelectronics · TQFP-32 tok · R10–R12 SMD ellenállások · Forrasztási minőség ellenőrzés",
+"photo3.cap":"L4981AD IC makrofotó lupén keresztül · ST Microelectronics · SO-20 tok · R10–R12 SMD ellenállások · Forrasztási minőség ellenőrzés",
 "sec.psu":"XP Power BCC400PS28 — a tápegységről",
 "sec.topo":"Kapcsolóüzemű tápegység — topológia",
 "sec.ic":"L4981B — a kicserélt IC részletesen",
@@ -309,7 +311,7 @@ hu:{
 "ic1.t":"Mi az a PFC és miért kell?",
 "ic1.b":"A PFC azt oldja meg, hogy a tápegység ne csupán a szinuszos feszültség csúcsainál vegyen fel áramot. Reaktív veszteség, EMC előírások (EN 61000-3-2) és ipari teljesítményszámla szempontjából kritikus. Az aktív PFC boost fokozat ~400V DC buszra emeli az egyenirányított feszültséget, miközben az áramfelvételt szinuszossá alakítja. Az L4981B ehhez vezérli a boost MOSFET-et.",
 "ic2.t":"L4981B belső felépítése és lábkiosztása",
-"ic2.b":"TQFP-32 tok, 32 láb. Főbb blokkok: Sokszorozó (áramreferencia szinuszos alakítása), Hibaerősítő (400V busz szabályozása), PWM komparátor (kapcsolási pillanat), Gate driver (MOSFET vezérlése), Soft start, OVP/OCP védelmek. L4981A (average current mode) vs. L4981B (peak current mode) — utóbbi egyszerűbb külső hálózat, de érzékenyebb áramcsúcsokra.",
+"ic2.b":"SO-20 tok, 20 láb (a lapon lévő példány jelölése L4981AD). Főbb blokkok: Sokszorozó (áramreferencia szinuszos alakítása), Hibaerősítő (400V busz szabályozása), PWM komparátor (kapcsolási pillanat), Gate driver (MOSFET vezérlése), Soft start, OVP/OCP védelmek. Az L4981A és L4981B egyaránt átlagáram-szabályozású; a B frekvenciamodulációt is tud az EMI csökkentésére.",
 "ic3.t":"Hogyan azonosítottuk a hibát?",
 "ic3.b":"1. Vizuális ellenőrzés — semmi látható sérülés. 2. Fokozatos bemeneti feszültségemelés leválasztó transzformátorral. 3. PFC busz: 0V (normálisan ~400V kellene). 4. L4981B VCC OK (15V), de GATE kimenet lapos oszcilloszkóppal. 5. In-circuit ellenállások rendellenesek → belső törés. Diagnózis: L4981B csere.",
 "ic4.t":"Az IC csere folyamata — SMD forrasztás",
@@ -326,7 +328,7 @@ en:{
 "sec.photos":"Own photos",
 "photo1.cap":"XP Power BCC400PS28 — PCB opened · PFC inductor (red toroid), bulk capacitor (blue), EMI filter · TP.01-223 Issue 3",
 "photo2.cap":"Test bench — variable isolation transformer · UNI-T UT33A+ multimeter · PFC output verification · Industrial lab",
-"photo3.cap":"L4981AD IC macro photo through magnifier · ST Microelectronics · TQFP-32 package · R10–R12 SMD resistors · Solder quality inspection",
+"photo3.cap":"L4981AD IC macro photo through magnifier · ST Microelectronics · SO-20 package · R10–R12 SMD resistors · Solder quality inspection",
 "sec.psu":"XP Power BCC400PS28 — about the PSU",
 "sec.topo":"Switch-mode power supply — topology",
 "sec.ic":"L4981B — the replaced IC in detail",
@@ -334,7 +336,7 @@ en:{
 "ic1.t":"What is PFC and why is it needed?",
 "ic1.b":"PFC ensures the PSU draws current continuously rather than only at voltage peaks. Critical for: reactive losses in transformers and cables, EMC regulations (EN 61000-3-2), and industrial power billing with poor cos(φ). The active PFC boost stage raises the rectified mains to ~400V DC while shaping the current draw sinusoidally. The L4981B controls the boost MOSFET to achieve this.",
 "ic2.t":"L4981B internal structure and pinout",
-"ic2.b":"TQFP-32 package, 32 pins. Key blocks: Multiplier (sinusoidal current reference), Error amplifier (400V bus regulation), PWM comparator (switching instant), Gate driver (MOSFET drive), Soft start, OVP/OCP protections. L4981A (average current mode) vs. L4981B (peak current mode) — B requires simpler external network but is more sensitive to current peaks.",
+"ic2.b":"SO-20 package, 20 pins (the part on this board is marked L4981AD). Key blocks: multiplier (sinusoidal current reference), error amplifier (400V bus regulation), PWM comparator, gate driver, soft start, OVP/OCP protections. Both L4981A and L4981B are average current mode controllers; the B version adds frequency modulation to spread the switching spectrum.",
 "ic3.t":"How did we identify the fault?",
 "ic3.b":"1. Visual inspection — no visible damage. 2. Gradual mains voltage ramp via isolation transformer. 3. PFC bus: 0V (should be ~400V). 4. L4981B VCC OK (15V) but GATE output flat on oscilloscope. 5. In-circuit resistances abnormal → internal failure. Diagnosis: L4981B replacement.",
 "ic4.t":"The IC replacement process — SMD soldering",
@@ -351,7 +353,7 @@ de:{
 "sec.photos":"Eigene Fotos",
 "photo1.cap":"XP Power BCC400PS28 — Leiterplatte geöffnet · PFC-Induktivität (roter Ringkern), Pufferkondensator (blau), EMV-Filter · TP.01-223 Issue 3",
 "photo2.cap":"Prüfstand — regelbarer Trenntransformator · UNI-T UT33A+ Multimeter · PFC-Ausgangsprüfung · Industrielabor",
-"photo3.cap":"L4981AD IC Makrofoto durch Lupe · ST Microelectronics · TQFP-32 Gehäuse · R10–R12 SMD-Widerstände · Lötqualitätsprüfung",
+"photo3.cap":"L4981AD IC Makrofoto durch Lupe · ST Microelectronics · SO-20 Gehäuse · R10–R12 SMD-Widerstände · Lötqualitätsprüfung",
 "sec.psu":"XP Power BCC400PS28 — das Netzteil",
 "sec.topo":"Schaltnetzteil — Topologie",
 "sec.ic":"L4981B — der getauschte IC im Detail",
@@ -359,7 +361,7 @@ de:{
 "ic1.t":"Was ist PFC und warum wird es benötigt?",
 "ic1.b":"PFC sorgt dafür, dass das Netzteil kontinuierlich und nicht nur an den Spannungsscheiteln Strom aufnimmt. Wichtig für: Blindleistungsverluste, EMV-Vorschriften (EN 61000-3-2) und Industriestromrechnungen. Die aktive PFC-Boost-Stufe hebt die gleichgerichtete Netzspannung auf ~400V DC und formt den Stromverlauf sinusförmig.",
 "ic2.t":"L4981B Innenaufbau und Pinbelegung",
-"ic2.b":"TQFP-32 Gehäuse, 32 Pins. Hauptblöcke: Multiplizierer, Fehlerverstärker (400V-Bus), PWM-Komparator, Gate-Treiber, Soft-Start, OVP/OCP-Schutz. L4981A (Average-Current-Mode) vs. L4981B (Peak-Current-Mode) — B braucht einfacheres externes Netzwerk.",
+"ic2.b":"SO-20-Gehäuse, 20 Pins (das Bauteil auf dieser Platine ist mit L4981AD markiert). Hauptblöcke: Multiplizierer, Fehlerverstärker (400V-Bus), PWM-Komparator, Gate-Treiber, Soft-Start, OVP/OCP-Schutz. L4981A und L4981B sind beide Average-Current-Mode; die B-Version bietet zusätzlich Frequenzmodulation zur EMV-Reduktion.",
 "ic3.t":"Wie haben wir den Fehler identifiziert?",
 "ic3.b":"1. Sichtprüfung — kein sichtbarer Schaden. 2. Schrittweise Netzspannungserhöhung über Trenntransformator. 3. PFC-Bus: 0V (sollte ~400V sein). 4. L4981B VCC OK (15V), aber GATE-Ausgang flach am Oszilloskop. 5. In-circuit Widerstände anomal → innerer Defekt. Diagnose: L4981B tauschen.",
 "ic4.t":"Der IC-Tauschprozess — SMD-Löten",

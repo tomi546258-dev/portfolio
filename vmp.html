@@ -253,7 +253,7 @@ canvas { display:block; width:100%; border-radius:2px; }
   <!-- header -->
   <div class="status-pill">
     <span class="status-dot"></span>
-    <span data-i18n="status">Preprint — bírálat alatt</span>
+    <span data-i18n="status">Preprint — Zenodo / ResearchGate</span>
   </div>
 
   <h1 class="paper-title" data-i18n="title">
@@ -273,16 +273,14 @@ canvas { display:block; width:100%; border-radius:2px; }
   <div class="section">
     <div class="section-label" data-i18n="sec.abstract">Összefoglalás</div>
     <div class="abstract-box" data-i18n="abstract.text">
-      Bevezetjük a Vektoriális Mátrixszorzatot (VMP), egy háromváltozós hibrid szorzatműveletet,
-      amely egy $M$ mátrix és két vektor geometriai kapcsolatát írja le, és természetes általánosítása
-      a klasszikus keresztszorzatnak torzított koordináta-rendszerekben. Megmutatjuk, hogy a VMP
-      lehetővé teszi egy visszatorzításos integráltétel felállítását: ha a tér és az összes
-      mezőstruktúra ($M$, $\mathbf{a}$, $\mathbf{b}$, $\mathbf{c}$) konzisztensen torzul a pullback-szabály
-      szerint, az integrál értéke invariáns marad — még akkor is, ha az integrandus önmagában nem
-      invariáns a koordinátatranszformációra. A tétel két változatát bizonyítjuk (gyengébb és erősebb),
-      és fizikai alkalmazásokat mutatunk be: Gauss-törvény ellipszoid felett, Lagrange-sűrűség
-      invarianciája, energia-integrál megmaradása. Az invariancia itt nem feltétel, hanem
-      <em>aktívan teremtett struktúra</em>.
+      A Vektoriális Mátrixszorzat (VMP) egy $M$ mátrixszal súlyozott keresztszorzat:
+      $\mathbf{a}\otimes_M\mathbf{b} = M^{\!\top}(\mathbf{a}\times\mathbf{b})$, azaz a keresztszorzat
+      és egy lineáris leképezés kompozíciója. $M = I$ esetén visszakapjuk a keresztszorzatot.
+      A jegyzet azt mutatja meg, hogyan írhatók fel egységes jelöléssel torzított (nem ortonormált)
+      koordinátákban a térfogat- és fluxusintegrálok, és hogy a VMP pullback-szabálya
+      ($M_T = T^{-1}MT^{-\top}$) a kontinuummechanikából ismert Piola–Nanson-transzformáció
+      mintáját követi. A mögöttes tartalom a helyettesítéses integrálás és a kofaktor-azonosságok
+      átírása — <em>közös nézőpont, nem új tétel</em>.
     </div>
   </div>
 
@@ -295,30 +293,34 @@ canvas { display:block; width:100%; border-radius:2px; }
         <div class="result-tag" data-i18n="r1.tag">Definíció</div>
         <div class="result-title" data-i18n="r1.title">A VMP-szorzat</div>
         <div class="result-body" data-i18n="r1.body">
-          A VMP egy torzított paralelepipedon orientált térfogatát számítja: az $M$ mátrix
-          oszlopait keresztszorozzuk $\mathbf{a}$-val, majd $\mathbf{b}$ komponenseivel
-          súlyozzuk. Ha $M = I$, visszakapjuk a klasszikus keresztszorzatot.
+          A VMP a keresztszorzat $M$-mel súlyozott változata:
+          $\mathbf{a}\otimes_M\mathbf{b} = M^{\!\top}(\mathbf{a}\times\mathbf{b})$.
+          A $(\mathbf{a}\otimes_M\mathbf{b})\cdot\mathbf{c} = \det[\mathbf{a},\mathbf{b},M\mathbf{c}]$
+          hármas szorzat egy torzított paralelepipedon előjeles térfogata.
+          Ha $M = I$, visszakapjuk a klasszikus keresztszorzatot.
         </div>
       </div>
 
       <div class="result-card">
-        <div class="result-tag" data-i18n="r2.tag">Tétel 1 — Gyengébb változat</div>
-        <div class="result-title" data-i18n="r2.title">Visszatorzításos integráltétel</div>
+        <div class="result-tag" data-i18n="r2.tag">Következmény 1</div>
+        <div class="result-title" data-i18n="r2.title">Helyettesítéses integrálás a VMP jelölésével</div>
         <div class="result-body" data-i18n="r2.body">
-          Ha az integrandus invariáns a $T$ transzformációra, az integrál értéke
-          a Jacobi-determináns $|\det T|$ mértéktényezővel skálázódik.
-          Homogén fokszámú és dimenziótlan kvociens típusú függvényekre érvényes.
+          Ez a klasszikus helyettesítéses integrálás: $x = T\tilde{x}$ mellett
+          $\iiint_\Omega f\,d\mathbf{x} = \iiint_{\tilde\Omega} f(T\tilde{\mathbf{x}})\,|\det T|\,d\tilde{\mathbf{x}}$.
+          Nulladfokú homogén (skálainvariáns) $f$ és $T = \lambda I$ esetén $f(T\tilde{x}) = f(\tilde{x})$,
+          így az integrál pusztán $|\det T|$-vel skálázódik. Nem új tétel — a VMP itt csak jelölés.
         </div>
       </div>
 
       <div class="result-card">
-        <div class="result-tag" data-i18n="r3.tag">Tétel 2 — Erősebb változat</div>
-        <div class="result-title" data-i18n="r3.title">Mezőtorzítással bővített tétel</div>
+        <div class="result-tag" data-i18n="r3.tag">Következmény 2</div>
+        <div class="result-title" data-i18n="r3.title">Mezőpullback — mire kell figyelni</div>
         <div class="result-body" data-i18n="r3.body">
-          Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály
-          szerint torzítunk ($M_T$, $\mathbf{a}_T$, $\mathbf{b}_T$, $\mathbf{c}_T$),
-          az integrál mégis invariáns marad. Ez kezeli az $f(x,y,z)=xyz$ típusú,
-          nem skálainvariáns eseteket is.
+          Ha a mezőket a $T^{-1}$-es szabállyal húzzuk vissza, a VMP-kifejezés <em>nem</em> skalárként
+          transzformálódik: $T=\lambda I$ mellett a három vektor és az $M$ együtt $\lambda^{-5}$-t ad.
+          Az integrál akkor és csak akkor marad változatlan, ha a súlyokat úgy választjuk, hogy az
+          integrandus 1-súlyú skalársűrűségként transzformálódjon. Ez tehát nem invariancia-tétel,
+          hanem könyvelési szabály — érdemes kiszámolni, mielőtt bárki tételnek nevezné.
         </div>
       </div>
 
@@ -326,9 +328,9 @@ canvas { display:block; width:100%; border-radius:2px; }
         <div class="result-tag" data-i18n="r4.tag">Fizikai alkalmazások</div>
         <div class="result-title" data-i18n="r4.title">Gauss, Lagrange, energia</div>
         <div class="result-body" data-i18n="r4.body">
-          A VMP-tétel megőrzi a fluxust torzított térben (Gauss-törvény ellipszoid felett),
-          konzisztens akciót ad Lagrange-sűrűségekben, és helyes energiát számol
-          olyan mezőkre is, amelyekre a klasszikus változócsere-tétel nem működik.
+          Torzított térben a fluxusintegrál (pl. Gauss-törvény ellipszoid felett) és a
+          térfogatintegrálok egységes jelöléssel írhatók fel. A klasszikus változócsere-tétel
+          persze ugyanezt adja — a VMP itt nem többletet, hanem áttekinthetőbb könyvelést ad.
         </div>
       </div>
 
@@ -342,11 +344,9 @@ canvas { display:block; width:100%; border-radius:2px; }
     <div class="eq-label" data-i18n="eq1.label">A VMP definíciója</div>
     <div class="eq-block">
       $$[\mathbf{a} \otimes_M \mathbf{b}]_r
-        := \sum_{i,l,s} \varepsilon_{ils}\, a_i\, b_l\, M_{sr},
-      \qquad \mathbf{a} \otimes_M \mathbf{b}
-        = \bigl[\mathbf{a}\times\mathbf{m}_1,\;
-                \mathbf{a}\times\mathbf{m}_2,\;
-                \mathbf{a}\times\mathbf{m}_3\bigr]\cdot\mathbf{b}$$
+        := \sum_{i,l,s} \varepsilon_{ils}\, a_i\, b_l\, M_{sr}
+      \qquad\Longleftrightarrow\qquad
+      \mathbf{a} \otimes_M \mathbf{b} = M^{\!\top}\!\left(\mathbf{a}\times\mathbf{b}\right)$$
     </div>
 
     <div class="eq-label" data-i18n="eq2.label">Visszaállás keresztszorzatra ($M=I$)</div>
@@ -354,29 +354,15 @@ canvas { display:block; width:100%; border-radius:2px; }
       $$\mathbf{a} \otimes_I \mathbf{b} = \mathbf{a} \times \mathbf{b}$$
     </div>
 
-    <div class="eq-label" data-i18n="eq3.label">Erősebb tétel — pullback-transzformációk</div>
+    <div class="eq-label" data-i18n="eq3.label">Pullback-szabály (mezőtorzítás)</div>
     <div class="eq-block">
-      $$\iiint_\Omega f(\mathbf{x})\,d\mathbf{x}
-        = \iiint_{\tilde\Omega}
-          \bigl(\mathbf{a}_T \otimes_{M_T} \mathbf{b}_T\bigr)\cdot\mathbf{c}_T
-          \cdot|\det T|\,d\tilde{\mathbf{x}}$$
       $$M_T(\tilde{\mathbf{x}}) = T^{-1}M(T\tilde{\mathbf{x}})T^{-\top},\quad
         \mathbf{a}_T = T^{-1}\mathbf{a}(T\tilde{\mathbf{x}}),\quad
         \mathbf{b}_T = T^{-1}\mathbf{b}(T\tilde{\mathbf{x}}),\quad
         \mathbf{c}_T = T^{-1}\mathbf{c}(T\tilde{\mathbf{x}})$$
-    </div>
-
-    <div class="eq-label" data-i18n="eq4.label">Aktív vs. passzív invariancia</div>
-    <div class="eq-block" style="display:grid;grid-template-columns:1fr auto 1fr;gap:.6rem 1.2rem;align-items:center">
-      <div style="text-align:center">
-        $$f(T\tilde{\mathbf{x}}) = f(\tilde{\mathbf{x}})$$
-        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--accent2);margin-top:.2rem;letter-spacing:.06em" data-i18n="eq4.passive">passzív — előfeltétel</div>
-      </div>
-      <div style="font-family:'DM Mono',monospace;color:var(--text-dim);font-size:.9rem;text-align:center">vs.</div>
-      <div style="text-align:center">
-        $$f_T(\tilde{\mathbf{x}}) = |\det T|^{-1}\, f(\mathbf{x})$$
-        <div style="font-family:'DM Mono',monospace;font-size:.62rem;color:var(--purple);margin-top:.2rem;letter-spacing:.06em" data-i18n="eq4.active">aktív — mezőpullback eredménye</div>
-      </div>
+      $$\text{ellenőrizd a súlyokat: } T=\lambda I \Rightarrow
+        (\mathbf{a}_T\otimes_{M_T}\mathbf{b}_T)\cdot\mathbf{c}_T
+        = \lambda^{-5}\,(\mathbf{a}\otimes_{M}\mathbf{b})\cdot\mathbf{c}$$
     </div>
   </div>
 
@@ -461,87 +447,45 @@ canvas { display:block; width:100%; border-radius:2px; }
     </div>
   </div>
 
-  <!-- interactive: invariance demo -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.viz2">Interaktív — integrál-invariancia demonstráció</div>
-    <div class="viz-wrap">
-      <div class="viz-title" data-i18n="viz2.subtitle">$f(x,y,z)=xyz$ integrál torzítás előtt és után — $T=\lambda I$, $\lambda$ változtatható</div>
-      <canvas id="invariance-canvas" height="220"></canvas>
-      <div class="viz-controls">
-        <label class="ctrl-label">
-          $\lambda$ (torzítás) <input type="range" id="lambda-sl" min="30" max="300" value="100">
-          <span class="ctrl-val" id="lambda-val">1.00</span>
-        </label>
-      </div>
-    </div>
-  </div>
-
   <!-- theorem boxes -->
   <div class="section">
-    <div class="section-label" data-i18n="sec.theorems">Tételek összefoglalása</div>
+    <div class="section-label" data-i18n="sec.theorems">Mit ad a VMP és mit nem</div>
 
     <div class="theorem-box" style="margin-bottom:.8rem">
-      <div class="theorem-label" data-i18n="thm1.label">Gyengébb tétel (4. fejezet)</div>
+      <div class="theorem-label" data-i18n="thm1.label">Amit ad</div>
       <div class="theorem-body" data-i18n="thm1.body">
-        Ha $f(T\tilde{\mathbf{x}}) = f(\tilde{\mathbf{x}})$ (skálainvariáns), akkor:
-        $\iiint_\Omega f\,d\mathbf{x} = \iiint_{\tilde\Omega} f\cdot|\det T|\,d\tilde{\mathbf{x}}$.
-        Teljesül: homogén fokszámú, dimenziótlan kvociens típusú függvényekre.
+        Egységes jelölés torzított koordinátákban: a hármas szorzat
+        $(\mathbf{a}\otimes_M\mathbf{b})\cdot\mathbf{c} = \det[\mathbf{a},\mathbf{b},M\mathbf{c}]$
+        egy lépésben adja a torzított paralelepipedon előjeles térfogatát, és a
+        $M_T = T^{-1}MT^{-\top}$ pullback-szabály ugyanazt a kettős (kovariáns–kontravariáns)
+        mintát követi, mint a Piola–Nanson-formula. A tenzoriális változat az $M$-súlyozott
+        kofaktorra, illetve a Piola–Nanson-transzformációra vezet vissza.
       </div>
     </div>
 
     <div class="theorem-box">
-      <div class="theorem-label" data-i18n="thm2.label">Erősebb tétel (6. fejezet)</div>
+      <div class="theorem-label" data-i18n="thm2.label">Amit nem ad</div>
       <div class="theorem-body" data-i18n="thm2.body">
-        Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint
-        torzítunk — $M_T = T^{-1}M(T\tilde{\mathbf{x}})T^{-\top}$,
-        $\mathbf{a}_T = T^{-1}\mathbf{a}(T\tilde{\mathbf{x}})$ stb. —, akkor az integrál
-        értéke invariáns marad. Az invariancia itt nem feltétel, hanem a konzisztens
-        mezőtorzítás következménye.
+        Új integráltételt nem ad: minden itt szereplő állítás a helyettesítéses integrálás és a
+        kofaktor-azonosságok átírása. A mezőpullback önmagában nem tesz invariánssá semmit —
+        $T=\lambda I$ mellett a $T^{-1}$-es szabállyal képzett VMP-kifejezés $\lambda^{-5}$-nel
+        skálázódik, tehát a súlyokat mindig ki kell számolni. A VMP itt közös nézőpont, nem
+        új eszköz.
       </div>
     </div>
-  </div>
-
-  <!-- invariance table -->
-  <div class="section">
-    <div class="section-label" data-i18n="sec.inv">Passzív vs. aktív invariancia</div>
-    <table class="inv-table">
-      <thead>
-        <tr>
-          <th data-i18n="inv.th.type">Típus</th>
-          <th data-i18n="inv.th.cond">Feltétel</th>
-          <th data-i18n="inv.th.mech">Mechanizmus</th>
-          <th data-i18n="inv.th.ex">Példa</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td style="color:var(--accent2)" data-i18n="inv.passive.type">Passzív</td>
-          <td data-i18n="inv.passive.cond">$f(T\tilde{\mathbf{x}})=f(\tilde{\mathbf{x}})$ teljesül előre</td>
-          <td data-i18n="inv.passive.mech">Jacobi-determináns kompenzálja a mértéket</td>
-          <td data-i18n="inv.passive.ex">$f=(x^2+y^2)/z^2$</td>
-        </tr>
-        <tr>
-          <td style="color:var(--purple)" data-i18n="inv.active.type">Aktív</td>
-          <td data-i18n="inv.active.cond">$f$ nem invariáns, de mezőpullback végrehajtva</td>
-          <td data-i18n="inv.active.mech">$M_T$, $\mathbf{a}_T$, $\mathbf{b}_T$, $\mathbf{c}_T$ konzisztens torzítása</td>
-          <td data-i18n="inv.active.ex">$f=xyz$, nem diag. $M$</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 
   <!-- BibTeX -->
   <div class="section">
     <div class="section-label" data-i18n="sec.bib">Hivatkozás / BibTeX</div>
     <div style="position:relative">
-      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@article</span>{bodis2025vmp,
+      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@misc</span>{bodis2025vmp,
   <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
   <span class="bib-field">title</span>   = {<span class="bib-val">Vektoriális Mátrixszorzat (VMP):
             torzított terek és megmaradó törvények</span>},
   <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
-  <span class="bib-field">note</span>    = {<span class="bib-val">Preprint, bírálat alatt</span>},
-  <span class="bib-field">institution</span> = {<span class="bib-val">Óbudai Egyetem, Kandó Kálmán
-               Villamosmérnöki Kar</span>},
+  <span class="bib-field">note</span>    = {<span class="bib-val">Preprint (Zenodo / ResearchGate)</span>},
+  <span class="bib-field">howpublished</span> = {<span class="bib-val">Zenodo</span>},
   <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
 }</pre>
       <button class="copy-btn" id="copy-btn" onclick="copyBib()">Copy</button>
@@ -549,7 +493,7 @@ canvas { display:block; width:100%; border-radius:2px; }
   </div>
 
   <div class="page-footer">
-    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>Bódis Tamás · Budapest</span>
     <span>VMP — Torzított terek &amp; megmaradó törvények</span>
   </div>
 
@@ -561,33 +505,33 @@ canvas { display:block; width:100%; border-radius:2px; }
 // ════════════════════════════════════════
 const T = {
   hu: {
-    "status": "Preprint — bírálat alatt",
+    "status": "Preprint — Zenodo / ResearchGate",
     "title": "Vektoriális Mátrixszorzat (VMP) —<br><em>Torzított terek</em> &amp; megmaradó törvények",
     "sec.abstract": "Összefoglalás",
-    "abstract.text": "Bevezetjük a Vektoriális Mátrixszorzatot (VMP), egy háromváltozós hibrid szorzatműveletet, amely egy $M$ mátrix és két vektor geometriai kapcsolatát írja le, és természetes általánosítása a klasszikus keresztszorzatnak torzított koordináta-rendszerekben. Megmutatjuk, hogy a VMP lehetővé teszi egy visszatorzításos integrállétel felállítását: ha a tér és az összes mezőstruktúra konzisztensen torzul a pullback-szabály szerint, az integrál értéke invariáns marad — még akkor is, ha az integrandus önmagában nem invariáns. Az invariancia itt nem feltétel, hanem <em>aktívan teremtett struktúra</em>.",
+    "abstract.text": "A Vektoriális Mátrixszorzat (VMP) egy $M$ mátrixszal súlyozott keresztszorzat: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$, azaz a keresztszorzat és egy lineáris leképezés kompozíciója. $M=I$ esetén a klasszikus keresztszorzat. A jegyzet azt mutatja meg, hogyan írhatók fel egységes jelöléssel torzított koordinátákban a térfogat- és fluxusintegrálok, és hogy a pullback-szabály ($M_T = T^{-1}MT^{-\\top}$) a Piola–Nanson-transzformáció mintáját követi. A mögöttes tartalom a helyettesítéses integrálás átírása — közös nézőpont, nem új tétel.",
     "sec.results": "Főbb eredmények",
     "r1.tag": "Definíció", "r1.title": "A VMP-szorzat",
-    "r1.body": "A VMP egy torzított paralelepipedon orientált térfogatát számítja: az $M$ mátrix oszlopait keresztszorozzuk $\\mathbf{a}$-val, majd $\\mathbf{b}$ komponenseivel súlyozzuk. Ha $M = I$, visszakapjuk a klasszikus keresztszorzatot.",
-    "r2.tag": "Tétel 1 — Gyengébb változat", "r2.title": "Visszatorzításos integrállétel",
-    "r2.body": "Ha az integrandus invariáns a $T$ transzformációra, az integrál értéke a Jacobi-determináns $|\\det T|$ mértéktényezővel skálázódik. Homogén fokszámú és dimenziótlan kvociens típusú függvényekre érvényes.",
-    "r3.tag": "Tétel 2 — Erősebb változat", "r3.title": "Mezőtorzítással bővített tétel",
-    "r3.body": "Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint torzítunk ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), az integrál mégis invariáns marad.",
+    "r1.body": "A VMP a keresztszorzat $M$-mel súlyozott változata: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$. A hármas szorzat $(\\mathbf{a}\\otimes_M\\mathbf{b})\\cdot\\mathbf{c} = \\det[\\mathbf{a},\\mathbf{b},M\\mathbf{c}]$ egy torzított paralelepipedon előjeles térfogata. $M=I$ esetén a klasszikus keresztszorzat.",
+    "r2.tag": "Következmény 1", "r2.title": "Helyettesítéses integrálás a VMP jelölésével",
+    "r2.body": "A klasszikus helyettesítéses integrálás: $x=T\\tilde{x}$ mellett $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f(T\\tilde{\\mathbf{x}})|\\det T|\\,d\\tilde{\\mathbf{x}}$. Nulladfokú homogén $f$ és $T=\\lambda I$ esetén az integrál $|\\det T|$-vel skálázódik. Nem új tétel — a VMP itt jelölés.",
+    "r3.tag": "Következmény 2", "r3.title": "Mezőpullback — mire kell figyelni",
+    "r3.body": "A $T^{-1}$-es visszahúzással a VMP-kifejezés nem skalárként transzformálódik: $T=\\lambda I$ mellett $\\lambda^{-5}$-t ad. Az integrál csak akkor marad változatlan, ha a súlyokat úgy választjuk, hogy az integrandus 1-súlyú skalársűrűség legyen. Ez könyvelési szabály, nem invariancia-tétel.",
     "r4.tag": "Fizikai alkalmazások", "r4.title": "Gauss, Lagrange, energia",
-    "r4.body": "A VMP-tétel megőrzi a fluxust torzított térben, konzisztens akciót ad Lagrange-sűrűségekben, és helyes energiát számol olyan mezőkre is, amelyekre a klasszikus változócsere-tétel nem működik.",
+    "r4.body": "Torzított térben a fluxus- és térfogatintegrálok egységes jelöléssel írhatók fel (pl. Gauss-törvény ellipszoid felett). A klasszikus változócsere-tétel ugyanezt adja — a VMP áttekinthetőbb könyvelés, nem többlet.",
     "sec.eqs": "Alapegyenletek",
     "eq1.label": "A VMP definíciója",
     "eq2.label": "Visszaállás keresztszorzatra ($M=I$)",
-    "eq3.label": "Erősebb tétel — pullback-transzformációk",
+    "eq3.label": "Pullback-szabály (mezőtorzítás)",
     "eq4.label": "Aktív vs. passzív invariancia",
     "sec.viz1": "Interaktív — torzított paralelepipedon",
     "viz1.subtitle": "A VMP geometriai értelme: $M$ oszlopai torzítják a bázist — húzd a csúszkákat",
     "sec.viz2": "Interaktív — integrál-invariancia demonstráció",
     "viz2.subtitle": "$f(x,y,z)=xyz$ integrál torzítás előtt és után — $T=\\lambda I$, $\\lambda$ változtatható",
-    "sec.theorems": "Tételek összefoglalása",
-    "thm1.label": "Gyengébb tétel (4. fejezet)",
-    "thm1.body": "Ha $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (skálainvariáns), akkor: $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$. Teljesül: homogén fokszámú, dimenziótlan kvociens típusú függvényekre.",
-    "thm2.label": "Erősebb tétel (6. fejezet)",
-    "thm2.body": "Ha $f$ nem invariáns $T$-re, de minden mezőstruktúrát a pullback-szabály szerint torzítunk, az integrál értéke invariáns marad. Az invariancia itt nem feltétel, hanem a konzisztens mezőtorzítás következménye.",
+    "sec.theorems": "Mit ad a VMP és mit nem",
+    "thm1.label": "Amit ad",
+    "thm1.body": "Egységes jelölés torzított koordinátákban: $(\\mathbf{a}\\otimes_M\\mathbf{b})\\cdot\\mathbf{c} = \\det[\\mathbf{a},\\mathbf{b},M\\mathbf{c}]$, és a $M_T = T^{-1}MT^{-\\top}$ pullback-szabály a Piola–Nanson-mintát követi. A tenzoriális változat az $M$-súlyozott kofaktorra vezet vissza.",
+    "thm2.label": "Amit nem ad",
+    "thm2.body": "Új integráltételt nem ad: minden állítás a helyettesítéses integrálás és a kofaktor-azonosságok átírása. A mezőpullback önmagában nem tesz invariánssá semmit — a súlyokat ki kell számolni.",
     "sec.inv": "Passzív vs. aktív invariancia",
     "inv.th.type": "Típus", "inv.th.cond": "Feltétel", "inv.th.mech": "Mechanizmus", "inv.th.ex": "Példa",
     "inv.passive.type": "Passzív", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ teljesül előre",
@@ -607,33 +551,33 @@ const T = {
     "eq4.active": "aktív — mezőpullback eredménye",
   },
   en: {
-    "status": "Preprint — under review",
+    "status": "Preprint — Zenodo / ResearchGate",
     "title": "Vectorial Matrix Product (VMP) —<br><em>Distorted fields</em> &amp; conservation laws",
     "sec.abstract": "Abstract",
-    "abstract.text": "We introduce the Vectorial Matrix Product (VMP), a three-variable hybrid multiplication that describes the geometric relationship between a matrix $M$ and two vectors, forming a natural generalisation of the cross product to distorted coordinate systems. We show that the VMP enables a retraction integral theorem: if the space and all field structures transform consistently via the pullback rule, the integral remains invariant — even when the integrand is not itself invariant under the coordinate transformation. Invariance here is not a precondition but an <em>actively constructed structure</em>.",
+    "abstract.text": "The Vectorial Matrix Product (VMP) is a cross product weighted by a matrix $M$: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$ — the composition of the cross product with a linear map. For $M=I$ it reduces to the classical cross product. The note shows how volume and flux integrals in distorted coordinates can be written in a single notation, and that the pullback rule ($M_T = T^{-1}MT^{-\\top}$) follows the pattern of the Piola–Nanson transformation. The underlying content is a restatement of the change-of-variables formula — a common viewpoint, not a new theorem.",
     "sec.results": "Key results",
     "r1.tag": "Definition", "r1.title": "The VMP operation",
-    "r1.body": "The VMP computes the oriented volume of a distorted parallelepiped: the columns of $M$ are crossed with $\\mathbf{a}$, then weighted by the components of $\\mathbf{b}$. Setting $M=I$ recovers the classical cross product.",
-    "r2.tag": "Theorem 1 — Weaker form", "r2.title": "Retraction integral theorem",
-    "r2.body": "When the integrand is invariant under $T$, the integral scales by the Jacobian $|\\det T|$. Applies to homogeneous-degree and dimensionless-quotient type functions.",
-    "r3.tag": "Theorem 2 — Stronger form", "r3.title": "Theorem with field distortion",
-    "r3.body": "When $f$ is not invariant under $T$, but all field structures are distorted via the pullback rule ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), the integral remains invariant.",
+    "r1.body": "The VMP is the $M$-weighted cross product: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$. The triple product $(\\mathbf{a}\\otimes_M\\mathbf{b})\\cdot\\mathbf{c} = \\det[\\mathbf{a},\\mathbf{b},M\\mathbf{c}]$ is the signed volume of a distorted parallelepiped. For $M=I$: the classical cross product.",
+    "r2.tag": "Corollary 1", "r2.title": "Change of variables in VMP notation",
+    "r2.body": "This is the classical change-of-variables formula: with $x=T\\tilde{x}$, $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f(T\\tilde{\\mathbf{x}})|\\det T|\\,d\\tilde{\\mathbf{x}}$. For a degree-zero homogeneous $f$ and $T=\\lambda I$ the integral simply scales by $|\\det T|$. Not a new theorem — the VMP is notation here.",
+    "r3.tag": "Corollary 2", "r3.title": "Field pullback — what to watch for",
+    "r3.body": "Under the $T^{-1}$ pullback the VMP expression does not transform as a scalar: for $T=\\lambda I$ it picks up $\\lambda^{-5}$. The integral is unchanged only if the weights are chosen so that the integrand is a scalar density of weight one. This is bookkeeping, not an invariance theorem.",
     "r4.tag": "Physical applications", "r4.title": "Gauss, Lagrange, energy",
-    "r4.body": "The VMP theorem preserves flux in distorted space (Gauss's law over an ellipsoid), gives a consistent action in Lagrangian field theory, and yields correct energies for fields where the classical substitution theorem fails.",
+    "r4.body": "Flux and volume integrals in distorted space can be written in one notation (e.g. Gauss law over an ellipsoid). The classical change-of-variables formula gives the same result — the VMP is clearer bookkeeping, not extra content.",
     "sec.eqs": "Core equations",
     "eq1.label": "Definition of the VMP",
     "eq2.label": "Reduction to cross product ($M=I$)",
-    "eq3.label": "Stronger theorem — pullback transformations",
+    "eq3.label": "Pullback rule (field distortion)",
     "eq4.label": "Active vs. passive invariance",
     "sec.viz1": "Interactive — distorted parallelepiped",
     "viz1.subtitle": "Geometric meaning of VMP: columns of $M$ distort the basis — drag the sliders",
     "sec.viz2": "Interactive — integral invariance demonstration",
     "viz2.subtitle": "Integral of $f(x,y,z)=xyz$ before and after distortion — $T=\\lambda I$, $\\lambda$ adjustable",
-    "sec.theorems": "Theorem summary",
-    "thm1.label": "Weaker theorem (§4)",
-    "thm1.body": "If $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (scale-invariant), then $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$. Holds for homogeneous-degree and dimensionless-quotient functions.",
-    "thm2.label": "Stronger theorem (§6)",
-    "thm2.body": "If $f$ is not invariant under $T$, but all field structures are consistently distorted via the pullback rule, the integral remains invariant. Invariance is a consequence of consistent field distortion, not a precondition.",
+    "sec.theorems": "What the VMP gives and what it does not",
+    "thm1.label": "What it gives",
+    "thm1.body": "A single notation in distorted coordinates: $(\\mathbf{a}\\otimes_M\\mathbf{b})\\cdot\\mathbf{c} = \\det[\\mathbf{a},\\mathbf{b},M\\mathbf{c}]$, with a pullback rule $M_T = T^{-1}MT^{-\\top}$ that follows the Piola–Nanson pattern. The tensorial version reduces to the $M$-weighted cofactor.",
+    "thm2.label": "What it does not give",
+    "thm2.body": "No new integral theorem: every statement here restates the change-of-variables formula and cofactor identities. Field pullback by itself makes nothing invariant — the weights have to be computed.",
     "sec.inv": "Passive vs. active invariance",
     "inv.th.type": "Type", "inv.th.cond": "Condition", "inv.th.mech": "Mechanism", "inv.th.ex": "Example",
     "inv.passive.type": "Passive", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ holds a priori",
@@ -651,33 +595,35 @@ const T = {
     "piola.note.body": "The $\\sqrt{|g|}$ metric volume form — discussed in the Covariant Conservation paper — produces exactly the $|\\det T| = \\sqrt{|\\det g|}$ factor. The Piola–Nanson formula, the VMP pullback rule, and the covariant conservation identity thus share a common geometric root: the consistent tracking of spatial distortion across field structures.",
     "eq4.passive": "passive — precondition",
     "eq4.active": "active — result of field pullback",
+  },
+  de: {
     "status": "Preprint — unter Begutachtung",
     "title": "Vektorielles Matrixprodukt (VMP) —<br><em>Verzerrte Felder</em> &amp; Erhaltungssätze",
     "sec.abstract": "Zusammenfassung",
-    "abstract.text": "Wir führen das Vektorielle Matrixprodukt (VMP) ein, eine dreistellige hybride Multiplikation, die die geometrische Beziehung zwischen einer Matrix $M$ und zwei Vektoren beschreibt und das Kreuzprodukt auf verzerrte Koordinatensysteme verallgemeinert. Wir zeigen, dass das VMP einen Rücktorsions-Integralsatz ermöglicht: Wenn der Raum und alle Feldstrukturen konsistent gemäß der Pullback-Regel transformieren, bleibt das Integral invariant — auch wenn der Integrand selbst nicht invariant ist. Invarianz ist hier keine Voraussetzung, sondern eine <em>aktiv konstruierte Struktur</em>.",
+    "abstract.text": "Das Vektorielle Matrixprodukt (VMP) ist ein mit einer Matrix $M$ gewichtetes Kreuzprodukt: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$ — die Verkettung von Kreuzprodukt und linearer Abbildung. Für $M=I$ ergibt sich das klassische Kreuzprodukt. Die Notiz zeigt, wie sich Volumen- und Flussintegrale in verzerrten Koordinaten einheitlich schreiben lassen und dass die Pullback-Regel ($M_T = T^{-1}MT^{-\\top}$) dem Muster der Piola–Nanson-Transformation folgt. Inhaltlich ist es eine Umschreibung der Substitutionsregel — eine gemeinsame Sichtweise, kein neuer Satz.",
     "sec.results": "Hauptergebnisse",
     "r1.tag": "Definition", "r1.title": "Das VMP-Produkt",
-    "r1.body": "Das VMP berechnet das orientierte Volumen eines verzerrten Parallelepipeds: Die Spalten von $M$ werden mit $\\mathbf{a}$ gekreuzt, dann mit den Komponenten von $\\mathbf{b}$ gewichtet. Für $M=I$ erhält man das klassische Kreuzprodukt.",
-    "r2.tag": "Satz 1 — Schwächere Form", "r2.title": "Rücktorsions-Integralsatz",
-    "r2.body": "Wenn der Integrand unter $T$ invariant ist, skaliert das Integral mit der Jacobi-Determinante $|\\det T|$. Gilt für homogen-gradige und dimensionslose Quotienten-Funktionen.",
-    "r3.tag": "Satz 2 — Stärkere Form", "r3.title": "Satz mit Feldverzerrung",
-    "r3.body": "Wenn $f$ nicht unter $T$ invariant ist, aber alle Feldstrukturen gemäß der Pullback-Regel verzerrt werden ($M_T$, $\\mathbf{a}_T$, $\\mathbf{b}_T$, $\\mathbf{c}_T$), bleibt das Integral dennoch invariant.",
+    "r1.body": "Das VMP ist das $M$-gewichtete Kreuzprodukt: $\\mathbf{a}\\otimes_M\\mathbf{b} = M^{\\!\\top}(\\mathbf{a}\\times\\mathbf{b})$. Das Spatprodukt $(\\mathbf{a}\\otimes_M\\mathbf{b})\\cdot\\mathbf{c} = \\det[\\mathbf{a},\\mathbf{b},M\\mathbf{c}]$ ist das vorzeichenbehaftete Volumen eines verzerrten Spats.",
+    "r2.tag": "Folgerung 1", "r2.title": "Substitutionsregel in VMP-Notation",
+    "r2.body": "Das ist die klassische Substitutionsregel: mit $x=T\\tilde{x}$ gilt $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f(T\\tilde{\\mathbf{x}})|\\det T|\\,d\\tilde{\\mathbf{x}}$. Kein neuer Satz — das VMP ist hier Notation.",
+    "r3.tag": "Folgerung 2", "r3.title": "Feld-Pullback — worauf zu achten ist",
+    "r3.body": "Unter dem $T^{-1}$-Pullback transformiert sich der VMP-Ausdruck nicht wie ein Skalar: für $T=\\lambda I$ erhält man $\\lambda^{-5}$. Das Integral bleibt nur dann unverändert, wenn der Integrand als Skalardichte vom Gewicht eins transformiert. Das ist Buchführung, kein Invarianzsatz.",
     "r4.tag": "Physikalische Anwendungen", "r4.title": "Gauß, Lagrange, Energie",
-    "r4.body": "Der VMP-Satz erhält den Fluss im verzerrten Raum, liefert eine konsistente Wirkung in Lagrangeschen Feldtheorien und korrekte Energien für Felder, bei denen der klassische Substitutionssatz versagt.",
+    "r4.body": "Fluss- und Volumenintegrale im verzerrten Raum lassen sich einheitlich schreiben. Die klassische Substitutionsregel liefert dasselbe — das VMP ist übersichtlichere Buchführung, kein Mehrwert.",
     "sec.eqs": "Grundgleichungen",
     "eq1.label": "Definition des VMP",
     "eq2.label": "Rückführung auf Kreuzprodukt ($M=I$)",
-    "eq3.label": "Stärkerer Satz — Pullback-Transformationen",
+    "eq3.label": "Pullback-Regel (Feldverzerrung)",
     "eq4.label": "Aktive vs. passive Invarianz",
     "sec.viz1": "Interaktiv — verzerrtes Parallelepiped",
     "viz1.subtitle": "Geometrische Bedeutung des VMP: Spalten von $M$ verzerren die Basis — Schieberegler ziehen",
     "sec.viz2": "Interaktiv — Integral-Invarianz-Demonstration",
     "viz2.subtitle": "Integral von $f(x,y,z)=xyz$ vor und nach Verzerrung — $T=\\lambda I$, $\\lambda$ einstellbar",
-    "sec.theorems": "Satz-Zusammenfassung",
-    "thm1.label": "Schwächerer Satz (§4)",
-    "thm1.body": "Wenn $f(T\\tilde{\\mathbf{x}}) = f(\\tilde{\\mathbf{x}})$ (skaleninvariant), dann $\\iiint_\\Omega f\\,d\\mathbf{x} = \\iiint_{\\tilde\\Omega} f\\cdot|\\det T|\\,d\\tilde{\\mathbf{x}}$.",
-    "thm2.label": "Stärkerer Satz (§6)",
-    "thm2.body": "Wenn $f$ nicht unter $T$ invariant ist, aber alle Feldstrukturen konsistent nach der Pullback-Regel verzerrt werden, bleibt das Integral invariant. Invarianz ist eine Konsequenz, keine Voraussetzung.",
+    "sec.theorems": "Was das VMP leistet und was nicht",
+    "thm1.label": "Was es leistet",
+    "thm1.body": "Einheitliche Notation in verzerrten Koordinaten, mit einer Pullback-Regel $M_T = T^{-1}MT^{-\\top}$ nach dem Piola–Nanson-Muster. Die tensorielle Variante führt auf den $M$-gewichteten Kofaktor zurück.",
+    "thm2.label": "Was es nicht leistet",
+    "thm2.body": "Keinen neuen Integralsatz: alle Aussagen sind Umschreibungen der Substitutionsregel und der Kofaktor-Identitäten. Der Feld-Pullback macht für sich genommen nichts invariant.",
     "sec.inv": "Passive vs. aktive Invarianz",
     "inv.th.type": "Typ", "inv.th.cond": "Bedingung", "inv.th.mech": "Mechanismus", "inv.th.ex": "Beispiel",
     "inv.passive.type": "Passiv", "inv.passive.cond": "$f(T\\tilde{\\mathbf{x}})=f(\\tilde{\\mathbf{x}})$ a priori",
@@ -844,128 +790,6 @@ function drawPP() {
 }
 
 // ════════════════════════════════════════
-// INVARIANCE CANVAS
-// ════════════════════════════════════════
-const invCanvas = document.getElementById('invariance-canvas');
-const ictx = invCanvas.getContext('2d');
-
-function drawInvariance() {
-  const W = invCanvas.offsetWidth;
-  invCanvas.width  = W * devicePixelRatio;
-  invCanvas.height = 220 * devicePixelRatio;
-  ictx.scale(devicePixelRatio, devicePixelRatio);
-  const H = 220;
-  ictx.clearRect(0, 0, W, H);
-
-  const lambda = document.getElementById('lambda-sl').value / 100;
-
-  // f(x,y,z)=xyz integrated over [0,1]^3 = 1/8
-  // after distortion T=λI: integral of fT * |det T| = λ^-3 * xyz * λ^3 = xyz  → same 1/8
-  const origIntegral = 1/8;
-  const detT = lambda * lambda * lambda;
-  const fTscale = Math.pow(lambda, -3);
-  const distIntegral = fTscale * origIntegral * detT; // always 1/8
-
-  const lp = 60, rp = 20, tp = 20, bp = 40;
-  const pw = W - lp - rp, ph = H - tp - bp;
-
-  // axes
-  ictx.strokeStyle = '#2a2e2e'; ictx.lineWidth = 1;
-  ictx.beginPath(); ictx.moveTo(lp, tp); ictx.lineTo(lp, tp+ph); ictx.lineTo(lp+pw, tp+ph); ictx.stroke();
-
-  // x-axis: lambda values 0.3..3.0
-  const lambdaMin = 0.3, lambdaMax = 3.0;
-  const N = 120;
-
-  // original integral line (constant = 1/8)
-  ictx.beginPath();
-  for (let i = 0; i <= N; i++) {
-    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
-    const x = lp + (i/N) * pw;
-    const y = tp + ph - (origIntegral / 0.2) * ph * 0.85;
-    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
-  }
-  ictx.strokeStyle = 'rgba(90,144,168,0.5)'; ictx.lineWidth = 1.5;
-  ictx.setLineDash([5,4]); ictx.stroke(); ictx.setLineDash([]);
-
-  // distorted f_T * |det T| line (also constant = 1/8 — this IS the invariance)
-  ictx.beginPath();
-  for (let i = 0; i <= N; i++) {
-    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
-    const val = Math.pow(lv,-3) * origIntegral * Math.pow(lv,3);
-    const x = lp + (i/N) * pw;
-    const y = tp + ph - (val / 0.2) * ph * 0.85;
-    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
-  }
-  ictx.strokeStyle = '#28c898'; ictx.lineWidth = 1.5; ictx.stroke();
-
-  // f_T alone (without det T compensation) — diverges
-  ictx.beginPath();
-  for (let i = 0; i <= N; i++) {
-    const lv = lambdaMin + (i/N) * (lambdaMax - lambdaMin);
-    const val = Math.pow(lv,-3) * origIntegral;
-    const x = lp + (i/N) * pw;
-    const y = tp + ph - Math.min((val / 0.2) * ph * 0.85, ph + 10);
-    i === 0 ? ictx.moveTo(x, y) : ictx.lineTo(x, y);
-  }
-  ictx.strokeStyle = 'rgba(200,80,80,0.4)'; ictx.lineWidth = 1; ictx.stroke();
-
-  // current lambda marker
-  const markerX = lp + ((lambda - lambdaMin) / (lambdaMax - lambdaMin)) * pw;
-  const markerY = tp + ph - (origIntegral / 0.2) * ph * 0.85;
-  ictx.beginPath();
-  ictx.arc(markerX, markerY, 5, 0, Math.PI*2);
-  ictx.fillStyle = '#c8a96e'; ictx.fill();
-
-  // λ vertical line
-  ictx.strokeStyle = 'rgba(200,169,110,0.3)'; ictx.lineWidth = 1; ictx.setLineDash([3,3]);
-  ictx.beginPath(); ictx.moveTo(markerX, tp); ictx.lineTo(markerX, tp+ph); ictx.stroke();
-  ictx.setLineDash([]);
-
-  // value annotation
-  ictx.fillStyle = '#c8a96e'; ictx.font = '11px DM Mono, monospace'; ictx.textAlign = 'center';
-  ictx.fillText(`λ=${lambda.toFixed(2)}`, markerX, tp+ph+14);
-  ictx.fillText(`∫fT·|detT| = ${distIntegral.toFixed(4)}`, markerX, tp+16);
-
-  // x-axis ticks
-  [0.5, 1.0, 1.5, 2.0, 2.5].forEach(lv => {
-    const x = lp + ((lv-lambdaMin)/(lambdaMax-lambdaMin))*pw;
-    ictx.fillStyle = '#2e5868'; ictx.font = '10px DM Mono,monospace'; ictx.textAlign = 'center';
-    ictx.fillText(lv.toFixed(1), x, tp+ph+26);
-  });
-
-  // axis labels
-  ictx.fillStyle = '#2e5868'; ictx.textAlign = 'center';
-  ictx.fillText('λ', lp + pw/2, H - 2);
-  ictx.save(); ictx.translate(14, tp+ph/2); ictx.rotate(-Math.PI/2);
-  ictx.fillText('∫ érték', 0, 0); ictx.restore();
-
-  // y-axis ticks
-  [0, 0.125, 0.2].forEach((v,i) => {
-    const y = tp + ph - (v/0.2)*ph*0.85;
-    ictx.fillStyle = '#2e5868'; ictx.textAlign = 'right'; ictx.font = '10px DM Mono,monospace';
-    ictx.fillText(v.toFixed(3), lp-4, y+3);
-  });
-
-  // legend — two rows to avoid overlap
-  ictx.font = '10px DM Mono, monospace'; ictx.textAlign = 'left';
-  const ly1 = tp + 20, ly2 = tp + 36;
-
-  ictx.setLineDash([5,4]); ictx.strokeStyle='rgba(90,144,168,0.6)'; ictx.lineWidth=1.5;
-  ictx.beginPath(); ictx.moveTo(lp+6, ly1-3); ictx.lineTo(lp+22, ly1-3); ictx.stroke();
-  ictx.setLineDash([]);
-  ictx.fillStyle='#5a90a8'; ictx.fillText('∫f dx  (eredeti)', lp+26, ly1);
-
-  ictx.strokeStyle='#28c898'; ictx.lineWidth=1.5;
-  ictx.beginPath(); ictx.moveTo(lp+6, ly2-3); ictx.lineTo(lp+22, ly2-3); ictx.stroke();
-  ictx.fillStyle='#28c898'; ictx.fillText('∫fT·|det T|  (invariáns ✓)', lp+26, ly2);
-
-  ictx.strokeStyle='rgba(200,80,80,0.55)'; ictx.lineWidth=1;
-  ictx.beginPath(); ictx.moveTo(lp + pw*0.52, ly1-3); ictx.lineTo(lp + pw*0.52 + 16, ly1-3); ictx.stroke();
-  ictx.fillStyle='rgba(200,80,80,0.8)'; ictx.fillText('∫fT  (kompenzáció nélkül)', lp + pw*0.52 + 20, ly1);
-}
-
-// ════════════════════════════════════════
 // SLIDERS
 // ════════════════════════════════════════
 function initSliders() {
@@ -975,22 +799,18 @@ function initSliders() {
       drawPP();
     });
   });
-  document.getElementById('lambda-sl').addEventListener('input', function() {
-    document.getElementById('lambda-val').textContent = (this.value/100).toFixed(2);
-    drawInvariance();
-  });
 }
 
 // ════════════════════════════════════════
 // BibTeX
 // ════════════════════════════════════════
 function copyBib() {
-  const raw = `@article{bodis2025vmp,
+  const raw = `@misc{bodis2025vmp,
   author      = {Bódis, Tamás},
   title       = {Vektoriális Mátrixszorzat (VMP): torzított terek és megmaradó törvények},
   year        = {2025},
-  note        = {Preprint, bírálat alatt},
-  institution = {Óbudai Egyetem, Kandó Kálmán Villamosmérnöki Kar},
+  note        = {Preprint (Zenodo / ResearchGate)},
+  howpublished = {Zenodo},
   orcid       = {0009-0004-6349-712X}
 }`;
   navigator.clipboard.writeText(raw).then(() => {
@@ -1006,10 +826,9 @@ function copyBib() {
 function init() {
   initSliders();
   drawPP();
-  drawInvariance();
 }
 window.addEventListener('load', init);
-window.addEventListener('resize', () => { drawPP(); drawInvariance(); });
+window.addEventListener('resize', () => { drawPP(); });
 </script>
 </body>
 </html>

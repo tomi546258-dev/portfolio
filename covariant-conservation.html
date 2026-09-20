@@ -276,7 +276,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
   <!-- ══ HEADER ══ -->
   <div class="status-pill">
     <span class="status-dot"></span>
-    <span data-i18n="status">Under review · Journal of Geometric Mechanics</span>
+    <span data-i18n="status">Kézirat — bírálat alatt</span>
   </div>
 
   <h1 class="paper-title" data-i18n="title">
@@ -290,9 +290,6 @@ canvas { display: block; width: 100%; border-radius: 2px; }
     <span>·</span>
     <a href="https://orcid.org/0009-0004-6349-712X" target="_blank">ORCID 0009-0004-6349-712X</a>
     <span>·</span>
-    <span>Manuscript GM-D-25-00033</span>
-    <span>·</span>
-    <span data-i18n="meta.editor">Handling editor: Arieh Iserles</span>
   </div>
 
   <!-- ══ ABSTRACT ══ -->
@@ -320,9 +317,11 @@ canvas { display: block; width: 100%; border-radius: 2px; }
         <div class="result-tag" data-i18n="r1.tag">Theorem 1</div>
         <div class="result-title" data-i18n="r1.title">Covariant conservation identity</div>
         <div class="result-body" data-i18n="r1.body">
-          The canonical divergence of $\sqrt{|g|}\,V^\mu$ satisfies an exact identity
-          that is metric-compatible and coordinate-independent. This extends the
-          Piola–Nanson formula to curved spectral problems.
+          A $\sqrt{|g|}\,V^\mu$ vektorsűrűség divergenciájára a standard azonosság
+          $\partial_\mu(\sqrt{|g|}V^\mu) = \sqrt{|g|}\,\nabla_\mu V^\mu$ érvényes (mert
+          $\nabla_\mu\sqrt{|g|} = 0$). A dolgozat ezt használja kiindulásként a görbült
+          tartományon vett spektrális feladathoz — a Piola–Nanson-formulával való
+          rokonság szerkezeti analógia, nem általánosítás.
         </div>
       </div>
 
@@ -330,9 +329,9 @@ canvas { display: block; width: 100%; border-radius: 2px; }
         <div class="result-tag" data-i18n="r2.tag">Theorem 2 — Helical tube</div>
         <div class="result-title" data-i18n="r2.title">Vanishing first-order correction</div>
         <div class="result-body" data-i18n="r2.body">
-          For the helical tube perturbation, $\lambda^{(1)} = 0$ follows directly from
-          the conservation law — no first-order energy shift occurs. This is a symmetry
-          consequence, not a coincidence.
+          A helikális perturbációra $\lambda^{(1)} = 0$, mert a perturbáció szögátlaga
+          eltűnik: a diagonális mátrixelem ($\Delta m = 0$) azonosan nulla.
+          Elsőrendben tehát nincs energiaeltolódás — ez szimmetriakövetkezmény.
         </div>
       </div>
 
@@ -346,12 +345,13 @@ canvas { display: block; width: 100%; border-radius: 2px; }
       </div>
 
       <div class="result-card">
-        <div class="result-tag" data-i18n="r4.tag">New result</div>
+        <div class="result-tag" data-i18n="r4.tag">Másodrend</div>
         <div class="result-title" data-i18n="r4.title">Lommel–Bessel second-order spectrum</div>
         <div class="result-body" data-i18n="r4.body">
-          Second-order corrections $\lambda^{(2)}$ reduce to Lommel-type integrals of
-          Bessel functions, giving a closed-form perturbative spectrum not previously
-          reported in the geometric mechanics literature.
+          A másodrendű korrekció $\lambda^{(2)}$ Bessel-függvények Lommel-típusú
+          integráljaira vezet. A mátrixelemekben a két módushoz tartozó Bessel-gyök
+          különbözik ($k_{mn} \neq k_{m'n'}$), és a perturbáció radiális profilja is
+          szerepel a súlyban.
         </div>
       </div>
 
@@ -361,10 +361,10 @@ canvas { display: block; width: 100%; border-radius: 2px; }
   <!-- ══ CORE EQUATION ══ -->
   <div class="section">
     <div class="section-label" data-i18n="sec.identity">Central identity</div>
-    <div class="eq-label">Covariant conservation law</div>
+    <div class="eq-label">A vektorsűrűség divergenciája (standard azonosság)</div>
     <div class="eq-block">
-      $$\nabla_\mu \!\left(\sqrt{|g|}\;V^\mu\right) = \sqrt{|g|}\;\nabla_\mu V^\mu
-      + V^\mu\,\partial_\mu\!\sqrt{|g|}$$
+      $$\partial_\mu \!\left(\sqrt{|g|}\;V^\mu\right) = \sqrt{|g|}\;\nabla_\mu V^\mu
+      \qquad\left(\nabla_\mu\sqrt{|g|} = 0\ \text{ a Levi-Civita-konnexióra}\right)$$
     </div>
     <div class="eq-label">Perturbative eigenvalue expansion</div>
     <div class="eq-block">
@@ -374,7 +374,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
     <div class="eq-label">Second-order correction via Lommel integrals</div>
     <div class="eq-block">
       $$\lambda^{(2)} = -\sum_{m'\neq m} \frac{\left|\langle \psi_{m'n} \mid V^{(1)} \mid \psi_{mn}\rangle\right|^2}{\lambda^{(0)}_{m'n} - \lambda^{(0)}_{mn}},
-      \quad \langle \cdot \rangle = \int_0^R J_{m'}(k r)\,J_m(k r)\;r\,\mathrm{d}r$$
+      \quad \langle \cdot \rangle = \int_0^R J_{m'}\!\left(k_{m'n'} r\right) v(r)\, J_m\!\left(k_{mn} r\right) r\,\mathrm{d}r$$
     </div>
   </div>
 
@@ -439,13 +439,12 @@ canvas { display: block; width: 100%; border-radius: 2px; }
   <div class="section">
     <div class="section-label" data-i18n="sec.citation">Citation / BibTeX</div>
     <div style="position:relative">
-      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@article</span>{bodis2025covariant,
+      <pre class="bibtex-box" id="bibtex-content"><span class="bib-key">@unpublished</span>{bodis2026covariant,
   <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
   <span class="bib-field">title</span>   = {<span class="bib-val">Covariant conservation, metric volume forms,
             and symmetry-adapted spectral bases</span>},
-  <span class="bib-field">journal</span> = {<span class="bib-val">Journal of Geometric Mechanics</span>},
   <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
-  <span class="bib-field">note</span>    = {<span class="bib-val">Manuscript GM-D-25-00033, under review</span>},
+  <span class="bib-field">note</span>    = {<span class="bib-val">Manuscript under review</span>},
   <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
 }</pre>
       <button class="copy-btn" id="copy-btn" onclick="copyBib()">Copy</button>
@@ -454,8 +453,7 @@ canvas { display: block; width: 100%; border-radius: 2px; }
 
   <!-- ══ FOOTER ══ -->
   <div class="page-footer">
-    <span>Bódis Tamás · BT Tech · Budapest</span>
-    <span>GM-D-25-00033 · Journal of Geometric Mechanics</span>
+    <span>Bódis Tamás · Budapest</span>
   </div>
 
 </div><!-- /page -->
@@ -812,12 +810,12 @@ function initSliders() {
 // BibTeX copy
 // ════════════════════════════════════════════════
 function copyBib() {
-  const raw = `@article{bodis2025covariant,
+  const raw = `@unpublished{bodis2026covariant,
   author  = {Bódis, Tamás},
   title   = {Covariant conservation, metric volume forms, and symmetry-adapted spectral bases},
-  journal = {Journal of Geometric Mechanics},
+  note    = {Manuscript under review},
   year    = {2025},
-  note    = {Manuscript GM-D-25-00033, under review},
+  note    = {Manuscript under review},
   orcid   = {0009-0004-6349-712X}
 }`;
   navigator.clipboard.writeText(raw).then(() => {
@@ -833,24 +831,23 @@ function copyBib() {
 // ════════════════════════════════════════════════
 const TRANS = {
   hu: {
-    "status": "Bírálat alatt · Journal of Geometric Mechanics",
+    "status": "Kézirat — bírálat alatt",
     "title": "Kovariáns megmaradás,<br><em>metrikus térfogatformák</em><br>és szimmetria-adaptált spektrális bázisok",
-    "meta.editor": "Szerkesztő: Arieh Iserles",
     "sec.abstract": "Összefoglalás",
     "abstract.text": "Megállapítjuk a $\\sqrt{|g|}$ metrikus térfogatformából épített vektorsűrűség kanonikus divergenciájának kovariáns megmaradási azonosságát, és megmutatjuk, hogyan korlátozza ez az azonosság a geometriai differenciáloperátorok spektrális felbontását görbült tartományokon. A hélix-cső geometriára alkalmazva bizonyítjuk, hogy az alapállapot sajátérték első rendű perturbatív korrekciója azonosan eltűnik ($\\lambda^{(1)} = 0$) a megmaradási törvény közvetlen következményeként, és levezetjük a móduscsatolást kormányzó szelekcióssszabályokat. A másodrendű korrekciók Lommel-típusú Bessel-integrálokra redukálódnak, zárt alakú perturbatív spektrumot adva.",
     "sec.results": "Főbb eredmények",
     "r1.tag": "1. tétel",
     "r1.title": "Kovariáns megmaradási azonosság",
-    "r1.body": "A $\\sqrt{|g|}\\,V^\\mu$ vektorsűrűség kanonikus divergenciája egy egzakt azonosságot elégít ki, amely metrika-kompatibilis és koordinátafüggetlen. Ez kiterjeszti a Piola–Nanson-formulát görbült spektrális problémákra.",
+    "r1.body": "A $\\sqrt{|g|}\\,V^\\mu$ vektorsűrűségre a standard azonosság $\\partial_\\mu(\\sqrt{|g|}V^\\mu) = \\sqrt{|g|}\\nabla_\\mu V^\\mu$ érvényes, mert $\\nabla_\\mu\\sqrt{|g|}=0$. A dolgozat ezt használja kiindulásként; a Piola–Nanson-rokonság szerkezeti analógia, nem általánosítás.",
     "r2.tag": "2. tétel — hélix-cső",
     "r2.title": "Eltűnő első rendű korrekció",
-    "r2.body": "A hélix-cső perturbációra $\\lambda^{(1)} = 0$ közvetlenül a megmaradási törvényből következik — első rendben nincs energiaeltolódás. Ez szimmetriakövetkezmény, nem véletlen.",
+    "r2.body": "A helikális perturbációra $\\lambda^{(1)} = 0$, mert a perturbáció szögátlaga eltűnik: a diagonális ($\\Delta m = 0$) mátrixelem azonosan nulla. Elsőrendben tehát nincs energiaeltolódás — szimmetriakövetkezmény.",
     "r3.tag": "Szelekcióssszabály",
     "r3.title": "Csatolási szabály: $\\Delta m = \\pm 1,\\; \\Delta n = 0$",
     "r3.body": "Csak az azimutális indexben pontosan eggyel különböző módusokat csatolja a hélix-perturbáció. Az axiális kvantumszám $n$ megmarad a csatolás során.",
     "r4.tag": "Új eredmény",
     "r4.title": "Lommel–Bessel másodrendű spektrum",
-    "r4.body": "A másodrendű $\\lambda^{(2)}$ korrekciók Lommel-típusú Bessel-integrálokra redukálódnak, az irodalomban korábban nem közölt zárt alakú perturbatív spektrumot adva.",
+    "r4.body": "A másodrendű $\\lambda^{(2)}$ korrekció Lommel-típusú Bessel-integrálokra vezet. A mátrixelemekben a két módus Bessel-gyöke különbözik ($k_{mn}\\neq k_{m'n'}$), és a perturbáció radiális profilja is szerepel a súlyban.",
     "sec.identity": "Centrális azonosság",
     "sec.helix": "Interaktív — hélix-cső geometria",
     "sec.spectrum": "Interaktív — perturbatív spektrum",
@@ -859,24 +856,23 @@ const TRANS = {
     "sec.citation": "Hivatkozás / BibTeX",
   },
   en: {
-    "status": "Under review · Journal of Geometric Mechanics",
+    "status": "Manuscript — under review",
     "title": "Covariant conservation,<br><em>metric volume forms,</em><br>and symmetry-adapted spectral bases",
-    "meta.editor": "Handling editor: Arieh Iserles",
     "sec.abstract": "Abstract",
-    "abstract.text": "We establish a covariant conservation identity for the canonical divergence of a vector density built from the metric volume form $\\sqrt{|g|}$, and show how this identity constrains the spectral decomposition of geometric differential operators on curved domains. Applying the framework to a helical tube geometry, we prove that the first-order perturbative correction to the ground-state eigenvalue vanishes identically ($\\lambda^{(1)} = 0$) as a direct consequence of the conservation law, and derive selection rules governing inter-mode coupling. Second-order corrections are expressed via Lommel-type Bessel integrals, yielding closed-form perturbative spectra not previously reported in the literature.",
+    "abstract.text": "We establish a covariant conservation identity for the canonical divergence of a vector density built from the metric volume form $\\sqrt{|g|}$, and show how this identity constrains the spectral decomposition of geometric differential operators on curved domains. Applying the framework to a helical tube geometry, we prove that the first-order perturbative correction to the ground-state eigenvalue vanishes identically ($\\lambda^{(1)} = 0$) as a direct consequence of the conservation law, and derive selection rules governing inter-mode coupling. Second-order corrections are expressed via Lommel-type Bessel integrals, yielding closed-form expressions for the perturbative spectrum.",
     "sec.results": "Key results",
     "r1.tag": "Theorem 1",
     "r1.title": "Covariant conservation identity",
-    "r1.body": "The canonical divergence of $\\sqrt{|g|}\\,V^\\mu$ satisfies an exact identity that is metric-compatible and coordinate-independent. This extends the Piola–Nanson formula to curved spectral problems.",
+    "r1.body": "For the vector density $\\sqrt{|g|}\\,V^\\mu$ the standard identity $\\partial_\\mu(\\sqrt{|g|}V^\\mu) = \\sqrt{|g|}\\nabla_\\mu V^\\mu$ holds, since $\\nabla_\\mu\\sqrt{|g|}=0$. The paper takes this as its starting point; the link to the Piola–Nanson formula is a structural analogy, not a generalisation.",
     "r2.tag": "Theorem 2 — Helical tube",
     "r2.title": "Vanishing first-order correction",
-    "r2.body": "For the helical tube perturbation, $\\lambda^{(1)} = 0$ follows directly from the conservation law — no first-order energy shift occurs. This is a symmetry consequence, not a coincidence.",
+    "r2.body": "For the helical perturbation $\\lambda^{(1)} = 0$ because the azimuthal average of the perturbation vanishes: the diagonal ($\\Delta m = 0$) matrix element is identically zero. Hence no first-order energy shift — a symmetry consequence.",
     "r3.tag": "Selection rule",
     "r3.title": "Coupling rule $\\Delta m = \\pm 1,\\; \\Delta n = 0$",
     "r3.body": "Only modes with azimuthal index differing by exactly one are coupled by the helical perturbation. Axial quantum number $n$ is conserved across the coupling.",
     "r4.tag": "New result",
     "r4.title": "Lommel–Bessel second-order spectrum",
-    "r4.body": "Second-order corrections $\\lambda^{(2)}$ reduce to Lommel-type integrals of Bessel functions, giving a closed-form perturbative spectrum not previously reported in the geometric mechanics literature.",
+    "r4.body": "Second-order corrections $\\lambda^{(2)}$ lead to Lommel-type Bessel integrals. In the matrix elements the two modes carry different Bessel roots ($k_{mn}\\neq k_{m'n'}$), and the radial profile of the perturbation enters the weight.",
     "sec.identity": "Central identity",
     "sec.helix": "Interactive — helical tube geometry",
     "sec.spectrum": "Interactive — perturbative spectrum",
@@ -885,9 +881,8 @@ const TRANS = {
     "sec.citation": "Citation / BibTeX",
   },
   de: {
-    "status": "Unter Begutachtung · Journal of Geometric Mechanics",
+    "status": "Manuskript — in Begutachtung",
     "title": "Kovariante Erhaltung,<br><em>metrische Volumenformen</em><br>und symmetrieangepasste Spektralbasen",
-    "meta.editor": "Bearbeitender Herausgeber: Arieh Iserles",
     "sec.abstract": "Zusammenfassung",
     "abstract.text": "Wir leiten eine kovariante Erhaltungsidentität für die kanonische Divergenz einer aus der metrischen Volumenform $\\sqrt{|g|}$ aufgebauten Vektordichte her und zeigen, wie diese Identität die Spektralzerlegung geometrischer Differentialoperatoren auf gekrümmten Gebieten einschränkt. Für eine Spiralrohr-Geometrie beweisen wir, dass die Korrekturen erster Ordnung identisch verschwinden ($\\lambda^{(1)} = 0$) als direkte Konsequenz des Erhaltungssatzes.",
     "sec.results": "Hauptergebnisse",
@@ -896,7 +891,7 @@ const TRANS = {
     "r1.body": "Die kanonische Divergenz von $\\sqrt{|g|}\\,V^\\mu$ erfüllt eine exakte, metrikkompatible und koordinatenunabhängige Identität. Dies erweitert die Piola–Nanson-Formel auf gekrümmte Spektralprobleme.",
     "r2.tag": "Satz 2 — Spiralrohr",
     "r2.title": "Verschwindende Korrektur erster Ordnung",
-    "r2.body": "Für die Spiralrohr-Störung gilt $\\lambda^{(1)} = 0$ direkt aus dem Erhaltungssatz — keine Energieverschiebung erster Ordnung. Dies ist eine Symmetriekonsequenz.",
+    "r2.body": "Für die helikale Störung gilt $\\lambda^{(1)} = 0$, weil der azimutale Mittelwert der Störung verschwindet: das diagonale ($\\Delta m = 0$) Matrixelement ist identisch null. Also keine Energieverschiebung erster Ordnung — eine Symmetriekonsequenz.",
     "r3.tag": "Auswahlregel",
     "r3.title": "Kopplungsregel: $\\Delta m = \\pm 1,\\; \\Delta n = 0$",
     "r3.body": "Nur Modi mit genau um eins verschiedenem Azimutalindex werden durch die Spiralstörung gekoppelt. Die axiale Quantenzahl $n$ bleibt erhalten.",

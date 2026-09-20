@@ -123,7 +123,7 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
     <div style="background:var(--bg2);border:1px solid var(--border);padding:1rem 1.2rem;border-radius:2px">
       <div style="font-family:'DM Mono',monospace;font-size:.6rem;color:var(--accent2);letter-spacing:.12em;margin-bottom:.5rem">HÉTKÖZNAPI INTUÍCIÓ</div>
       <div style="font-size:.88rem;color:var(--text-dim);line-height:1.7">
-        Ha egy napig sem járok haza, felesleges a bojler — de ha két hetet leszek távol, már nagyon megéri lekapcsolni.
+        Egy napra is megéri lekapcsolni a bojlert — a kérdés inkább az, megér-e a spórolás öt óra várakozást hazaérkezéskor.
         <em>Valahol a kettő között van az optimum.</em>
       </div>
     </div>
@@ -198,10 +198,13 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
   <div class="prob-panel active" id="panel-boiler">
     <div class="prob-card">
       <div class="prob-desc" data-i18n="boiler.desc">
-        Lakásban villanybojler napi 3 órát fűt. Ha ritkán járunk be, érdemes lekapcsolni — de az
-        újraforrósítás egyszeri költség. Mikortól éri meg?
+        Lakásban villanybojler napi 3 órát fűt. Energetikailag a kikapcsolás <em>mindig</em> nyer:
+        a hőveszteség a hőmérséklet-különbséggel arányos, így a lehűlt tartály kevesebbet veszít,
+        és a visszafűtés pontosan a kikapcsolás alatt elvesztett hőt pótolja. Az alábbi egyszerű
+        modell ezért nem energetikai megtérülést számol, hanem azt: hány napi készenléti fűtés ér
+        föl egy teljes, hidegről indított visszafűtéssel — vagyis mennyi kényelmet ér a döntés.
       </div>
-      <div class="eq-label" data-i18n="boiler.eq.label">Megtérülési feltétel</div>
+      <div class="eq-label" data-i18n="boiler.eq.label">Egyszerű összevetés (kényelmi döntés)</div>
       <div class="eq-block" style="text-align:center;padding:1.2rem">
         <div style="display:inline-flex;align-items:center;gap:.8rem;flex-wrap:wrap;justify-content:center;font-size:.9rem">
           <div style="text-align:center">
@@ -221,7 +224,8 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
         <canvas id="boiler-canvas" height="180"></canvas>
         <div style="font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent2);
                     padding:.4rem .2rem;letter-spacing:.06em;">
-          ℹ︎ N* = t_reheat / t_heat — független P-től és c-től (kiesnek az egyenletből)
+          ℹ︎ N* = t_reheat / t_heat — független P-től és c-től. Felső becslés: a lehűlt tartály
+          kevesebbet veszít, ezért a valódi visszafűtés ennél olcsóbb.
         </div>
         <div class="viz-controls">
           <label class="ctrl-label">P (kW)
@@ -264,7 +268,8 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
       </div>
       <div class="eq-label" data-i18n="bulb.eq.label">Optimális kikapcsolási idő</div>
       <div class="eq-block">
-        $$t^* = \frac{C_{switch}}{P \cdot c_{kWh}} = \frac{C_{bulb}/L_{hours}}{P \cdot c_{kWh}}$$
+        $$t^* = \frac{C_{switch}}{P \cdot c_{kWh}} = \frac{C_{bulb}/S}{P \cdot c_{kWh}},
+        \qquad S = \text{névleges kapcsolási ciklusszám}$$
       </div>
       <div class="viz-wrap">
         <canvas id="bulb-canvas" height="180"></canvas>
@@ -283,9 +288,9 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
             <input type="range" id="bl-bulbprice" min="100" max="3000" value="500" step="50">
             <span class="ctrl-val" id="bl-bulbprice-v">500 Ft</span>
           </label>
-          <label class="ctrl-label">Élettartam (h)
+          <label class="ctrl-label">Kapcsolási ciklusok (db)
             <input type="range" id="bl-life" min="1000" max="25000" value="10000" step="500">
-            <span class="ctrl-val" id="bl-life-v">10000 h</span>
+            <span class="ctrl-val" id="bl-life-v">10k ciklus</span>
           </label>
         </div>
       </div>
@@ -295,7 +300,8 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
     <div class="expand-content" id="bulb-math">
       <p data-i18n="bulb.math.p1">A célfüggvény minimalizálja az összes "élettartam-egységnyi" költséget:</p>
       <div class="eq-block">
-        $$C_{total}(t) = \underbrace{P\cdot c \cdot t}_{\text{energiaköltség}} + \underbrace{\frac{C_{bulb}}{L}}_{\text{kapcsolási élettartam-veszteség}}$$
+        $$\underbrace{P\cdot c\cdot t}_{\text{égve hagyás }t\text{ órán át}}
+        \quad\text{vs.}\quad \underbrace{\frac{C_{bulb}}{S}}_{\text{egy le-föl kapcsolás ára}}$$
       </div>
       <p data-i18n="bulb.math.p2">A $t^*$ az az időküszöb, ahol a fenn tartás marginális energiaköltsége eléri a kapcsolás marginális élettartam-veszteségét. Ez a <strong>határ-elvű optimum</strong> legegyszerűbb formája.</p>
       <div class="eq-block">
@@ -387,7 +393,7 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
         \quad\Rightarrow\quad
         \rho^* = 1 - \sqrt{\frac{\lambda}{\mu R}}$$
       </div>
-      <p data-i18n="rest.math.p2">Vegyük észre: a $\rho \to 1$ határnál $W \to \infty$ — a rendszer "szétesik". Ez a variációszámításban az <strong>egyensúly elvesztése</strong>: a funkcionál nem korlátozott felülről ρ=1 közelében.</p>
+      <p data-i18n="rest.math.p2">Vegyük észre: a $\rho \to 1$ határnál $W \to \infty$ — a rendszer "szétesik". Ez az <strong>egyensúly elvesztése</strong>: a célfüggvény alulról nem korlátos ρ→1-nél (a várakozási tag −∞-be visz).</p>
     </div>
   </div>
 </div>
@@ -422,7 +428,7 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
       $$\delta J[u;\eta] = \lim_{\varepsilon\to 0}\frac{J[u+\varepsilon\eta]-J[u]}{\varepsilon}
       = \int_\Omega \left(\frac{\partial L}{\partial u}\eta + \frac{\partial L}{\partial u'}\eta'\right)dx$$
     </div>
-    <p data-i18n="math.deep.p2">Részleges integrálással (ha $\eta$ az elemen eltűnik):</p>
+    <p data-i18n="math.deep.p2">Parciális integrálással (ha $\eta$ a peremen eltűnik):</p>
     <div class="eq-block">
       $$\delta J = \int_\Omega \underbrace{\left(\frac{\partial L}{\partial u} - \frac{d}{dx}\frac{\partial L}{\partial u'}\right)}_{\text{Euler–Lagrange maradék}} \eta\,dx = 0 \;\;\forall\eta$$
     </div>
@@ -468,21 +474,26 @@ canvas{display:block;width:100%;border-radius:2px;min-height:100px;}
 
   <div class="code-label" data-i18n="code1.label">Bojler / izzó — analitikus optimum</div>
   <div class="code-box"><pre>
-def boiler_optimum(P_kW, t_heat_h, t_reheat_h, c_HUF_per_kWh):
-    """Hány nap után érdemes lekapcsolni a bojlert?"""
-    daily_cost = P_kW * t_heat_h * c_HUF_per_kWh      # Ft/nap
-    reheat_cost = P_kW * t_reheat_h * c_HUF_per_kWh   # Ft (egyszeri)
-    N_star = reheat_cost / daily_cost
-    return N_star
+def boiler_breakeven(P_kW, t_heat_h, t_reheat_h, c_HUF_per_kWh):
+    """Hány napi készenléti fűtés ér föl egy teljes visszafűtéssel?
 
-def bulb_optimum(P_W, c_HUF_per_kWh, bulb_price_HUF, lifetime_h):
+    FIGYELEM: ez nem energetikai megtérülés. Newton-féle lehűlés mellett a
+    kikapcsolás minden időtartamra spórol, mert a hideg tartály kevesebbet
+    veszít; a visszafűtés csak a kikapcsolás alatt elvesztett hőt pótolja.
+    Az N_star felső becslés, a döntés valójában kényelmi.
+    """
+    daily_cost = P_kW * t_heat_h * c_HUF_per_kWh      # Ft/nap
+    reheat_cost = P_kW * t_reheat_h * c_HUF_per_kWh   # Ft (egyszeri, hidegről)
+    return reheat_cost / daily_cost
+
+def bulb_optimum(P_W, c_HUF_per_kWh, bulb_price_HUF, switch_cycles):
     """Hány másodperc után éri meg lekapcsolni az izzót?"""
-    C_switch = bulb_price_HUF / lifetime_h          # Ft / kapcsolás
+    C_switch = bulb_price_HUF / switch_cycles       # Ft / kapcsolás
     P_kW = P_W / 1000
     t_star_h = C_switch / (P_kW * c_HUF_per_kWh)
     return t_star_h * 3600  # másodpercben
 
-print(boiler_optimum(1.5, 3, 5, 30))  # → 1.67 nap
+print(boiler_breakeven(1.5, 3, 5, 30))  # → 1.67 nap (felső becslés)
 print(bulb_optimum(100, 50, 500, 10000))  # → 36 mp</pre></div>
 
   <div class="code-label" style="margin-top:1rem" data-i18n="code2.label">Erősítő — koordináta-descent (black-box)</div>
@@ -501,20 +512,24 @@ def J(RC, RE, lam=10):
         return -1e6  # bünteti a túl nagy torzítást
     return np.log(Av) - lam * THD
 
-# Koordináta-descent
-RC, RE = 4700, 47   # Ohm
-step = 200
+# Koordináta-descent — a paramétereket tartományon belül tartjuk,
+# különben RE negatívba fut és a (RE+1)**0.5 komplex lesz
+RC_MIN, RC_MAX = 100.0, 47000.0
+RE_MIN, RE_MAX = 1.0, 4700.0
+
+def clamp(x, lo, hi):
+    return max(lo, min(hi, x))
+
+RC, RE = 4700.0, 47.0   # Ohm
+step = 200.0
 for iteration in range(50):
-    for direction, param in [(1, 'RC'), (-1, 'RE')]:
-        for delta in [step, -step]:
-            if param == 'RC':
-                new_J = J(RC + delta, RE)
-                if new_J > J(RC, RE):
-                    RC += delta
-            else:
-                new_J = J(RC, RE + delta)
-                if new_J > J(RC, RE):
-                    RE += delta
+    for delta in (step, -step):
+        cand = clamp(RC + delta, RC_MIN, RC_MAX)
+        if J(cand, RE) > J(RC, RE):
+            RC = cand
+        cand = clamp(RE + delta, RE_MIN, RE_MAX)
+        if J(RC, cand) > J(RC, RE):
+            RE = cand
     step *= 0.9   # csökkentjük a lépésközt
 
 print(f"Optimum: RC={RC}Ω, RE={RE}Ω")
@@ -525,21 +540,21 @@ print(f"Av={Av_opt:.1f}x, THD={THD_opt*100:.2f}%")</pre></div>
   <div class="code-box"><pre>
 import numpy as np
 
-def restaurant_optimum(mu, R_per_guest, lambda_cost):
+def restaurant_optimum(mu, R_per_guest, w_wait):
     """
     mu: kiszolgálási ráta (vendég/óra)
     R_per_guest: bevétel/vendég (Ft)
-    lambda_cost: élménysúly (Ft·óra)
+    w_wait: a várakozás súlya (Ft/óra) — NEM azonos a lambda érkezési rátával
     """
-    rho_star = 1 - np.sqrt(lambda_cost / (mu * R_per_guest))
+    rho_star = 1 - np.sqrt(w_wait / (mu * R_per_guest))
     rho_star = np.clip(rho_star, 0, 0.99)
     W_star = 1 / (mu * (1 - rho_star))     # várakozási idő (óra)
-    J_star = R_per_guest * rho_star - lambda_cost * W_star
+    J_star = R_per_guest * rho_star - w_wait * W_star
     return rho_star, W_star * 60, J_star   # perc
 
 # Példa: étterem 20 vendég/óra kapacitással
 rho, W_min, profit = restaurant_optimum(
-    mu=20, R_per_guest=3500, lambda_cost=8000
+    mu=20, R_per_guest=3500, w_wait=8000
 )
 print(f"Optimális telítettség: {rho*100:.1f}%")
 print(f"Várakozási idő: {W_min:.1f} perc")
@@ -551,12 +566,18 @@ from scipy.optimize import minimize
 import numpy as np
 
 def black_box_objective(params):
-    """Cseréld le saját mérési függvényedre."""
-    x, y = params
-    # Szimulált célfüggvény: max gain, min torzítás
-    gain = -np.log(abs(x) + 1) - 0.5 * np.log(abs(y) + 1)
-    thd  = 0.01 * x**2 / (y + 1)**0.5
-    return gain + 10 * thd   # minimalizálandó
+    """Cseréld le saját mérési függvényedre.
+
+    A Nelder-Mead nem ismer korlátokat: korlátozás nélkül ez a célfüggvény
+    negatív ellenállásértékre fut ki. Ezért a paramétereket a fizikailag
+    értelmes tartományba vágjuk, és a tartományon kívülre büntetést adunk.
+    """
+    x, y = params                      # RC, RE [ohm]
+    if not (100 <= x <= 47000 and 1 <= y <= 4700):
+        return 1e6                     # büntetés
+    Av  = x / (y + 26)                 # erősítés
+    thd = 0.01 * (x / 1000) ** 2 / (y + 1) ** 0.5
+    return -np.log(Av) + 10 * thd      # minimalizálandó
 
 result = minimize(
     black_box_objective,
@@ -569,7 +590,7 @@ print(f"Iterációk: {result.nit}")</pre></div>
 </div>
 
 <div class="page-footer">
-  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span>Bódis Tamás · Budapest</span>
   <span data-i18n="footer.tag">Optimumszámítás · Variációszámítás · Kód</span>
 </div>
 </div>
@@ -583,15 +604,17 @@ function setVal(id, val){
 
 const T = {
   hu: {
-    "title": "Optimumszámítás a <em>hétköznapokban</em>",
+    "pattern.intro": "Első ránézésre a bojler, a villanykörte, az erősítő és az étterem teljesen különböző problémák. Mégis mind ugyanolyan szerkezetű kérdést tesznek fel: <strong>meddig érdemes menni?",
+    "pattern.lambda": "A <strong>λ (lambda)</strong> paraméter azt fejezi ki, hogy számodra <em>mennyit ér</em> az egyik szempont a másikhoz képest. Ha az étteremben a vendégek élményét fontosabbnak tartod a bevételnél, nagy λ-t választasz — és az optimális telítettség alacsonyabb lesz. Ha a bevétel az elsődleges, kis λ-val dolgozol — és zsúfoltabb éttermet tolerálsz. <strong>Nincs egyetlen helyes λ — ez értékítélet.</strong> </div> <div class=\"pattern-box\" data-i18n=\"pattern.text\"> Formálisan minden probléma leírható így: <strong>max(nyereség − λ · költség)</strong>. Az optimum feltétele: a két hatás deriváltja egyenlő — vagyis a <em>marginálisnál</em> (a következő kis lépésnél) a nyereség és a költség éppen egyforma mértékben változik. Ha a nyereség gyorsabban nő, érdemes továbblépni. Ha a költség nő gyorsabban, vissza kell lépni. </div> <div class=\"eq-label\" data-i18n=\"eq.pattern.label\">Általános alak</div> <div class=\"eq-block\" style=\"text-align:center;padding:1.2rem\"> <div style=\"display:inline-flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:center\"> <div>$$\max_{x}$$</div> <div style=\"display:inline-flex;align-items:flex-start;gap:.3rem\"> <span style=\"font-size:1.4rem;color:var(--text-dim)\">[</span> <div style=\"text-align:center\"> <div>$\text{Gain}(x)$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.58rem;color:var(--accent2);margin-top:.15rem\">nyereség</div> </div> <div style=\"padding-top:.1rem\">$\;-\;\lambda\;\cdot\;$</div> <div style=\"text-align:center\"> <div>$\text{Cost}(x)$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.58rem;color:var(--red,#c05050);margin-top:.15rem\">költség</div> </div> <span style=\"font-size:1.4rem;color:var(--text-dim)\">]</span> </div> <div>$\;\Longrightarrow\;$</div> <div>$$\frac{d(\text{Gain})}{dx} = \lambda\cdot\frac{d(\text{Cost})}{dx}$$</div> </div> </div> <div style=\"font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim); padding:.7rem 1rem;border:1px solid var(--border);border-radius:2px; background:var(--bg2);line-height:1.8;margin-top:.4rem\"> <span style=\"color:var(--accent2)\">Bojler:</span> nyereség = megtakarított energia, költség = újramelegítés &nbsp;·&nbsp; <span style=\"color:var(--accent2)\">Izzó:</span> nyereség = spórolt áram, költség = rövidebb élettartam<br> <span style=\"color:var(--accent2)\">Erősítő:</span> nyereség = erősítés (Av), költség = torzítás (THD) &nbsp;·&nbsp; <span style=\"color:var(--accent2)\">Étterem:</span> nyereség = bevétel, költség = vendégelégedetlenség </div> </div> <!-- ══ PROBLEMS ══ --> <div class=\"section\"> <div class=\"section-label\" data-i18n=\"sec.problems\">Interaktív problémák</div> <div class=\"prob-tabs\"> <button class=\"prob-tab active\" onclick=\"showProb('boiler')\" data-i18n=\"tab.boiler\">🔥 Bojler</button> <button class=\"prob-tab\" onclick=\"showProb('bulb')\" data-i18n=\"tab.bulb\">💡 Izzó</button> <button class=\"prob-tab\" onclick=\"showProb('amp')\" data-i18n=\"tab.amp\">📡 Erősítő</button> <button class=\"prob-tab\" onclick=\"showProb('rest')\" data-i18n=\"tab.rest\">🍽️ Étterem</button> </div> <!-- BOILER --> <div class=\"prob-panel active\" id=\"panel-boiler\"> <div class=\"prob-card\"> <div class=\"prob-desc\" data-i18n=\"boiler.desc\"> Lakásban villanybojler napi 3 órát fűt. Energetikailag a kikapcsolás <em>mindig</em> nyer: a hőveszteség a hőmérséklet-különbséggel arányos, így a lehűlt tartály kevesebbet veszít, és a visszafűtés pontosan a kikapcsolás alatt elvesztett hőt pótolja. Az alábbi egyszerű modell ezért nem energetikai megtérülést számol, hanem azt: hány napi készenléti fűtés ér föl egy teljes, hidegről indított visszafűtéssel — vagyis mennyi kényelmet ér a döntés. </div> <div class=\"eq-label\" data-i18n=\"boiler.eq.label\">Egyszerű összevetés (kényelmi döntés)</div> <div class=\"eq-block\" style=\"text-align:center;padding:1.2rem\"> <div style=\"display:inline-flex;align-items:center;gap:.8rem;flex-wrap:wrap;justify-content:center;font-size:.9rem\"> <div style=\"text-align:center\"> <div>$P \cdot t_{\text{heat}} \cdot c \cdot N$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem\">napi cost × N nap</div> </div> <div style=\"color:var(--text-dim)\">$\;\geq\;$</div> <div style=\"text-align:center\"> <div>$P \cdot t_{\text{reheat}} \cdot c$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem\">újramelegítés (egyszeri)</div> </div> <div style=\"color:var(--text-dim)\">$\;\Rightarrow\;$</div> <div>$$N^* = \dfrac{t_{\text{reheat}}}{t_{\text{heat}}}$$</div> </div> </div> <div class=\"viz-wrap\"> <canvas id=\"boiler-canvas\" height=\"180\"></canvas> <div style=\"font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent2); padding:.4rem .2rem;letter-spacing:.06em;\"> ℹ︎ N* = t_reheat / t_heat — független P-től és c-től. Felső becslés: a lehűlt tartály kevesebbet veszít, ezért a valódi visszafűtés ennél olcsóbb. </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">P (kW) <input type=\"range\" id=\"b-power\" min=\"5\" max=\"30\" value=\"15\"> <span class=\"ctrl-val\" id=\"b-power-v\">1.5 kW</span> </label> </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">c (Ft/kWh) <input type=\"range\" id=\"b-price\" min=\"10\" max=\"80\" value=\"30\"> <span class=\"ctrl-val\" id=\"b-price-v\">30 Ft</span> </label> </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">t_reheat (h) <input type=\"range\" id=\"b-reheat\" min=\"2\" max=\"10\" value=\"5\"> <span class=\"ctrl-val\" id=\"b-reheat-v\">5 h</span> </label> </div> </div> <div class=\"prob-result\" id=\"boiler-result\">⟶ Eredmény itt jelenik meg</div> </div> <button class=\"expand-btn\" onclick=\"toggleExpand('boiler-math')\" data-i18n=\"btn.deepmath\">▸ Mélyebb matematika</button> <div class=\"expand-content\" id=\"boiler-math\"> <p data-i18n=\"boiler.math.p1\">A probléma diszkrét esemény + folytonos költség típusú. A \"kapcsolás\" egy Dirac-delta jellegű egyszeri költség, míg a napi fűtés folytonos.",
+        "title": "Optimumszámítás a <em>hétköznapokban</em>",
     "sub": "Bojlertől az Euler–Lagrange egyenletig · Interaktív szimulációk · Kód",
     "sec.pattern": "Közös minta",
     "pattern.text": "Minden optimumszámítási probléma — legyen az bojler, villanykörte, erősítő vagy étterem — ugyanabba az absztrakt sémába illeszthető: <strong>max(nyereség − λ · költség)</strong>. Az optimum általában nem a szélsőértékeken van, hanem egy egyensúlyi ponton, amelyet egy <strong>kompenzációs paraméter λ</strong> határoz meg.",
     "eq.pattern.label": "Általános alak",
     "sec.problems": "Interaktív problémák",
     "tab.boiler": "🔥 Bojler", "tab.bulb": "💡 Izzó", "tab.amp": "📡 Erősítő", "tab.rest": "🍽️ Étterem",
-    "boiler.desc": "Lakásban villanybojler napi 3 órát fűt. Ha ritkán járunk be, érdemes lekapcsolni — de az újraforrósítás egyszeri költség. Mikortól éri meg?",
-    "boiler.eq.label": "Megtérülési feltétel",
+    "boiler.desc": "Lakásban villanybojler napi 3 órát fűt. Energetikailag a kikapcsolás mindig nyer: a hőveszteség a hőmérséklet-különbséggel arányos, így a lehűlt tartály kevesebbet veszít. Ez az egyszerű modell azt mutatja meg, hány napi készenléti fűtés ér föl egy teljes, hidegről indított visszafűtéssel — vagyis kényelmi döntésről van szó.",
+    "boiler.eq.label": "Egyszerű összevetés (kényelmi döntés)",
     "b.price.label": "c (Ft/kWh)", "b.reheat.label": "t_reheat (h)",
     "btn.deepmath": "▸ Mélyebb matematika",
     "boiler.math.p1": "A probléma diszkrét esemény + folytonos költség típusú. A 'kapcsolás' egyszeri Dirac-delta jellegű költség, míg a napi fűtés folytonos.",
@@ -635,7 +658,9 @@ const T = {
     "footer.tag": "Optimumszámítás · Variációszámítás · Kód",
   },
   en: {
-    "title": "Optimization in <em>everyday life</em>",
+    "pattern.intro": "At first glance the boiler, the light bulb, the amplifier and the restaurant are entirely different problems. Yet they all ask the same kind of question: how far is it worth pushing one quantity before the cost of the other outweighs the gain?",
+    "pattern.lambda": "The parameter <strong>λ (lambda)</strong> expresses how much one criterion is worth to you relative to the other. Choosing λ is a decision, not a measurement — it is where your preferences enter the optimisation.",
+        "title": "Optimization in <em>everyday life</em>",
     "sub": "From boilers to Euler–Lagrange · Interactive simulations · Code",
     "sec.pattern": "Common pattern",
     "pattern.text": "Every optimization problem — boiler, light bulb, amplifier, or restaurant — fits the same abstract schema: <strong>max(gain − λ · cost)</strong>. The optimum is rarely at the extremes; it is an equilibrium point determined by a <strong>trade-off parameter λ</strong>.",
@@ -687,7 +712,9 @@ const T = {
     "footer.tag":"Optimisation · Calculus of Variations · Code",
   },
   de: {
-    "title": "Optimierung im <em>Alltag</em>",
+    "pattern.intro": "Auf den ersten Blick sind Boiler, Glühbirne, Verstärker und Restaurant völlig verschiedene Probleme. Sie stellen aber dieselbe Art von Frage: Wie weit lohnt es sich, eine Größe zu treiben, bevor die Kosten der anderen den Gewinn übersteigen?",
+    "pattern.lambda": "Der Parameter <strong>λ (Lambda)</strong> drückt aus, wie viel Ihnen ein Kriterium gegenüber dem anderen wert ist. Die Wahl von λ ist eine Entscheidung, keine Messung — hier gehen Ihre Präferenzen in die Optimierung ein.",
+        "title": "Optimierung im <em>Alltag</em>",
     "sub": "Vom Boiler zur Euler–Lagrange-Gleichung · Interaktive Simulationen · Code",
     "sec.pattern":"Gemeinsames Muster",
     "pattern.text":"Jedes Optimierungsproblem — Boiler, Glühbirne, Verstärker oder Restaurant — lässt sich in dasselbe abstrakte Schema einordnen: <strong>max(Gewinn − λ · Kosten)</strong>. Das Optimum liegt selten an den Extremen, sondern an einem Gleichgewichtspunkt, bestimmt durch den <strong>Trade-off-Parameter λ</strong>.",
@@ -857,7 +884,7 @@ function drawBulb(){
   setVal('bl-power-v', P+' W');
   setVal('bl-price-v', c+' Ft');
   setVal('bl-bulbprice-v', bp2+' Ft');
-  setVal('bl-life-v', (life/1000).toFixed(1)+'k h');
+  setVal('bl-life-v', (life/1000).toFixed(1)+'k ciklus');
 
   const Cswitch=bp2/life; // Ft per switch
   const Penergy=(P/1000)*c; // Ft per hour

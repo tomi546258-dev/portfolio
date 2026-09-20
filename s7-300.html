@@ -131,7 +131,7 @@ body::before {
   <span class="proj-icon">🏭</span>
   <h1 class="proj-title" data-i18n="title">Siemens <em>S7-300</em> PLC<br>— ipari tapasztalatok</h1>
   <div class="proj-sub">
-    <span>Bódis Tamás · BT Tech</span>
+    <span>Bódis Tamás</span>
     <span data-i18n="sub">Ipari automatizálás · PLC programozás · Karbantartás</span>
   </div>
 
@@ -139,7 +139,7 @@ body::before {
   <div class="section">
     <div class="section-label" data-i18n="sec.overview">Áttekintés</div>
     <div class="overview-box" data-i18n="overview.text">
-      A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam — digitális I/O bővítőkártya telepítéstől kezdve hibakeresésen át egész rack-rendszer átépítéséig.
+      A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam: digitális I/O bővítőkártya telepítése és hibakeresés egy leállt gyártósoron.
     </div>
   </div>
 
@@ -168,7 +168,7 @@ body::before {
         <tr><td>Munka-RAM</td><td>128 kB</td><td>Bővíthető MC memóriakártyával (max. 8 MB)</td></tr>
         <tr><td>Digitális I/O</td><td>max. 1024 be / 1024 ki</td><td>SM321/SM322/SM323 modulokkal</td></tr>
         <tr><td>Analóg I/O</td><td>max. 256 csatorna</td><td>SM331/SM332 modulok, 12–16 bit felbontás</td></tr>
-        <tr><td>Kommunikáció</td><td>MPI, Profibus-DP, Profinet</td><td>CP modulokkal Ethernet, AS-i, CAN</td></tr>
+        <tr><td>Kommunikáció</td><td>MPI + Profibus-DP</td><td>a 2AF03-on nincs Profinet; Ethernet CP343 modullal</td></tr>
         <tr><td>Tápfeszültség</td><td>24 V DC</td><td>PS307 tápegység: 2A / 5A / 10A változat</td></tr>
         <tr><td>Üzemi hőmérséklet</td><td>0 … +60 °C</td><td>Kiterjesztett: −25 … +70 °C (SIPLUS)</td></tr>
         <tr><td>Programozás</td><td>STEP 7 / TIA Portal</td><td>LAD, FBD, STL, SCL, Graph</td></tr>
@@ -187,7 +187,7 @@ body::before {
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro1"><strong style="color:var(--accent2)">Bevált megbízhatóság</strong> — 30 éves kúltúra, rengeteg üzemeltető ismeri. MTBF értéke extrém magas, 10-15 éves üzemidő teljesen jellemző.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro2"><strong style="color:var(--accent2)">Moduláris bővíthetőség</strong> — a rack tetszőlegesen bővíthető I/O, kommunikációs és funkcionális modulokkal. Cserélhető az igény változásával.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro3"><strong style="color:var(--accent2)">Hatalmas ökoszisztéma</strong> — számtalan gyártó épített rá periféria-eszközöket, HMI-t, frekvenciaváltót. Szinte minden iparágban megtalálható.</span></div>
-        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro4"><strong style="color:var(--accent2)">Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, akár 127 eszköz egy szegmensen. Sok régi gép csak ezen kommunikál.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro4"><strong style="color:var(--accent2)">Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, szegmensenként 32 állomás, összesen 126 cím (repeaterekkel). Sok régi gép csak ezen kommunikál.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro5"><strong style="color:var(--accent2)">Gazdag diagnosztika</strong> — online állapotfigyelés STEP 7-ből, szimbólikus I/O monitorozás, hardverhiba-riportok modulszinten.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="pro6"><strong style="color:var(--accent2)">Tartalékalkatrész-piac</strong> — bőséges used market, sok raktáron tartott modul. Egy meghalt SM323 kártya akár másnap pótolható.</span></div>
       </div>
@@ -196,7 +196,7 @@ body::before {
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="con1"><strong style="color:#d08080">EOL — életciklus vége</strong> — Siemens 2023-ban leállította az értékesítést. Szerviz ugyan még fut, de új projektre nem javasolt, és alkatrész-ellátás egyre drágul.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="con2"><strong style="color:#d08080">Magas ár</strong> — egy CPU315 + rack + modulok összköltsége €2000–5000 felett van. Kis alkalmazásokhoz teljesen aránytalanul drága.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="con3"><strong style="color:#d08080">Nincs natív Ethernet/IP</strong> — az alap CPU-khoz CP343 kommunikációs modul kell, ami plusz költség és helyfoglalás.</span></div>
-        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con4"><strong style="color:#d08080">Nehézkes szoftver</strong> — STEP 7 Classic Windows-specifikus, registry-igényes, VirtualBox-on kell futtatni modern gépen. TIA Portal sokkal jobb, de drágább.</span></div>
+        <div class="procon-item"><span class="icon">▸</span><span data-i18n="con4"><strong style="color:#d08080">Nehézkes szoftver</strong> — a STEP 7 Classic Windows-specifikus és registry-igényes; régebbi verziókat modern gépen jellemzően virtuális gépben futtatnak. A TIA Portal kényelmesebb, de drágább.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="con5"><strong style="color:#d08080">Akkumulátor-függőség</strong> — a CPU RAM tartalmát akkumulátor tartja fenn áramkimaradáskor. Ez karbantartási feladat és meghibásodási pont.</span></div>
         <div class="procon-item"><span class="icon">▸</span><span data-i18n="con6"><strong style="color:#d08080">Nem skálázható lefelé</strong> — S7-300 alatti teljesítményszintre nincs értelme erőltetni, míg az S7-1200/1500 széria sokkal rugalmasabb.</span></div>
       </div>
@@ -373,7 +373,7 @@ body::before {
   </div>
 
   <div class="page-footer">
-    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>Bódis Tamás · Budapest</span>
     <span>Siemens SIMATIC S7-300 — Ipari tapasztalatok</span>
   </div>
 </div>
@@ -384,7 +384,7 @@ const T = {
     "title": "Siemens <em>S7-300</em> PLC<br>— ipari tapasztalatok",
     "sub": "Ipari automatizálás · PLC programozás · Karbantartás",
     "sec.overview": "Áttekintés",
-    "overview.text": "A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam — digitális I/O bővítőkártya telepítéstől kezdve hibakeresésen át egész rack-rendszer átépítéséig.",
+    "overview.text": "A Siemens SIMATIC S7-300 a középkategóriás PLC-k egyik legjelentősebb képviselője — 1994 óta gyártják, és még ma is több tízezer aktív telepítésben fut a világon. Moduláris felépítése, robusztus tápegységei és az óriási ökoszisztéma (Step 7, TIA Portal, Profibus, Profinet) miatt évtizedekig meghatározó szabvány volt az ipari automatizálásban. Saját munkám során CPU315-2AF03 és CPU312 típusokkal dolgoztam: digitális I/O bővítőkártya telepítése és hibakeresés egy leállt gyártósoron.",
     "sec.photos": "Saját fotók — üzemi környezetből",
     "photo1.cap": "CPU315-2AF03 · MC951/32kB memóriakártya · RUN/STOP/MRES kapcsoló",
     "photo2.cap": "Teljes rack: PS307-5A tápegység · CPU315 · SM321/SM323 digitális I/O modulok · kézi I/O-jelölések",
@@ -395,7 +395,7 @@ const T = {
     "pro1": "<strong style='color:var(--accent2)'>Bevált megbízhatóság</strong> — 30 éves kultúra, rengeteg üzemeltető ismeri. MTBF értéke extrém magas, 10-15 éves üzemidő teljesen jellemző.",
     "pro2": "<strong style='color:var(--accent2)'>Moduláris bővíthetőség</strong> — a rack tetszőlegesen bővíthető I/O, kommunikációs és funkcionális modulokkal.",
     "pro3": "<strong style='color:var(--accent2)'>Hatalmas ökoszisztéma</strong> — számtalan gyártó épített rá periféria-eszközöket, HMI-t, frekvenciaváltót.",
-    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, akár 127 eszköz egy szegmensen.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP háló</strong> — gyors, determinisztikus busz 12 Mbit/s-ig, szegmensenként 32 állomás, összesen 126 cím.",
     "pro5": "<strong style='color:var(--accent2)'>Gazdag diagnosztika</strong> — online állapotfigyelés STEP 7-ből, szimbólikus I/O monitorozás, hardverhiba-riportok.",
     "pro6": "<strong style='color:var(--accent2)'>Tartalékalkatrész-piac</strong> — bőséges used market, sok raktáron tartott modul.",
     "con1": "<strong style='color:#d08080'>EOL — életciklus vége</strong> — Siemens 2023-ban leállította az értékesítést. Alkatrész-ellátás egyre drágul.",
@@ -443,7 +443,7 @@ const T = {
     "title": "Siemens <em>S7-300</em> PLC<br>— Industrial experience",
     "sub": "Industrial automation · PLC programming · Maintenance",
     "sec.overview": "Overview",
-    "overview.text": "The Siemens SIMATIC S7-300 is one of the most significant mid-range PLCs — manufactured since 1994, it still runs in tens of thousands of active installations worldwide. Its modular architecture, robust power supplies, and vast ecosystem (Step 7, TIA Portal, Profibus, Profinet) made it the defining standard in industrial automation for decades. In my own work I have operated CPU315-2AF03 and CPU312 units — from installing digital I/O expansion cards through fault-finding to full rack system rebuilds.",
+    "overview.text": "The Siemens SIMATIC S7-300 is one of the most significant mid-range PLCs — manufactured since 1994, it still runs in tens of thousands of active installations worldwide. Its modular architecture, robust power supplies, and vast ecosystem (Step 7, TIA Portal, Profibus, Profinet) made it the defining standard in industrial automation for decades. In my own work I have used CPU315-2AF03 and CPU312 units: installing a digital I/O expansion card and fault-finding on a stopped production line.",
     "sec.photos": "Own photos — operational environment",
     "photo1.cap": "CPU315-2AF03 · MC951/32kB memory card · RUN/STOP/MRES selector",
     "photo2.cap": "Full rack: PS307-5A PSU · CPU315 · SM321/SM323 digital I/O modules · hand-written I/O labels",
@@ -454,7 +454,7 @@ const T = {
     "pro1": "<strong style='color:var(--accent2)'>Proven reliability</strong> — 30-year culture, many operators know it well. Extremely high MTBF; 10–15 year operational lifetime is typical.",
     "pro2": "<strong style='color:var(--accent2)'>Modular expandability</strong> — the rack can be expanded arbitrarily with I/O, communication and function modules.",
     "pro3": "<strong style='color:var(--accent2)'>Vast ecosystem</strong> — countless manufacturers built peripheral devices, HMIs, and drives on it.",
-    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP network</strong> — fast, deterministic bus up to 12 Mbit/s, up to 127 devices per segment.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP network</strong> — fast, deterministic bus up to 12 Mbit/s, 32 stations per segment, 126 addresses in total.",
     "pro5": "<strong style='color:var(--accent2)'>Rich diagnostics</strong> — online monitoring from STEP 7, symbolic I/O watch, hardware fault reports per module.",
     "pro6": "<strong style='color:var(--accent2)'>Spare parts market</strong> — abundant used market, many modules kept in stock.",
     "con1": "<strong style='color:#d08080'>EOL — end of life</strong> — Siemens halted sales in 2023. Parts supply is increasingly expensive.",
@@ -513,7 +513,7 @@ const T = {
     "pro1": "<strong style='color:var(--accent2)'>Bewährte Zuverlässigkeit</strong> — 30 Jahre Erfahrung, viele Betreiber kennen sie. Extrem hohe MTBF, 10–15 Jahre Betriebsdauer typisch.",
     "pro2": "<strong style='color:var(--accent2)'>Modulare Erweiterbarkeit</strong> — das Rack kann beliebig mit I/O-, Kommunikations- und Funktionsmodulen erweitert werden.",
     "pro3": "<strong style='color:var(--accent2)'>Riesiges Ökosystem</strong> — zahllose Hersteller haben Peripheriegeräte, HMIs und Antriebe darauf aufgebaut.",
-    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP-Netzwerk</strong> — schneller, deterministischer Bus bis 12 Mbit/s, bis zu 127 Geräte pro Segment.",
+    "pro4": "<strong style='color:var(--accent2)'>Profibus-DP-Netzwerk</strong> — schneller, deterministischer Bus bis 12 Mbit/s, 32 Stationen pro Segment, insgesamt 126 Adressen.",
     "pro5": "<strong style='color:var(--accent2)'>Umfangreiche Diagnose</strong> — Online-Überwachung aus STEP 7, symbolische I/O-Beobachtung.",
     "pro6": "<strong style='color:var(--accent2)'>Ersatzteilmarkt</strong> — reichhaltiger Gebrauchtmarkt, viele Module auf Lager.",
     "con1": "<strong style='color:#d08080'>EOL — Lebensende</strong> — Siemens hat 2023 den Verkauf eingestellt. Teileversorgung wird teurer.",

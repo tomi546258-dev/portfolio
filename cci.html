@@ -129,7 +129,7 @@ canvas { display:block; width:100%; border-radius:2px; }
     <button class="lang-btn" onclick="setLang('de')">DE</button>
   </div>
 
-  <div class="status-pill"><span class="status-dot"></span><span data-i18n="status">Konferencia közlemény — bírálat alatt</span></div>
+  <div class="status-pill"><span class="status-dot"></span><span data-i18n="status">Munkaanyag — kísérleti módszer</span></div>
 
   <h1 class="paper-title" data-i18n="title">Corner-Corrected Integral (CCI) —<br><em>Kvantált jelekre</em> optimalizált numerikus integrátor</h1>
   <div class="paper-meta">
@@ -139,7 +139,7 @@ canvas { display:block; width:100%; border-radius:2px; }
     <span>·</span>
     <span>Óbudai Egyetem, KVK</span>
     <span>·</span>
-    <span data-i18n="meta.venue">MDPI Electronics / Sensors</span>
+    <span data-i18n="meta.venue">Saját munkaanyag</span>
   </div>
 
   <!-- abstract -->
@@ -149,10 +149,14 @@ canvas { display:block; width:100%; border-radius:2px; }
       A Corner-Corrected Integral (CCI) egy egyszerű, egész-aritmetikán alapuló numerikus integrálási módszer,
       amely a klasszikus téglalap-szabályt egy <em>kvadratikus sarokkorrekciós taggal</em> egészíti ki.
       A korrekció egy geometriai azonosságból fakad: $(n-1)(n+1) = n^2 - 1$, amelynek átlaga $n^2 - \tfrac{1}{2}$.
-      Az eredmény $O(h^3)$ globális hibakorlát — egy renddel jobb a téglalap- és trapézszabálynál lépcsős jeleknél.
-      Szintetikus teszteken (szinusz, PWM, kvantált Gauss) a CCI az RMS hibát 30–60%-kal csökkenti
-      a klasszikus szabályokhoz képest, és 15%-kal jobb Simpson-módszernél is — miközben
-      lebegőpontos egység nélkül, $O(1)$ memóriával futtatható mikrovezérlőkön.
+      A cél nem egy magasabb rendű kvadratúra, hanem egy olcsó korrekció lépcsős (kvantált) jelekre:
+      a korrekciós tag minden szintváltásnál a lépcső fél mintányi területét pótolja, csak egész
+      szorzással és összeadással, $O(1)$ memóriával, lebegőpontos egység nélkül.
+      <br><br>
+      <strong>Korlátok, amiket érdemes tudni:</strong> a korrekció $n^2$-es, ezért a módszer nem lineáris
+      a jelben ($I(2y) \neq 2I(y)$), és az $n$ paraméter hangolást igényel — rosszul megválasztott
+      $n$-nel a hiba nagyobb, mint a sima téglalap-szabályé. Az összehasonlító mérés újrafuttatása
+      folyamatban van; addig a módszer kísérleti munkaanyagnak tekintendő.
     </div>
   </div>
 
@@ -167,8 +171,8 @@ canvas { display:block; width:100%; border-radius:2px; }
       </div>
       <div class="result-card">
         <div class="result-tag" data-i18n="r2.tag">Pontosság</div>
-        <div class="result-title" data-i18n="r2.title">1.8% RMS hiba (Q=8)</div>
-        <div class="result-body" data-i18n="r2.body">Téglalap: 8.2%, trapéz: 5.7%, Simpson: 3.1%, CCI: <strong style="color:var(--accent2)">1.8%</strong> — azonos számítási komplexitás mellett, lebegőpontos egység nélkül.</div>
+        <div class="result-title" data-i18n="r2.title">Egész aritmetika, FPU nélkül</div>
+        <div class="result-body" data-i18n="r2.body">A számítás egész szorzásból és összeadásból áll, mintánként konstans munkával és $O(1)$ memóriával — 8 bites mikrovezérlőn is elfut.</div>
       </div>
       <div class="result-card">
         <div class="result-tag" data-i18n="r3.tag">Automatikus n-hangolás</div>
@@ -221,7 +225,8 @@ canvas { display:block; width:100%; border-radius:2px; }
 
     <div class="eq-label" data-i18n="eq5.label">Globális hibakorlát</div>
     <div class="eq-block">
-      $$E_\text{CCI} = O(h^3) \quad\text{lépcsős jelek esetén} \qquad \text{vs.}\qquad E_\text{rect} = O(h^2), \quad E_\text{trap} = O(h^2)$$
+      $$I_\text{CCI} - I_\text{rect} = K(y)\,\Delta t\left(n^2 - \tfrac{1}{2}\right)
+      \qquad\text{— a korrekció a szintváltások számával skálázódik, nem $h$ rendjével}$$
     </div>
   </div>
 
@@ -268,17 +273,16 @@ canvas { display:block; width:100%; border-radius:2px; }
       <thead>
         <tr>
           <th data-i18n="th.method">Módszer</th>
-          <th data-i18n="th.rms">RMS hiba</th>
           <th data-i18n="th.ops">Műveletek/minta</th>
           <th data-i18n="th.mem">Memória</th>
           <th data-i18n="th.fpu">FPU szükséges?</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td data-i18n="m.rect">Téglalap</td><td>8.2%</td><td>1 összeadás</td><td>O(1)</td><td data-i18n="no">Nem</td></tr>
-        <tr><td data-i18n="m.trap">Trapéz</td><td>5.7%</td><td>2 összeadás, 1 osztás</td><td>O(1)</td><td data-i18n="opt">Opcionális</td></tr>
-        <tr><td data-i18n="m.simp">Simpson</td><td>3.1%</td><td>4 összeadás, 2 szorzás</td><td>O(3)</td><td data-i18n="opt">Opcionális</td></tr>
-        <tr class="cci"><td><strong>CCI (javasolt)</strong></td><td><strong>1.8%</strong></td><td>2 szorzás, 2 összeadás</td><td>O(1)</td><td data-i18n="no"><strong>Nem</strong></td></tr>
+        <tr><td data-i18n="m.rect">Téglalap</td><td>1 összeadás</td><td>O(1)</td><td data-i18n="no">Nem</td></tr>
+        <tr><td data-i18n="m.trap">Trapéz</td><td>2 összeadás, 1 osztás</td><td>O(1)</td><td data-i18n="opt">Opcionális</td></tr>
+        <tr><td data-i18n="m.simp">Simpson</td><td>4 összeadás, 2 szorzás</td><td>O(1)</td><td data-i18n="opt">Opcionális</td></tr>
+        <tr class="cci"><td><strong>CCI</strong></td><td>2 szorzás, 2 összeadás</td><td>O(1)</td><td data-i18n="no"><strong>Nem</strong></td></tr>
       </tbody>
     </table>
   </div>
@@ -287,23 +291,32 @@ canvas { display:block; width:100%; border-radius:2px; }
   <div class="section">
     <div class="section-label" data-i18n="sec.code">Implementáció — pszeudokód</div>
     <div class="code-label" data-i18n="code1.label">Mikrovezérlő (8-bit, egész aritmetika)</div>
-    <div class="code-box"><pre>uint16_t sum = 0;
-uint8_t prev = sample[0];
-sum += (prev * prev * 2 - 1) / 2;   // első sarok
+    <div class="code-box"><pre>/* y[]   : kvantált minták (LSB)
+ * n_q   : hangolt korrekciós paraméter, 2^8-as fixpontban (0…256)
+ * dt_q  : mintavételi idő fixpontban
+ * Az akkumulátor 32 bites: 8 bites mintáknál is túlcsordul a 16 bites. */
 
-for (uint8_t i = 1; i &lt; N; i++) {
-    uint8_t n = sample[i];
-    sum += n * dt;                   // téglalap tag
-    if (n != prev) {
-        sum += (n*n*2 - 1) / 2;     // sarokkorrekció
-        prev = n;
-    }
+int32_t  acc  = 0;          // téglalap-összeg
+uint16_t K    = 1;          // szintváltások száma (az első sarok is az)
+uint8_t  prev = y[0];
+
+for (uint16_t i = 0; i &lt; N; i++) {      // N &gt; 255 miatt uint16_t!
+    acc += (int32_t)y[i];
+    if (i &gt; 0 &amp;&amp; y[i] != prev) { K++; prev = y[i]; }
 }
-// I_CCI = sum</pre></div>
+
+/* korrekció: K * dt * (n^2 - 1/2), fixpontban.
+   A -1/2-et 256-os skálán 128 képviseli. */
+int32_t corr = ((int32_t)K * ((int32_t)n_q * n_q / 256 - 128)) / 256;
+
+int32_t I_CCI = (acc + corr) * dt_q;</pre></div>
 
     <div class="code-label" style="margin-top:1rem" data-i18n="code2.label">MATLAB — kompakt verzió</div>
     <div class="code-box"><pre>function I = cci_integrate(y, dt, n)
-    if nargin &lt; 3, n = mean(y)/2; end
+    if nargin &lt; 3
+        error('cci_integrate:n', 'Az n korrekciós paramétert meg kell adni (0..1).');
+    end
+    n = min(max(n, 0), 1);   % a korrekció csak ebben a tartományban értelmes
     y = y(:); N = numel(y);
     I_rect = sum(y) * dt;
     tol = max(1e-12, 1e-6*(max(y)-min(y)+eps));
@@ -318,13 +331,13 @@ end</pre></div>
     <div class="theorem-box">
       <div class="theorem-label" data-i18n="thm.label">Maximális hiba szegmensenként</div>
       <div class="theorem-body" data-i18n="thm.body">
-        Legyen $f(x) = n + \delta$, ahol $\delta \in [0,1)$ a kvantálási maradék.
-        A CCI becslés: $n^2 - \tfrac{1}{2}$.
-        A valódi érték $(n+\delta)^2 = n^2 + 2n\delta + \delta^2$.
-        A hiba tehát: $E = 2n\delta + \delta^2 + \tfrac{1}{2}$,
-        maximuma ($\delta \to 1$): $E_\max = 2n + 1.5$.
-        A CCI <em>mindig kissé felülbecsli</em> az integrált,
-        de konzisztensen közelebb marad az igaz értékhez, mint a téglalap-szabály.
+        Egyetlen szintváltásnál a korrekció a $\left(n^2-\tfrac{1}{2}\right)\Delta t$ tagot adja hozzá,
+        miközben a valódi lépcsőterület a szintváltás helyzetétől ($\delta \in [0,1)$) függ.
+        Az eltérés szegmensenként korlátos, de <em>nem</em> egyenletesen kicsi: rögzített $n$ mellett
+        a korrekció alulbecsülheti és túl is lőheti a valódi területet, és a hiba a jel amplitúdójával
+        együtt nő, mert a korrekciós tag $n$-ben kvadratikus.
+        Ezért a módszer gyakorlati használatához az $n$ paramétert hangolni kell (lásd az automatikus
+        $n$-hangolást), és az eredményt mindig érdemes trapéz-szabállyal ellenőrizni.
       </div>
     </div>
   </div>
@@ -333,13 +346,13 @@ end</pre></div>
   <div class="section">
     <div class="section-label" data-i18n="sec.bib">Hivatkozás / BibTeX</div>
     <div style="position:relative">
-      <pre class="bibtex-box"><span class="bib-key">@article</span>{bodis2025cci,
+      <pre class="bibtex-box"><span class="bib-key">@unpublished</span>{bodis2026cci,
   <span class="bib-field">author</span>  = {<span class="bib-val">Bódis, Tamás</span>},
   <span class="bib-field">title</span>   = {<span class="bib-val">The Corner-Corrected Integral (CCI) Method:
             A Quadratic Correction-Based Numerical
             Integration Technique for Quantized Functions</span>},
-  <span class="bib-field">year</span>    = {<span class="bib-val">2025</span>},
-  <span class="bib-field">note</span>    = {<span class="bib-val">Manuscript under review</span>},
+  <span class="bib-field">year</span>    = {<span class="bib-val">2026</span>},
+  <span class="bib-field">note</span>    = {<span class="bib-val">Working note, not submitted</span>},
   <span class="bib-field">institution</span> = {<span class="bib-val">Óbuda University, Kandó Kálmán
                Faculty of Electrical Engineering</span>},
   <span class="bib-field">orcid</span>   = {<span class="bib-val">0009-0004-6349-712X</span>}
@@ -349,7 +362,7 @@ end</pre></div>
   </div>
 
   <div class="page-footer">
-    <span>Bódis Tamás · BT Tech · Budapest</span>
+    <span>Bódis Tamás · Budapest</span>
     <span>CCI — Corner-Corrected Integral Method</span>
   </div>
 </div>
@@ -360,14 +373,14 @@ end</pre></div>
 // ════════════════════════════════════════
 const T = {
   hu: {
-    "status": "Konferencia közlemény — bírálat alatt",
+    "status": "Munkaanyag — kísérleti módszer",
     "title": "Corner-Corrected Integral (CCI) —<br><em>Kvantált jelekre</em> optimalizált numerikus integrátor",
-    "meta.venue": "MDPI Electronics / Sensors",
+    "meta.venue": "Saját munkaanyag",
     "sec.abstract": "Összefoglalás",
-    "abstract.text": "A Corner-Corrected Integral (CCI) egy egyszerű, egész-aritmetikán alapuló numerikus integrálási módszer, amely a klasszikus téglalap-szabályt egy <em>kvadratikus sarokkorrekciós taggal</em> egészíti ki. A korrekció egy geometriai azonosságból fakad: $(n-1)(n+1)=n^2-1$, amelynek átlaga $n^2-\\tfrac{1}{2}$. Az eredmény $O(h^3)$ globális hibakorlát — egy renddel jobb a téglalap- és trapézszabálynál lépcsős jeleknél.",
+    "abstract.text": "A Corner-Corrected Integral (CCI) egy egyszerű, egész-aritmetikán alapuló numerikus integrálási módszer, amely a klasszikus téglalap-szabályt egy <em>kvadratikus sarokkorrekciós taggal</em> egészíti ki. A korrekció egy geometriai azonosságból fakad: $(n-1)(n+1)=n^2-1$, amelynek átlaga $n^2-\\tfrac{1}{2}$. A cél nem magasabb rendű kvadratúra, hanem olcsó korrekció lépcsős jelekre; a módszer nem lineáris a jelben ($I(2y)\\neq 2I(y)$), és az $n$ paraméter hangolást igényel. Az összehasonlító mérés újrafuttatása folyamatban.",
     "sec.results": "Főbb eredmények",
     "r1.tag":"Geometriai motiváció","r1.title":"Lakásablakok ihletése","r1.body":"Az alaptétel egy lakótömb ablakrácsának megfigyeléséből ered: egy $n\\times n$ négyzetből $(n-1)\\times(n+1)$ téglalapba lépve az area pontosan 1-gyel csökken. Az átlag adja a $-\\tfrac{1}{2}$ korrekciót.",
-    "r2.tag":"Pontosság","r2.title":"1.8% RMS hiba (Q=8)","r2.body":"Téglalap: 8.2%, trapéz: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — azonos komplexitás mellett, lebegőpontos egység nélkül.",
+    "r2.tag":"Költség","r2.title":"Egész aritmetika, FPU nélkül","r2.body":"A számítás egész szorzásból és összeadásból áll, mintánként konstans munkával és $O(1)$ memóriával — 8 bites mikrovezérlőn is elfut.",
     "r3.tag":"Automatikus n-hangolás","r3.title":"Skála/fázis-invariancia","r3.body":"Az $n$ korrekciós paramétert decimálással és félmintás eltolással határozza meg az algoritmus — ground truth nélkül, $O(N)$ időben, $O(1)$ memóriával.",
     "r4.tag":"Implementáció","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Csak egész szorzás és összeadás kell. $10^6$ mintán $<0.1\\%$ integrálhiba fixpontos aritmetikával. Drop-in csere a hagyományos accumulate-and-sum megoldások helyett.",
     "sec.eqs":"Alapegyenletek",
@@ -382,25 +395,25 @@ const T = {
     "signal.subtitle":"Integrálási hiba összehasonlítás — kvantálási szint és módszer szerint",
     "ctrl.Q":"Kvantálási szint Q","ctrl.N":"Minták száma N",
     "sec.table":"Módszer-összehasonlítás (Q=8, N=1000)",
-    "th.method":"Módszer","th.rms":"RMS hiba","th.ops":"Műveletek/minta","th.mem":"Memória","th.fpu":"FPU szükséges?",
+    "th.method":"Módszer","th.ops":"Műveletek/minta","th.mem":"Memória","th.fpu":"FPU szükséges?",
     "m.rect":"Téglalap","m.trap":"Trapéz","m.simp":"Simpson","no":"Nem","opt":"Opcionális",
     "sec.code":"Implementáció — pszeudokód",
     "code1.label":"Mikrovezérlő (8-bit, egész aritmetika)",
     "code2.label":"MATLAB — kompakt verzió",
     "sec.theorem":"Hibakorlát",
     "thm.label":"Maximális hiba szegmensenként",
-    "thm.body":"Legyen $f(x)=n+\\delta$, ahol $\\delta\\in[0,1)$ a kvantálási maradék. A CCI becslés: $n^2-\\tfrac{1}{2}$. A valódi érték $(n+\\delta)^2=n^2+2n\\delta+\\delta^2$. A hiba: $E=2n\\delta+\\delta^2+\\tfrac{1}{2}$, maximuma ($\\delta\\to 1$): $E_{\\max}=2n+1.5$. A CCI <em>mindig kissé felülbecsli</em> az integrált.",
+    "thm.body":"Egyetlen szintváltásnál a korrekció $\\left(n^2-\\tfrac{1}{2}\\right)\\Delta t$-t ad hozzá, miközben a valódi lépcsőterület a szintváltás helyzetétől függ. Az eltérés szegmensenként korlátos, de rögzített $n$ mellett alul- és felülbecslés egyaránt előfordul, és a hiba az amplitúdóval nő, mert a korrekció $n$-ben kvadratikus. Ezért az $n$ paramétert hangolni kell.",
     "sec.bib":"Hivatkozás / BibTeX",
   },
   en: {
-    "status": "Conference paper — under review",
+    "status": "Working note — experimental method",
     "title": "Corner-Corrected Integral (CCI) —<br>Numerical integrator optimised for <em>quantised signals</em>",
-    "meta.venue": "MDPI Electronics / Sensors",
+    "meta.venue": "Saját munkaanyag",
     "sec.abstract": "Abstract",
-    "abstract.text": "The Corner-Corrected Integral (CCI) is a lightweight, integer-arithmetic numerical integration method that augments the classical rectangular rule with a <em>quadratic corner-correction term</em>. The correction follows from a geometric identity: $(n-1)(n+1)=n^2-1$, whose average yields $n^2-\\tfrac{1}{2}$. The result is an $O(h^3)$ global error bound — one order better than the rectangle or trapezoid rules for step signals.",
+    "abstract.text": "The Corner-Corrected Integral (CCI) is a lightweight, integer-arithmetic numerical integration method that augments the classical rectangular rule with a <em>quadratic corner-correction term</em>. The correction follows from a geometric identity: $(n-1)(n+1)=n^2-1$, whose average yields $n^2-\\tfrac{1}{2}$. The aim is not a higher-order quadrature but a cheap correction for staircase signals; the method is not linear in the signal ($I(2y)\\neq 2I(y)$) and the parameter $n$ has to be tuned. The comparative benchmark is being re-run.",
     "sec.results": "Key results",
     "r1.tag":"Geometric motivation","r1.title":"Inspired by apartment windows","r1.body":"The core insight comes from observing an apartment building's window grid: stepping from an $n\\times n$ square to an $(n-1)\\times(n+1)$ rectangle reduces the area by exactly 1. The average gives the $-\\tfrac{1}{2}$ correction.",
-    "r2.tag":"Accuracy","r2.title":"1.8% RMS error (Q=8)","r2.body":"Rectangle: 8.2%, trapezoid: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — at equal computational complexity, without floating-point unit.",
+    "r2.tag":"Cost","r2.title":"Integer arithmetic, no FPU","r2.body":"The computation is integer multiply-add with constant work per sample and $O(1)$ memory — it runs on an 8-bit microcontroller.",
     "r3.tag":"Auto-tuning of n","r3.title":"Scale/phase invariance","r3.body":"The correction parameter $n$ is determined via decimation and half-sample shifting — without ground truth, in $O(N)$ time with $O(1)$ memory.",
     "r4.tag":"Implementation","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Only integer multiplication and addition required. $<0.1\\%$ integral error over $10^6$ samples in fixed-point arithmetic. Drop-in replacement for accumulate-and-sum loops.",
     "sec.eqs":"Core equations",
@@ -415,7 +428,7 @@ const T = {
     "signal.subtitle":"Integration error comparison — by quantisation level and method",
     "ctrl.Q":"Quantisation level Q","ctrl.N":"Sample count N",
     "sec.table":"Method comparison (Q=8, N=1000)",
-    "th.method":"Method","th.rms":"RMS error","th.ops":"Ops/sample","th.mem":"Memory","th.fpu":"FPU required?",
+    "th.method":"Method","th.ops":"Ops/sample","th.mem":"Memory","th.fpu":"FPU required?",
     "m.rect":"Rectangle","m.trap":"Trapezoid","m.simp":"Simpson","no":"No","opt":"Optional",
     "sec.code":"Implementation — pseudocode",
     "code1.label":"Microcontroller (8-bit, integer arithmetic)",
@@ -426,14 +439,14 @@ const T = {
     "sec.bib":"Citation / BibTeX",
   },
   de: {
-    "status": "Konferenzbeitrag — unter Begutachtung",
+    "status": "Arbeitsnotiz — experimentelle Methode",
     "title": "Corner-Corrected Integral (CCI) —<br>Numerischer Integrator für <em>quantisierte Signale</em>",
-    "meta.venue": "MDPI Electronics / Sensors",
+    "meta.venue": "Saját munkaanyag",
     "sec.abstract": "Zusammenfassung",
-    "abstract.text": "Das Corner-Corrected Integral (CCI) ist eine einfache, ganzzahlarithmetische Methode zur numerischen Integration, die die klassische Rechteckregel um einen <em>quadratischen Ecken-Korrekturterm</em> erweitert. Die Korrektur folgt aus einer geometrischen Identität: $(n-1)(n+1)=n^2-1$, deren Mittelwert $n^2-\\tfrac{1}{2}$ ergibt. Das Resultat ist eine $O(h^3)$ globale Fehlerschranke — eine Ordnung besser als Rechteck- und Trapezregel für Treppensignale.",
+    "abstract.text": "Das Corner-Corrected Integral (CCI) ist eine einfache, ganzzahlarithmetische Methode zur numerischen Integration, die die klassische Rechteckregel um einen <em>quadratischen Ecken-Korrekturterm</em> erweitert. Die Korrektur folgt aus einer geometrischen Identität: $(n-1)(n+1)=n^2-1$, deren Mittelwert $n^2-\\tfrac{1}{2}$ ergibt. Ziel ist keine Quadratur höherer Ordnung, sondern eine günstige Korrektur für Treppensignale; die Methode ist nicht linear im Signal ($I(2y)\\neq 2I(y)$) und der Parameter $n$ muss abgestimmt werden.",
     "sec.results": "Hauptergebnisse",
     "r1.tag":"Geometrische Motivation","r1.title":"Inspiration: Apartmentfenster","r1.body":"Die Grundidee stammt aus der Beobachtung eines Gebäude-Fenstergitters: Von einem $n\\times n$ Quadrat zu einem $(n-1)\\times(n+1)$ Rechteck verringert sich die Fläche um genau 1. Der Mittelwert ergibt die $-\\tfrac{1}{2}$ Korrektur.",
-    "r2.tag":"Genauigkeit","r2.title":"1.8% RMS-Fehler (Q=8)","r2.body":"Rechteck: 8.2%, Trapez: 5.7%, Simpson: 3.1%, CCI: <strong style='color:var(--accent2)'>1.8%</strong> — bei gleicher Komplexität, ohne Gleitkommaeinheit.",
+    "r2.tag":"Kosten","r2.title":"Ganzzahlarithmetik, ohne FPU","r2.body":"Die Berechnung besteht aus ganzzahligen Multiplikationen und Additionen mit konstantem Aufwand pro Abtastwert und $O(1)$ Speicher.",
     "r3.tag":"Auto-Abstimmung von n","r3.title":"Skalen/Phasen-Invarianz","r3.body":"Der Korrekturparameter $n$ wird durch Dezimierung und Halbproben-Verschiebung bestimmt — ohne Ground Truth, in $O(N)$ Zeit mit $O(1)$ Speicher.",
     "r4.tag":"Implementierung","r4.title":"AVR, ARM, PIC, MSP430","r4.body":"Nur Ganzzahlmultiplikation und -addition erforderlich. $<0.1\\%$ Integralfehler über $10^6$ Samples in Festkomma-Arithmetik.",
     "sec.eqs":"Grundgleichungen",
@@ -448,7 +461,7 @@ const T = {
     "signal.subtitle":"Integrationsfehler-Vergleich — nach Quantisierungsstufe und Methode",
     "ctrl.Q":"Quantisierungsstufe Q","ctrl.N":"Anzahl Samples N",
     "sec.table":"Methodenvergleich (Q=8, N=1000)",
-    "th.method":"Methode","th.rms":"RMS-Fehler","th.ops":"Ops/Sample","th.mem":"Speicher","th.fpu":"FPU nötig?",
+    "th.method":"Methode","th.ops":"Ops/Sample","th.mem":"Speicher","th.fpu":"FPU nötig?",
     "m.rect":"Rechteck","m.trap":"Trapez","m.simp":"Simpson","no":"Nein","opt":"Optional",
     "sec.code":"Implementierung — Pseudocode",
     "code1.label":"Mikrocontroller (8-Bit, Ganzzahlarithmetik)",
@@ -674,7 +687,7 @@ function initSliders(){
 // BibTeX
 // ════════════════════════════════════════
 function copyBib(){
-  const raw=`@article{bodis2025cci,
+  const raw=`@unpublished{bodis2026cci,
   author      = {Bódis, Tamás},
   title       = {The Corner-Corrected Integral (CCI) Method: A Quadratic Correction-Based Numerical Integration Technique for Quantized Functions},
   year        = {2025},

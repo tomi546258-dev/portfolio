@@ -418,12 +418,12 @@
     </div>
 
     <div class="panel" style="font-size:.78rem;color:var(--sec);line-height:1.8;font-style:italic;border-color:var(--border)">
-      A megoldó <strong style="color:var(--gold);font-style:normal">branch-and-bound</strong> stratégiát alkalmaz az LP-relaxáción. A bináris, ritka struktúra ekvivalens az <em>exact cover</em> problémával — Knuth <em>Dancing Links</em> algoritmusa az optimális eljárás erre az osztályra.
+      Az ILP-felírás itt a struktúrát mutatja meg; a beépített megoldó <strong style="color:var(--gold);font-style:normal">backtracking</strong> (mélységi keresés) — LP-relaxációt nem old meg. A bináris, ritka struktúra ekvivalens az <em>exact cover</em> problémával, amire Knuth <em>Dancing Links</em> algoritmusa a szokásos hatékony megoldás.
     </div>
   </div>
 
   <div class="footer-note">
-    Teljesen kliens-oldali, semmit nem küld semmilyen szerverre. Beágyazható <code style="color:var(--teal);font-style:normal">&lt;iframe src="sudoku-ilp.html" ...&gt;&lt;/iframe&gt;</code> formában Cloudflare Pages-en.
+    Teljesen kliens-oldali, semmit nem küld semmilyen szerverre. Beágyazható <code style="color:var(--teal);font-style:normal">&lt;iframe src="sudoku-ilp.html" ...&gt;&lt;/iframe&gt;</code> formában.
   </div>
 </div>
 
@@ -440,7 +440,7 @@ let given = SAMPLE.map(r => r.map(v => v !== 0));
 let solution = null;
 let status = 'idle'; // idle|solving|done|error
 
-// ── Solver (backtracking — equivalent to ILP branch-and-bound on this structure) ──
+// ── Solver: backtracking (mélységi keresés) az ILP-felírás változóin ──
 function solve(b) {
   const g = b.map(r => [...r]);
   function canPlace(r, c, d) {

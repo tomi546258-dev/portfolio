@@ -153,12 +153,12 @@ canvas{display:block;border-radius:2px;}
 <div class="section">
   <div class="section-label" data-i18n="sec.specs">Technikai adatok — CP1L-M60DR-A</div>
   <div class="spec-grid">
-    <div class="spec-item"><div class="spec-key" data-i18n="sk.io">I/O pontok (alap)</div><div class="spec-val">36 be / 24 ki = 60 pont</div><div class="spec-note" data-i18n="sv.io">Max. 160 pont bővítőkkel</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.io">I/O pontok (alap)</div><div class="spec-val">36 be / 24 ki = 60 pont</div><div class="spec-note" data-i18n="sv.io">Max. 180 pont (M-típus: 3 bővítőmodul)</div></div>
     <div class="spec-item"><div class="spec-key" data-i18n="sk.cpu">CPU típusok</div><div class="spec-val">CP1L-L (10/14/20) · CP1L-M (30/40/60)</div><div class="spec-note" data-i18n="sv.cpu">CP1L-E: beépített Ethernet</div></div>
-    <div class="spec-item"><div class="spec-key" data-i18n="sk.prog">Programozás</div><div class="spec-val">USB-B · RS232C</div><div class="spec-note" data-i18n="sv.prog">CX-Programmer vagy Sysmac Studio</div></div>
-    <div class="spec-item"><div class="spec-key" data-i18n="sk.cycle">Ciklusidő</div><div class="spec-val">0.1 µs / utasítás</div><div class="spec-note" data-i18n="sv.cycle">Jellemzően 1–5 ms valós programban</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.prog">Programozás</div><div class="spec-val">USB-B · RS232C</div><div class="spec-note" data-i18n="sv.prog">CX-Programmer (CX-One)</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.cycle">Ciklusidő</div><div class="spec-val">0,55 µs / alaputasítás</div><div class="spec-note" data-i18n="sv.cycle">Jellemzően 1–5 ms valós programban</div></div>
     <div class="spec-item"><div class="spec-key" data-i18n="sk.pulse">Pulse output</div><div class="spec-val">2 × 100 kHz</div><div class="spec-note" data-i18n="sv.pulse">Direkt léptetőmotor vezérlés, PLS/ACC utasítás</div></div>
-    <div class="spec-item"><div class="spec-key" data-i18n="sk.analog">Analóg (beépített)</div><div class="spec-val">2 be + 1 ki (CP1L-M)</div><div class="spec-note" data-i18n="sv.analog">0–10V / 4–20mA, 12 bit felbontás</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="sk.analog">Analóg</div><div class="spec-val">bővítőmodullal</div><div class="spec-note" data-i18n="sv.analog">CP1W-AD041 / DA041 — a CPU-ban nincs analóg I/O</div></div>
     <div class="spec-item"><div class="spec-key" data-i18n="sk.comm">Kommunikáció</div><div class="spec-val">Modbus RTU · Host Link · NT Link</div><div class="spec-note" data-i18n="sv.comm">CP1L-E: Modbus TCP + EtherNet/IP natívan</div></div>
     <div class="spec-item"><div class="spec-key" data-i18n="sk.price">Ár (CPU)</div><div class="spec-val">€150 – €400</div><div class="spec-note" data-i18n="sv.price">S7-300 töredéke azonos I/O-ra</div></div>
   </div>
@@ -190,7 +190,7 @@ canvas{display:block;border-radius:2px;}
     <div class="module-card">
       <div class="module-type" data-i18n="m1.type">Digitális I/O</div>
       <div class="module-name" data-i18n="m1.name">CP1W-16ER / 40EDT</div>
-      <div class="module-body" data-i18n="m1.body">8–40 digitális I/O hozzáadása. Relay vagy tranzisztor kimenet. Akár 7 modul sorba fűzhető — 160 pontig.</div>
+      <div class="module-body" data-i18n="m1.body">8–40 digitális I/O hozzáadása. Relés vagy tranzisztoros kimenet. M-típusú CPU-ra 3 bővítőmodul fűzhető.</div>
       <div class="module-model">CP1W-16ER · CP1W-40EDT</div>
     </div>
     <div class="module-card">
@@ -202,7 +202,7 @@ canvas{display:block;border-radius:2px;}
     <div class="module-card">
       <div class="module-type" data-i18n="m3.type">Hőmérséklet</div>
       <div class="module-name" data-i18n="m3.name">CP1W-TS002 / TS102</div>
-      <div class="module-body" data-i18n="m3.body">Termoelem (K, J, T, E, L, U) vagy PT100/PT1000 közvetlen bekötés. Nincs szükség külső átalakítóra.</div>
+      <div class="module-body" data-i18n="m3.body">Termoelem (K, J) vagy Pt100 közvetlen bekötés. Nincs szükség külső átalakítóra.</div>
       <div class="module-model">CP1W-TS002 · CP1W-TS102</div>
     </div>
     <div class="module-card">
@@ -213,9 +213,9 @@ canvas{display:block;border-radius:2px;}
     </div>
     <div class="module-card">
       <div class="module-type" data-i18n="m5.type">Pozicionálás</div>
-      <div class="module-name" data-i18n="m5.name">CP1W-NC113 / NC213</div>
-      <div class="module-body" data-i18n="m5.body">1 vagy 2 tengelyes pozicionáló modul, beépített profil-generátorral. Léptetőmotor vagy szervó driver közvetlen meghajtás.</div>
-      <div class="module-model">CP1W-NC113 · CP1W-NC213</div>
+      <div class="module-name" data-i18n="m5.name">Pozicionálás pulse outputtal</div>
+      <div class="module-body" data-i18n="m5.body">A CP1L-hez nincs CP1W pozicionáló modul: a mozgásvezérlés a tranzisztoros CPU beépített pulse outputjaival (PLS2 / ACC / INI / PRV) megy, léptetőmotor- vagy szervodriverre.</div>
+      <div class="module-model">PLS2 · ACC · INI · PRV</div>
     </div>
     <div class="module-card">
       <div class="module-type" data-i18n="m6.type">CompoBus/S</div>
@@ -268,7 +268,7 @@ canvas{display:block;border-radius:2px;}
       <span class="config-arrow">▸</span>
     </div>
     <div class="config-body" data-i18n="cfg3.body">
-      A CP1L-M beépített <strong>2 darab 100 kHz-es pulse output</strong> csatornával rendelkezik (Q0.00 és Q0.01 kimenetek — tranzisztor változat kötelező!).
+      A CP1L <strong>tranzisztoros kimenetű</strong> változatai (…DT…) két 100 kHz-es pulse output csatornával rendelkeznek; a kimenetek a CIO 100.00 / 100.01 (impulzus) és CIO 100.02 / 100.03 (irány) biteken jelennek meg. <strong>Relés kimenetű típuson (…DR…, mint az itt bemutatott CP1L-M60DR-A) nincs pulse output</strong> — az alábbi konfiguráció tranzisztoros típusra vonatkozik.
       <br><br>
       <strong>Konfiguráció lépései:</strong>
       <br>• PLC Setup → Built-in Input/Output → Pulse Output 0/1 beállítás
@@ -296,7 +296,7 @@ canvas{display:block;border-radius:2px;}
       <strong>Master beállítás (CP1L olvas/ír egy invertert):</strong>
       <br>• PLC Setup → Serial Port 1 → Mode: <code>Modbus RTU Master</code>
       <br>• Baudrate, paritás az inverter kézikönyve szerint (tipikusan 9600 8N1 vagy 19200 8E1)
-      <br>• Ladder-ben: <code>PMCR</code> utasítás — Modbus function code, slave cím, regiszter cím, adatok
+      <br>• A CP1L <strong>Modbus-RTU Easy Master</strong> funkciót használ: a kérés paraméterei (slave cím, function code, regiszter, adat) a DM-be kerülnek, az indítás az AR-terület vezérlőbitjével történik
       <br><br>
       <strong>Slave beállítás (HMI olvassa a CP1L-t):</strong>
       <br>• Mode: <code>Modbus RTU Slave</code>, slave ID beállítás
@@ -314,14 +314,14 @@ canvas{display:block;border-radius:2px;}
     <div class="config-body" data-i18n="cfg5.body">
       A CP1L memóriaterületei a Ladder programozás alapjai:
       <br><br>
-      • <strong>CIO (0–6143)</strong> — I/O és belső relék. CIO 0–99: fizikai I/O, CIO 100–: belső használat
+      • <strong>CIO</strong> — I/O terület. Bemenetek: CIO 0–99 (a beépített bemenetek CIO 0-tól), kimenetek: CIO 100-tól. <strong>Ide nem írunk belső jelzéseket</strong> — arra a W terület való.<br>• <strong>W (W0–W511)</strong> — munkabitek: minden belső jelzés, léptetés, állapot ide megy
       <br>• <strong>DM (D0–D32767)</strong> — adatmemória, 16 bites szavak. Receptek, beállítások, mérési adatok tárolása. <em>Power-fail safe</em> — áramkimaradás után is megmarad
       <br>• <strong>HR (H0–H511)</strong> — holding relék, szintén power-fail safe. Állapotjelzők, amik nem nullázódnak le áramkimaradáskor
-      <br>• <strong>AR (A0–A959)</strong> — speciális segédterületek. A448–A511: olvasható rendszerinformációk (hibakódok, ciklusidő, port állapot)
+      <br>• <strong>AR (A0–A959)</strong> — segédterület: A0–A447 csak olvasható rendszerinformáció (hibakódok, ciklusidő, port állapot), A448-tól írható is
       <br>• <strong>TIM / CNT</strong> — időzítők és számlálók. CP1L-ben 4096 db. TIM0–TIM4095, CNT0–CNT4095
       <br>• <strong>IR / DR</strong> — index és adatregiszterek indirekt címzéshez. Táblázat-feldolgozásnál, receptkezelésnél nélkülözhetetlen
       <br><br>
-      <strong>Praktikus szabály:</strong> amit a HMI-nak meg kell jelenítenie → DM-be. Amit a program belső állapotként kezel → CIO 100+. Amit áramkimaradás után is meg kell tartani → HR.
+      <strong>Praktikus szabály:</strong> amit a HMI-nak meg kell jelenítenie → DM-be. Amit a program belső állapotként kezel → W-be (a CIO 100-tól a fizikai kimenetek vannak!). Amit áramkimaradás után is meg kell tartani → HR.
     </div>
   </div>
 
@@ -397,7 +397,7 @@ canvas{display:block;border-radius:2px;}
     <tbody>
       <tr class="hl"><td data-i18n="c.price">Ár (alap CPU)</td><td class="badge-good">€150–400</td><td class="badge-mid">€300–600</td><td class="badge-bad">€800–2000</td></tr>
       <tr><td data-i18n="c.prog">Programozás</td><td class="badge-good">USB-B (normál)</td><td class="badge-mid">USB (saját kábel)</td><td class="badge-bad">MPI adapter</td></tr>
-      <tr><td data-i18n="c.expand">Bővíthetőség</td><td class="badge-mid">max. 7 modul, 160 I/O</td><td class="badge-good">max. 8 modul</td><td class="badge-good">korlátlan rack</td></tr>
+      <tr><td data-i18n="c.expand">Bővíthetőség</td><td class="badge-mid">max. 3 modul, 180 I/O</td><td class="badge-good">max. 8 modul</td><td class="badge-good">korlátlan rack</td></tr>
       <tr class="hl"><td data-i18n="c.pulse">Pulse output</td><td class="badge-good">2×100 kHz beépített</td><td class="badge-good">4×100 kHz</td><td class="badge-bad">külön modul kell</td></tr>
       <tr><td data-i18n="c.modbus">Modbus RTU</td><td class="badge-good">natív</td><td class="badge-good">natív</td><td class="badge-mid">CP modul kell</td></tr>
       <tr><td data-i18n="c.ethernet">Ethernet</td><td class="badge-mid">CP1L-E változat</td><td class="badge-good">beépített</td><td class="badge-bad">CP343 modul</td></tr>
@@ -416,7 +416,7 @@ canvas{display:block;border-radius:2px;}
 </div>
 
 <div class="page-footer">
-  <span>Bódis Tamás · BT Tech · Budapest</span>
+  <span>Bódis Tamás · Budapest</span>
   <span data-i18n="footer.tag">Omron CP1L · CX-Programmer · Ipari automatizálás</span>
 </div>
 </div>
@@ -432,23 +432,23 @@ const T={hu:{
 "sec.photo":"Saját fotó — hamarosan",
 "photo.text":"Saját CP1L fotó — feltöltés folyamatban",
 "sec.specs":"Technikai adatok — CP1L-M60DR-A",
-"sk.io":"I/O pontok (alap)","sv.io":"Max. 160 pont bővítőkkel",
+"sk.io":"I/O pontok (alap)","sv.io":"Max. 180 pont (M-típus: 3 bővítőmodul)",
 "sk.cpu":"CPU típusok","sv.cpu":"CP1L-E: beépített Ethernet",
-"sk.prog":"Programozás","sv.prog":"CX-Programmer vagy Sysmac Studio",
+"sk.prog":"Programozás","sv.prog":"CX-Programmer (CX-One)",
 "sk.cycle":"Ciklusidő","sv.cycle":"Jellemzően 1–5 ms valós programban",
 "sk.pulse":"Pulse output","sv.pulse":"Direkt léptetőmotor vezérlés",
-"sk.analog":"Analóg (beépített)","sv.analog":"0–10V / 4–20mA, 12 bit",
+"sk.analog":"Analóg","sv.analog":"CP1W-AD041 / DA041 — a CPU-ban nincs analóg I/O",
 "sk.comm":"Kommunikáció","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP natívan",
 "sk.price":"Ár (CPU)","sv.price":"S7-300 töredéke azonos I/O-ra",
 "sec.ladder":"Interaktív — Ladder Diagram példa",
 "ladder.title":"Motor indítás / leállítás — START/STOP logika",
 "ladder.desc":"Kattints egy kontaktusra vagy tekercse a szimulációhoz ▸",
 "sec.modules":"Bővítőmodulok",
-"m1.type":"Digitális I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digitális I/O hozzáadása. Relay vagy tranzisztor kimenet. Akár 7 modul sorba fűzhető.",
+"m1.type":"Digitális I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digitális I/O hozzáadása. Relés vagy tranzisztoros kimenet. M-típusú CPU-ra 3 bővítőmodul fűzhető.",
 "m2.type":"Analóg I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4 csatornás analóg be- vagy kimenet. 0–10V / 4–20mA, 12 bit. PID vezérléshez.",
 "m3.type":"Hőmérséklet","m3.name":"CP1W-TS002 / TS102","m3.body":"Termoelem vagy PT100/PT1000 közvetlen bekötés. Nincs szükség külső átalakítóra.",
 "m4.type":"Kommunikáció","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C vagy RS422/485 port bővítés. Modbus RTU, inverter kommunikáció.",
-"m5.type":"Pozicionálás","m5.name":"CP1W-NC113 / NC213","m5.body":"1 vagy 2 tengelyes pozicionáló modul. Léptetőmotor vagy szervó driver meghajtás.",
+"m5.type":"Pozicionálás","m5.name":"Pozicionálás pulse outputtal","m5.body":"A CP1L-hez nincs CP1W pozicionáló modul: a mozgásvezérlés a tranzisztoros CPU beépített pulse outputjaival megy (PLS2, ACC, INI, PRV).",
 "m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave csatlakozás CompoBus/S hálóhoz. Max. 256 pont 100m-es hálón.",
 "sec.config":"Konfiguráció mélyen — CX-Programmer",
 "cfg1.title":"I/O tábla és eszközkonfiguráció",
@@ -458,7 +458,7 @@ const T={hu:{
 "cfg3.title":"Pulse output konfiguráció — léptetőmotor",
 "cfg3.body":"2×100 kHz beépített pulse output (tranzisztor kimenet kell!). CW/CCW vagy Pulse+Direction mód. PLS2, ACC, INI, PRV utasítások. Egy CP1L-M + driver + 2 végállás = komplett pozicionáló.",
 "cfg4.title":"Modbus RTU kommunikáció beállítása",
-"cfg4.body":"Soros porton Modbus RTU master vagy slave. PMCR utasítás a Ladder-ben. RS485 esetén CP1W-CIF11 modul. Az alap RS232 port és a bővítő egyszerre használható.",
+"cfg4.body":"Soros porton Modbus-RTU Easy Master. A kérés paraméterei a DM-ben, indítás AR-bittel. RS485 esetén CP1W-CIF11 modul. Az alap RS232 port és a bővítő egyszerre használható.",
 "cfg5.title":"Memóriaterületek — CIO, DM, HR, AR, TIM, CNT",
 "cfg5.body":"CIO: I/O és belső relék. DM: adatmemória, power-fail safe. HR: holding relék, megmarad áramkimaradás után. AR: rendszerinformációk. TIM/CNT: 4096 időzítő és számláló.",
 "cfg6.title":"CX-Programmer — online monitoring és hibakeresés",
@@ -487,23 +487,23 @@ en:{
 "sec.photo":"Own photo — coming soon",
 "photo.text":"Own CP1L photo — upload in progress",
 "sec.specs":"Technical data — CP1L-M60DR-A",
-"sk.io":"I/O points (built-in)","sv.io":"Up to 160 points with expansion",
+"sk.io":"I/O points (built-in)","sv.io":"Up to 180 points (M type: 3 expansion units)",
 "sk.cpu":"CPU variants","sv.cpu":"CP1L-E: built-in Ethernet",
-"sk.prog":"Programming","sv.prog":"CX-Programmer or Sysmac Studio",
+"sk.prog":"Programming","sv.prog":"CX-Programmer (CX-One)",
 "sk.cycle":"Cycle time","sv.cycle":"Typically 1–5 ms in real programs",
 "sk.pulse":"Pulse output","sv.pulse":"Direct stepper motor control",
-"sk.analog":"Analog (built-in)","sv.analog":"0–10V / 4–20mA, 12-bit",
+"sk.analog":"Analog","sv.analog":"CP1W-AD041 / DA041 — no analog I/O in the CPU itself",
 "sk.comm":"Communication","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP native",
 "sk.price":"Price (CPU)","sv.price":"Fraction of S7-300 for same I/O",
 "sec.ladder":"Interactive — Ladder Diagram example",
 "ladder.title":"Motor start/stop — START/STOP logic in ladder diagram",
 "ladder.desc":"Click a contact or coil to simulate ▸",
 "sec.modules":"Expansion modules",
-"m1.type":"Digital I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digital I/O. Relay or transistor output. Up to 7 modules chained.",
+"m1.type":"Digital I/O","m1.name":"CP1W-16ER / 40EDT","m1.body":"8–40 digital I/O. Relay or transistor output. Up to 3 expansion units on an M-type CPU.",
 "m2.type":"Analog I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4-channel analog input or output. 0–10V / 4–20mA, 12-bit. For PID control.",
 "m3.type":"Temperature","m3.name":"CP1W-TS002 / TS102","m3.body":"Thermocouple or PT100/PT1000 direct input. No external converter needed.",
 "m4.type":"Communication","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C or RS422/485 port expansion. Modbus RTU, drive communication.",
-"m5.type":"Positioning","m5.name":"CP1W-NC113 / NC213","m5.body":"1 or 2 axis positioning module. Stepper or servo driver output.",
+"m5.type":"Positioning","m5.name":"Positioning via pulse output","m5.body":"There is no CP1W positioning module for the CP1L: motion control uses the built-in pulse outputs of a transistor-output CPU (PLS2, ACC, INI, PRV).",
 "m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave for CompoBus/S network. Up to 256 points over 100m.",
 "sec.config":"Deep configuration — CX-Programmer",
 "cfg1.title":"I/O table and device configuration",
@@ -513,7 +513,7 @@ en:{
 "cfg3.title":"Pulse output configuration — stepper motor",
 "cfg3.body":"2×100 kHz built-in (transistor output required). CW/CCW or Pulse+Direction mode. PLS2, ACC, INI, PRV instructions. One CP1L-M + driver + 2 limit switches = complete positioner.",
 "cfg4.title":"Modbus RTU communication setup",
-"cfg4.body":"Modbus RTU master or slave on serial port. PMCR instruction in Ladder. For RS485 add CP1W-CIF11. Base RS232 and expansion port usable simultaneously.",
+"cfg4.body":"Modbus-RTU Easy Master on the serial port: request parameters in DM, started from an AR control bit. For RS485 add CP1W-CIF11. Base RS232 and expansion port usable simultaneously.",
 "cfg5.title":"Memory areas — CIO, DM, HR, AR, TIM, CNT",
 "cfg5.body":"CIO: I/O and internal relays. DM: data memory, power-fail safe. HR: holding relays, retained after power loss. AR: system info. TIM/CNT: 4096 timers and counters.",
 "cfg6.title":"CX-Programmer — online monitoring and fault-finding",
@@ -542,12 +542,12 @@ de:{
 "sec.photo":"Eigenes Foto — demnächst",
 "photo.text":"Eigenes CP1L-Foto — Upload in Bearbeitung",
 "sec.specs":"Technische Daten — CP1L-M60DR-A",
-"sk.io":"I/O-Punkte (eingebaut)","sv.io":"Bis 160 Punkte mit Erweiterung",
+"sk.io":"I/O-Punkte (eingebaut)","sv.io":"Bis 180 Punkte (M-Typ: 3 Erweiterungen)",
 "sk.cpu":"CPU-Varianten","sv.cpu":"CP1L-E: eingebautes Ethernet",
-"sk.prog":"Programmierung","sv.prog":"CX-Programmer oder Sysmac Studio",
+"sk.prog":"Programmierung","sv.prog":"CX-Programmer (CX-One)",
 "sk.cycle":"Zykluszeit","sv.cycle":"Typisch 1–5 ms in realen Programmen",
 "sk.pulse":"Pulsausgang","sv.pulse":"Direkte Schrittmotorsteuerung",
-"sk.analog":"Analog (eingebaut)","sv.analog":"0–10V / 4–20mA, 12-Bit",
+"sk.analog":"Analog","sv.analog":"CP1W-AD041 / DA041 — keine Analog-I/O in der CPU",
 "sk.comm":"Kommunikation","sv.comm":"CP1L-E: Modbus TCP + EtherNet/IP nativ",
 "sk.price":"Preis (CPU)","sv.price":"Bruchteil der S7-300 für gleiche I/O",
 "sec.ladder":"Interaktiv — Kontaktplan-Beispiel",
@@ -558,7 +558,7 @@ de:{
 "m2.type":"Analog I/O","m2.name":"CP1W-AD041 / DA041","m2.body":"4-kanaliger Analogeingang oder -ausgang. 0–10V / 4–20mA, 12-Bit. Für PID-Regelung.",
 "m3.type":"Temperatur","m3.name":"CP1W-TS002 / TS102","m3.body":"Thermoelement oder PT100/PT1000 direkter Eingang. Kein externer Wandler nötig.",
 "m4.type":"Kommunikation","m4.name":"CP1W-CIF01 / CIF11","m4.body":"RS232C oder RS422/485 Porterweiterung. Modbus RTU, Umrichter-Kommunikation.",
-"m5.type":"Positionierung","m5.name":"CP1W-NC113 / NC213","m5.body":"1 oder 2-achsiges Positioniermodul. Schrittmotor- oder Servoantrieb.",
+"m5.type":"Positionierung","m5.name":"Positionierung über Pulsausgang","m5.body":"Für die CP1L gibt es kein CP1W-Positioniermodul: die Bewegungssteuerung läuft über die eingebauten Pulsausgänge einer Transistor-CPU (PLS2, ACC, INI, PRV).",
 "m6.type":"CompoBus/S","m6.name":"CP1W-SRT21","m6.body":"Slave für CompoBus/S-Netzwerk. Bis 256 Punkte über 100m.",
 "sec.config":"Tiefe Konfiguration — CX-Programmer",
 "cfg1.title":"I/O-Tabelle und Gerätekonfiguration",
@@ -568,7 +568,7 @@ de:{
 "cfg3.title":"Pulsausgang-Konfiguration — Schrittmotor",
 "cfg3.body":"2×100 kHz eingebaut (Transistorausgang erforderlich). CW/CCW oder Puls+Richtung. PLS2, ACC, INI, PRV-Anweisungen. Eine CP1L-M + Treiber + 2 Endschalter = komplette Positioniereinheit.",
 "cfg4.title":"Modbus RTU Kommunikationseinrichtung",
-"cfg4.body":"Modbus RTU Master oder Slave am seriellen Port. PMCR-Anweisung im Kontaktplan. Für RS485 CP1W-CIF11 hinzufügen.",
+"cfg4.body":"Modbus-RTU Easy Master am seriellen Port: Parameter im DM, Start über ein AR-Steuerbit. Für RS485 CP1W-CIF11 hinzufügen.",
 "cfg5.title":"Speicherbereiche — CIO, DM, HR, AR, TIM, CNT",
 "cfg5.body":"CIO: I/O und interne Relais. DM: Datenspeicher, stromausfallsicher. HR: Halterelais, bleibt nach Stromausfall. AR: Systeminformationen. TIM/CNT: 4096 Timer und Zähler.",
 "cfg6.title":"CX-Programmer — Online-Monitoring und Fehlersuche",
@@ -631,7 +631,7 @@ function calcIO(){
   }
 
   if(!rec){
-    res.innerHTML='<span class="calc-err">⚠ A kért I/O meghaladja a CP1L maximumát (160 DI/DO, 7 modul). S7-1200 / S7-300 javasolt.</span>';
+    res.innerHTML='<span class="calc-err">⚠ A kért I/O meghaladja a CP1L maximumát (kb. 180 pont, 3 bővítőmodul). Nagyobb PLC javasolt.</span>';
     return;
   }
 
