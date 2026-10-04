@@ -650,5 +650,15 @@ function drawBlock(){
 document.addEventListener('DOMContentLoaded',()=>{ setLang('hu'); calcFreq(); setTimeout(drawBlock,80); });
 window.addEventListener('resize',drawBlock);
 </script>
+<script>
+  // GoatCounter: csak akkor mérünk, ha az oldal nem a főoldal modaljában (iframe) van
+  if (window.self === window.top) {
+    var _gc = document.createElement('script');
+    _gc.async = true;
+    _gc.src = 'https://gc.zgo.at/count.js';
+    _gc.setAttribute('data-goatcounter', 'https://bodistamas.goatcounter.com/count');
+    document.body.appendChild(_gc);
+  }
+</script>
 </body>
 </html>

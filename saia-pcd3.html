@@ -365,5 +365,15 @@ function setLang(l){lang=l;document.documentElement.lang=l;const t=T[l];document
 function toggleConfig(el){el.classList.toggle('open');}
 document.addEventListener('DOMContentLoaded',()=>setLang('hu'));
 </script>
+<script>
+  // GoatCounter: csak akkor mérünk, ha az oldal nem a főoldal modaljában (iframe) van
+  if (window.self === window.top) {
+    var _gc = document.createElement('script');
+    _gc.async = true;
+    _gc.src = 'https://gc.zgo.at/count.js';
+    _gc.setAttribute('data-goatcounter', 'https://bodistamas.goatcounter.com/count');
+    document.body.appendChild(_gc);
+  }
+</script>
 </body>
 </html>
