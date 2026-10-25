@@ -1045,6 +1045,24 @@ R_μν − ½Rg_μν = 8πGT_μν
         </div>
       </div>
       <div class="project-card">
+        <span class="project-icon">✺</span>
+        <div class="project-title" data-i18n="proj.kaleido.title">KaleidoCam — programozható kinetikus kaleidoszkóp</div>
+        <p class="project-desc" data-i18n="proj.kaleido.desc">Léptetőmotorral forgatott, RGB-PWM-mel világított kaleidoszkóp Arduino-vezérléssel; az optikai képet webkamera rögzíti. Előre programozott fény- és mozgáskoreográfia, saját építésű prototípus.</p>
+        <div class="project-tech">
+          <span class="tech-badge">Arduino</span><span class="tech-badge">A4988</span><span class="tech-badge">RGB PWM</span><span class="tech-badge">Optika</span>
+        </div>
+        <div style="margin-top:1rem">
+          <button onclick="openModal('kaleidocam.html','KaleidoCam — programozható kinetikus kaleidoszkóp')"
+            style="font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;
+                   background:none;border:1px solid var(--border);color:var(--text-dim);padding:.3rem .9rem;
+                   border-radius:2px;cursor:pointer;transition:all .2s;"
+            onmouseover="this.style.color='var(--accent)';this.style.borderColor='var(--accent)'"
+            onmouseout="this.style.color='var(--text-dim)';this.style.borderColor='var(--border)'">
+            ▸ Részletek
+          </button>
+        </div>
+      </div>
+      <div class="project-card">
         <span class="project-icon">🔧</span>
         <div class="project-title" data-i18n="proj.sc.title">SmartClone — I/O rögzítés és visszajátszás</div>
         <p class="project-desc" data-i18n="proj.sc.desc">Black-box capture-and-replay eszköz Arduino Nanón: egy vezérlő I/O-viselkedésének rögzítése és visszajátszása forráskód nélkül. Master/Analyzer/Clone felállás, Siemens LOGO! tesztpaddal.</p>
@@ -1165,7 +1183,9 @@ R_μν − ½Rg_μν = 8πGT_μν
     // ── i18n ──
     const translations = {
       hu: {
-        "nav.about": "Rólam", "nav.pubs": "Publikációk", "nav.projects": "Projektek",
+        "proj.kaleido.title": "KaleidoCam — programozható kinetikus kaleidoszkóp",
+        "proj.kaleido.desc": "Léptetőmotorral forgatott, RGB-PWM-mel világított kaleidoszkóp Arduino-vezérléssel; az optikai képet webkamera rögzíti. Előre programozott fény- és mozgáskoreográfia, saját építésű prototípus.",
+                "nav.about": "Rólam", "nav.pubs": "Publikációk", "nav.projects": "Projektek",
         "nav.contact": "Kapcsolat",
         "hero.label": "Villamosmérnök",
         "hero.h1": "Mérnöki precizitás<br><em>automatizálásban</em><br>és mérésben.",
@@ -1204,7 +1224,9 @@ R_μν − ½Rg_μν = 8πGT_μν
         "footer.visits": "látogatás"
       },
       de: {
-        "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
+        "proj.kaleido.title": "KaleidoCam — programmierbares kinetisches Kaleidoskop",
+        "proj.kaleido.desc": "Von einem Schrittmotor gedrehtes, mit RGB-PWM beleuchtetes Kaleidoskop unter Arduino-Steuerung; das optische Bild nimmt eine Webcam auf. Vorprogrammierte Licht- und Bewegungschoreografie, selbstgebauter Prototyp.",
+                "nav.about": "Über mich", "nav.pubs": "Publikationen", "nav.projects": "Projekte",
         "nav.contact": "Kontakt",
         "hero.label": "Elektroingenieur",
         "hero.h1": "Ingenieurpräzision<br>in <em>Automatisierung</em><br>und Messtechnik.",
@@ -1243,7 +1265,9 @@ R_μν − ½Rg_μν = 8πGT_μν
         "footer.visits": "Besuche"
       },
       en: {
-        "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
+        "proj.kaleido.title": "KaleidoCam — programmable kinetic kaleidoscope",
+        "proj.kaleido.desc": "A kaleidoscope rotated by a stepper motor and lit by RGB PWM under Arduino control, with its optical image captured by a webcam. Pre-programmed light and motion choreography, self-built prototype.",
+                "nav.about": "About", "nav.pubs": "Publications", "nav.projects": "Projects",
         "nav.contact": "Contact",
         "hero.label": "Electrical engineer",
         "hero.h1": "Engineering precision<br>in <em>automation</em><br>and measurement.",

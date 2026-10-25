@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KaleidoCam — programozható kinetikus kaleidoszkóp | Bódis Tamás</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Literata:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0e0f0f;--bg2:#151717;--bg3:#1c1f1f;--border:#2a2e2e;--accent:#c8a96e;--accent2:#7eb8a4;--text:#d8d4cc;--text-dim:#7a7870;--text-bright:#eeeae2;--orange:#d4703a;--purple:#8878c8;--green:#3a8060;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Literata',Georgia,serif;font-size:16px;line-height:1.75;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.012) 1px,transparent 1px),linear-gradient(to bottom,rgba(255,255,255,.012) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;}
+.page{max-width:960px;margin:0 auto;padding:clamp(28px,5vw,60px) clamp(16px,4vw,40px);position:relative;z-index:1;}
+.lang-bar{display:flex;justify-content:flex-end;gap:.3rem;margin-bottom:1.6rem;}
+.lang-btn{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;background:none;border:1px solid transparent;color:var(--text-dim);padding:.28rem .6rem;border-radius:2px;cursor:pointer;transition:all .18s;}
+.lang-btn:hover{color:var(--accent);border-color:var(--border);}
+.lang-btn.active{color:var(--accent);border-color:var(--accent);}
+.proj-title{font-family:'DM Serif Display',serif;font-size:clamp(1.5rem,4vw,2.5rem);color:var(--text-bright);line-height:1.1;margin-bottom:.5rem;}
+.proj-title em{font-style:italic;color:var(--accent);}
+.proj-sub{font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim);letter-spacing:.1em;margin-bottom:.9rem;}
+.status-pill{display:inline-block;font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent2);border:1px solid rgba(126,184,164,.4);padding:.25rem .7rem;border-radius:2px;margin-bottom:1.6rem;}
+.section{margin-top:2.6rem;}
+.section-label{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.8rem;display:flex;align-items:center;gap:.7rem;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.overview-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--purple);padding:1.4rem 1.6rem;border-radius:2px;font-size:.97rem;line-height:1.8;}
+.overview-box strong{color:var(--accent2);}
+
+/* hero + photo layouts */
+.hero-shot{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;margin-bottom:.2rem;}
+.hero-shot img{width:100%;display:block;}
+.photo-3{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+.photo-3 .photo-full{grid-column:1/-1;}
+@media(max-width:600px){.photo-3{grid-template-columns:1fr;}}
+.photo-card{background:var(--bg2);border:1px solid var(--border);border-radius:2px;overflow:hidden;}
+.photo-card img{width:100%;display:block;object-fit:cover;}
+.photo-card img.tall{max-height:340px;}
+.photo-card img.short{max-height:250px;}
+.photo-cap{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--text-dim);padding:.45rem .8rem;letter-spacing:.06em;line-height:1.5;}
+
+/* highlight box */
+.highlight-box{display:flex;gap:1.1rem;align-items:flex-start;background:var(--bg2);border:1px solid var(--accent2);border-radius:2px;padding:1.2rem 1.4rem;margin-top:.8rem;}
+.highlight-icon{font-size:1.8rem;flex-shrink:0;line-height:1.2;}
+.highlight-text{font-size:.92rem;line-height:1.8;}
+.highlight-text strong{color:var(--accent2);}
+
+/* spec grid */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-top:.8rem;}
+@media(max-width:560px){.spec-grid{grid-template-columns:1fr;}}
+.spec-item{background:var(--bg2);border:1px solid var(--border);padding:.8rem 1rem;border-radius:2px;}
+.spec-key{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.2rem;}
+.spec-val{font-family:'DM Mono',monospace;font-size:.82rem;color:var(--accent2);}
+.spec-note{font-size:.78rem;color:var(--text-dim);margin-top:.15rem;}
+
+/* pin table */
+.pin-table{width:100%;border-collapse:collapse;margin-top:.8rem;font-family:'DM Mono',monospace;font-size:.72rem;}
+.pin-table th{text-align:left;color:var(--accent);font-weight:400;letter-spacing:.1em;text-transform:uppercase;font-size:.58rem;padding:.5rem .8rem;border-bottom:1px solid var(--border);}
+.pin-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border);color:var(--text-dim);}
+.pin-table td:first-child{color:var(--text);}
+.pin-table td.pin{color:var(--accent2);}
+.pin-table tr:last-child td{border-bottom:none;}
+
+/* scene timeline */
+.timeline{margin-top:.8rem;display:flex;flex-direction:column;gap:.4rem;}
+.tl-item{display:flex;gap:1rem;align-items:flex-start;padding:.75rem 1rem;background:var(--bg2);border:1px solid var(--border);border-radius:2px;}
+.tl-step{font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent);min-width:28px;padding-top:.2rem;letter-spacing:.06em;}
+.tl-text{font-size:.88rem;color:var(--text-dim);line-height:1.65;}
+.tl-text strong{color:var(--text);}
+
+/* status columns */
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;margin-top:.8rem;}
+@media(max-width:600px){.status-grid{grid-template-columns:1fr;}}
+.status-col{background:var(--bg2);border:1px solid var(--border);border-radius:2px;padding:1.1rem 1.3rem;}
+.status-col.done{border-left:3px solid var(--green);}
+.status-col.plan{border-left:3px solid var(--orange);}
+.status-head{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:.6rem;}
+.status-col.done .status-head{color:var(--green);}
+.status-col.plan .status-head{color:var(--orange);}
+.status-col ul{list-style:none;}
+.status-col li{font-size:.85rem;color:var(--text-dim);line-height:1.6;padding:.22rem 0 .22rem 1rem;position:relative;}
+.status-col li::before{content:'·';position:absolute;left:.2rem;color:var(--text-dim);}
+
+.exp-box{background:var(--bg2);border:1px solid var(--border);border-left:3px solid var(--accent);padding:1.3rem 1.6rem;border-radius:2px;font-size:.95rem;line-height:1.85;}
+.page-footer{margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;justify-content:space-between;flex-wrap:wrap;gap:.5rem;font-family:'DM Mono',monospace;font-size:.63rem;color:var(--text-dim);}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="lang-bar">
+  <button class="lang-btn active" onclick="setLang('hu')">HU</button>
+  <button class="lang-btn" onclick="setLang('en')">EN</button>
+  <button class="lang-btn" onclick="setLang('de')">DE</button>
+</div>
+
+<h1 class="proj-title" data-i18n="title">KaleidoCam — <em>programozható kinetikus kaleidoszkóp</em></h1>
+<div class="proj-sub" data-i18n="sub">Arduino Nano · A4988 · léptetőmotoros hajtás · RGB PWM-világítás · webkamerás képalkotás</div>
+<div class="status-pill" data-i18n="status">Saját építésű kísérleti prototípus</div>
+
+<!-- hero -->
+<div class="hero-shot">
+  <img src="kaleido-minta-rozsa.jpg" alt="A KaleidoCam által létrehozott rózsaszín-lila-kék szimmetrikus optikai mintázat">
+  <div class="photo-cap" data-i18n="hero.cap">Kameraállókép a működő rendszerről — rózsaszín-lila-kék állapot. A kép a fizikai kaleidoszkóp optikai képe, nem utólag generált grafika.</div>
+</div>
+
+<!-- overview -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.overview">A projekt</div>
+  <div class="overview-box" data-i18n="overview.text">
+    A <strong>KaleidoCam</strong> egy léptetőmotorral forgatott, programozható RGB-fényforrással
+    megvilágított kaleidoszkóp, amelynek optikai képét webkamera rögzíti. Ismételhető a <strong>vezérlés</strong>:
+    a forgás és a megvilágítás előre megírt koreográfia szerint fut. A <strong>kép</strong> viszont nem:
+    az objektumkamra tartalma minden indulásnál máshogy áll be, a hajtás pedig rugalmas és visszacsatolás
+    nélküli, így ugyanaz a jelenet minden lefutásban más mintázatot ad.
+    <br><br>
+    A rendszer három szakterület metszéspontjában áll: <strong>optika</strong> (tükörcső, szórt
+    megvilágítás, az objektumkamra tartalma), <strong>beágyazott vezérlés</strong> (lépésjel-generálás,
+    PWM-es színkeverés, időzítés) és <strong>mechanika</strong> (rugalmas szíjhajtás, és az ebből
+    következő késés). A megvalósítás kísérleti prototípus — a hangsúly azon van, hogy minden
+    látott mintázat valódi, mérhető fizikai állapotból származik.
+  </div>
+</div>
+
+<!-- hardware -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.hw">Hardver</div>
+  <div class="spec-grid">
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k1">Mikrovezérlő</div><div class="spec-val">Arduino Nano</div><div class="spec-note" data-i18n="hw.n1">ATmega328P, 16 MHz</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k2">Motor</div><div class="spec-val" data-i18n="hw.v2">Léptetőmotor</div><div class="spec-note" data-i18n="hw.n2">bontott nyomtatóból, A4988-ról hajtva; a kaleidoszkóptest forgatása</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k3">Meghajtó</div><div class="spec-val">A4988 StepStick</div><div class="spec-note" data-i18n="hw.n3">STEP/DIR vezérlés; az EN bemenet nincs bekötve, a meghajtó folyamatosan engedélyezett</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k4">Világítás</div><div class="spec-val">RGB LED, közös anód</div><div class="spec-note" data-i18n="hw.n4">három PWM-csatorna, egyenként szabályozott fényerővel</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k5">Kamera</div><div class="spec-val">Logitech C270</div><div class="spec-note" data-i18n="hw.n5">HD webkamera a nézőke előtt</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k6">Tápellátás</div><div class="spec-val" data-i18n="hw.v6">külön motor- és 5 V-os ág</div><div class="spec-note" data-i18n="hw.n6">közös földeléssel, hogy a STEP/DIR jelszintek értelmezhetők maradjanak</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k7">Mechanika</div><div class="spec-val" data-i18n="hw.v7">rugalmas szíjhajtás</div><div class="spec-note" data-i18n="hw.n7">forgó kaleidoszkóptest, kötetlen áttétellel</div></div>
+    <div class="spec-item"><div class="spec-key" data-i18n="hw.k8">Lépésfrekvencia</div><div class="spec-val">~167 lépés/s</div><div class="spec-note" data-i18n="hw.n8">3000 µs magas + 3000 µs alacsony STEP-szint</div></div>
+  </div>
+
+  <table class="pin-table">
+    <thead>
+      <tr><th data-i18n="pin.fn">Funkció</th><th data-i18n="pin.pin">Arduino Nano</th><th data-i18n="pin.note">Megjegyzés</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>A4988 STEP</td><td class="pin">D3</td><td data-i18n="pin.r1">lépésimpulzus</td></tr>
+      <tr><td>A4988 DIR</td><td class="pin">D4</td><td data-i18n="pin.r2">forgásirány</td></tr>
+      <tr><td data-i18n="pin.r3n">RGB piros</td><td class="pin">D9</td><td data-i18n="pin.r3">PWM</td></tr>
+      <tr><td data-i18n="pin.r4n">RGB zöld</td><td class="pin">D10</td><td data-i18n="pin.r4">PWM</td></tr>
+      <tr><td data-i18n="pin.r5n">RGB kék</td><td class="pin">D11</td><td data-i18n="pin.r5">PWM</td></tr>
+    </tbody>
+  </table>
+
+  <div class="highlight-box">
+    <span class="highlight-icon">⟳</span>
+    <div class="highlight-text" data-i18n="hw.belt">
+      <strong>A szíjhajtás ára:</strong> a rugalmas hajtás miatt a kaleidoszkóp mozgása a motor
+      indulásához képest körülbelül <strong>6 másodperces késéssel</strong> jelenik meg. Ez nem
+      szoftveres késleltetés, hanem a mechanika rugalmassága. A koreográfia ehhez igazodik:
+      hosszabb forgási szakaszok, ritkább irányváltás — különben a fényváltás és a mozgás
+      szétcsúszna a kameraképen.
+    </div>
+  </div>
+</div>
+
+<!-- software -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.sw">Vezérlés és koreográfia</div>
+  <div class="overview-box" data-i18n="sw.text">
+    Az Arduino programja két dolgot hangol össze: a léptetőmotor forgását (STEP/DIR jelekkel)
+    és az RGB LED három csatornájának PWM-szintjét. A jelenetek előre programozottak,
+    nincs hang- vagy képvezérlés. A jelenlegi műsor — <strong>„A kristályok tánca”</strong> —
+    körülbelül <strong>4 perc 48 másodperc</strong>, és automatikusan ismétlődik.
+  </div>
+  <div class="timeline">
+    <div class="tl-item"><span class="tl-step">01</span><span class="tl-text" data-i18n="sc1"><strong>Nyitány</strong> — fokozatosan erősödő fény.</span></div>
+    <div class="tl-item"><span class="tl-step">02</span><span class="tl-text" data-i18n="sc2"><strong>Első felvonás</strong> — folyamatos forgás és színátmenetek.</span></div>
+    <div class="tl-item"><span class="tl-step">03</span><span class="tl-text" data-i18n="sc3"><strong>Vörös felvonás</strong> — tiszta, pulzáló piros megvilágítás.</span></div>
+    <div class="tl-item"><span class="tl-step">04</span><span class="tl-text" data-i18n="sc4"><strong>Drámai szünet</strong> — a motor megáll, a fény elhalkul.</span></div>
+    <div class="tl-item"><span class="tl-step">05</span><span class="tl-text" data-i18n="sc5"><strong>Tükörvilág</strong> — ellenkező forgásirány, hidegebb színvilág.</span></div>
+    <div class="tl-item"><span class="tl-step">06</span><span class="tl-text" data-i18n="sc6"><strong>Nagy finálé</strong> — intenzív RGB-fényjáték.</span></div>
+    <div class="tl-item"><span class="tl-step">07</span><span class="tl-text" data-i18n="sc7"><strong>Levezetés</strong> — elsötétülés, majd újraindulás.</span></div>
+  </div>
+</div>
+
+<!-- prototype photos -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.photos">A prototípus</div>
+  <div class="photo-3">
+    <div class="photo-card photo-full">
+      <img src="kaleido-rendszer.jpg" alt="A teljes KaleidoCam elrendezés a munkaasztalon" class="tall">
+      <div class="photo-cap" data-i18n="photo1.cap">A teljes elrendezés · kaleidoszkóptest a tápegység házára fektetve, külön tápellátás a motornak és a vezérlésnek, közös földeléssel · a laptopon a kamerakép rögzítés közben</div>
+    </div>
+    <div class="photo-card">
+      <img src="kaleido-optika.jpg" alt="A megvilágított objektumkamra közelről" class="short">
+      <div class="photo-cap" data-i18n="photo2.cap">A megvilágított objektumkamra · a közös anódos RGB LED közvetlenül a kaleidoszkóp végébe világít; a szórt, színes fény adja a mintázat alapját</div>
+    </div>
+    <div class="photo-card">
+      <img src="kaleido-hajtas.jpg" alt="A hajtás és a kamera elrendezése felülnézetből" class="short">
+      <div class="photo-cap" data-i18n="photo3.cap">Hajtás és képalkotás felülnézetből · a webkamera a nézőke előtt, jobbra a léptetőmotor, a testet rugalmas szíj forgatja</div>
+    </div>
+  </div>
+</div>
+
+<!-- optical results -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.results">Optikai eredmények</div>
+  <div class="photo-3">
+    <div class="photo-card photo-full">
+      <img src="kaleido-minta-zold.jpg" alt="Zöld-türkiz-kék kaleidoszkópmintázat">
+      <div class="photo-cap" data-i18n="res1.cap">Zöld-türkiz-kék állapot · kristályszerű, határozott élű geometriai struktúrák — ugyanaz az optika, más megvilágítással és más forgási fázisban</div>
+    </div>
+  </div>
+  <div class="highlight-box">
+    <span class="highlight-icon">◎</span>
+    <div class="highlight-text" data-i18n="res.note">
+      <strong>Mindkét mintázat kamerakép.</strong> Ugyanannak a fizikai optikai rendszernek két
+      különböző állapota: a megvilágítás színe és a forgási fázis változott, nem a kép.
+      Utólagos képfeldolgozás, szűrő vagy generált grafika nincs benne — a szimmetriát a
+      tükörcső geometriája hozza létre.
+    </div>
+  </div>
+</div>
+
+<!-- VIDEÓ — ha felkerül a videófájl a repóba, töröld a komment-jeleket, és írd át a fájlnevet:
+<div class="section">
+  <div class="section-label" data-i18n="sec.video">Videó</div>
+  <div class="hero-shot">
+    <video src="kaleidocam-demo.mp4" controls playsinline preload="none"
+           poster="kaleido-minta-rozsa.jpg" style="width:100%;display:block;"></video>
+    <div class="photo-cap" data-i18n="video.cap">Részlet „A kristályok tánca” című műsorból — folyamatos felvétel a webkamera képéről</div>
+  </div>
+</div>
+-->
+
+<!-- status -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.status">Hol tart most</div>
+  <div class="status-grid">
+    <div class="status-col done">
+      <div class="status-head" data-i18n="st.done">Működik</div>
+      <ul>
+        <li data-i18n="st.d1">Arduino-alapú léptetőmotor-vezérlés A4988-cal</li>
+        <li data-i18n="st.d2">RGB LED PWM-es színkeverése</li>
+        <li data-i18n="st.d3">Automatikus, ismétlődő fény- és mozgáskoreográfia</li>
+        <li data-i18n="st.d4">Rugalmas szíjas mechanikai hajtás</li>
+        <li data-i18n="st.d5">Kamerás megfigyelés és videórögzítés</li>
+      </ul>
+    </div>
+    <div class="status-col plan">
+      <div class="status-head" data-i18n="st.plan">Fejlesztési irányok</div>
+      <ul>
+        <li data-i18n="st.p1">A szíjhajtás merevebbé tétele, a 6 s-os késés csökkentése</li>
+        <li data-i18n="st.p2">Rendezett, burkolt elektronika</li>
+        <li data-i18n="st.p3">A megvilágítás és a kameraparaméterek optimalizálása</li>
+        <li data-i18n="st.p4">Új fény- és mozgásprogramok, zenével összehangolva</li>
+        <li data-i18n="st.p5">Érdekes képkockák automatikus kiválasztása</li>
+        <li data-i18n="st.p6">Kompaktabb, kiállítható változat</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- experience -->
+<div class="section">
+  <div class="section-label" data-i18n="sec.exp">Tapasztalat</div>
+  <div class="exp-box" data-i18n="exp.text">
+    A projekt tanulsága elsősorban mechanikai: egy rugalmas hajtás nem egyszerűen pontatlan,
+    hanem <strong>késleltet</strong> — és a késés a vezérlőprogramot is átírja. A koreográfiát nem a
+    motor mozgásához, hanem a kameraképen megjelenő mozgáshoz kellett igazítani, különben a fény- és
+    mozgásváltások szétcsúsztak volna.
+    <br><br>
+    Elektronikai oldalon a két tápág közös földelése a kritikus pont: a motorág és a vezérlés
+    külön táplálása csak közös referenciával működik, enélkül a STEP/DIR jelszintek értelmezhetetlenné
+    válnak a meghajtó számára. Az A4988 EN bemenete bekötetlen, így a meghajtó folyamatosan
+    engedélyezett — ez egyszerűsíti a programot, de a motor álló helyzetben is fogyaszt és melegszik.
+    Egy későbbi változatban ez kézenfekvő javítási pont.
+  </div>
+</div>
+
+<div class="page-footer">
+  <span>Bódis Tamás · Budapest</span>
+  <span data-i18n="footer.tag">KaleidoCam · Arduino · A4988 · RGB PWM · optika</span>
+</div>
+</div>
+
+<script>
+const T={
+hu:{
+"title":"KaleidoCam — <em>programozható kinetikus kaleidoszkóp</em>",
+"sub":"Arduino Nano · A4988 · léptetőmotoros hajtás · RGB PWM-világítás · webkamerás képalkotás",
+"status":"Saját építésű kísérleti prototípus",
+"hero.cap":"Kameraállókép a működő rendszerről — rózsaszín-lila-kék állapot. A kép a fizikai kaleidoszkóp optikai képe, nem utólag generált grafika.",
+"sec.overview":"A projekt",
+"overview.text":"A <strong>KaleidoCam</strong> egy léptetőmotorral forgatott, programozható RGB-fényforrással megvilágított kaleidoszkóp, amelynek optikai képét webkamera rögzíti. Ismételhető a <strong>vezérlés</strong>: a forgás és a megvilágítás előre megírt koreográfia szerint fut. A <strong>kép</strong> viszont nem: az objektumkamra tartalma minden indulásnál máshogy áll be, a hajtás pedig rugalmas és visszacsatolás nélküli, így ugyanaz a jelenet minden lefutásban más mintázatot ad.<br><br>A rendszer három szakterület metszéspontjában áll: <strong>optika</strong> (tükörcső, szórt megvilágítás, az objektumkamra tartalma), <strong>beágyazott vezérlés</strong> (lépésjel-generálás, PWM-es színkeverés, időzítés) és <strong>mechanika</strong> (rugalmas szíjhajtás, és az ebből következő késés). A megvalósítás kísérleti prototípus — a hangsúly azon van, hogy minden látott mintázat valódi, mérhető fizikai állapotból származik.",
+"sec.hw":"Hardver",
+"hw.k1":"Mikrovezérlő","hw.n1":"ATmega328P, 16 MHz",
+"hw.k2":"Motor","hw.v2":"Léptetőmotor","hw.n2":"bontott nyomtatóból, A4988-ról hajtva; a kaleidoszkóptest forgatása",
+"hw.k3":"Meghajtó","hw.n3":"STEP/DIR vezérlés; az EN bemenet nincs bekötve, a meghajtó folyamatosan engedélyezett",
+"hw.k4":"Világítás","hw.n4":"három PWM-csatorna, egyenként szabályozott fényerővel",
+"hw.k5":"Kamera","hw.n5":"HD webkamera a nézőke előtt",
+"hw.k6":"Tápellátás","hw.v6":"külön motor- és 5 V-os ág","hw.n6":"közös földeléssel, hogy a STEP/DIR jelszintek értelmezhetők maradjanak",
+"hw.k7":"Mechanika","hw.v7":"rugalmas szíjhajtás","hw.n7":"forgó kaleidoszkóptest, kötetlen áttétellel",
+"hw.k8":"Lépésfrekvencia","hw.n8":"3000 µs magas + 3000 µs alacsony STEP-szint",
+"pin.fn":"Funkció","pin.pin":"Arduino Nano","pin.note":"Megjegyzés",
+"pin.r1":"lépésimpulzus","pin.r2":"forgásirány",
+"pin.r3n":"RGB piros","pin.r3":"PWM",
+"pin.r4n":"RGB zöld","pin.r4":"PWM",
+"pin.r5n":"RGB kék","pin.r5":"PWM",
+"hw.belt":"<strong>A szíjhajtás ára:</strong> a rugalmas hajtás miatt a kaleidoszkóp mozgása a motor indulásához képest körülbelül <strong>6 másodperces késéssel</strong> jelenik meg. Ez nem szoftveres késleltetés, hanem a mechanika rugalmassága. A koreográfia ehhez igazodik: hosszabb forgási szakaszok, ritkább irányváltás — különben a fényváltás és a mozgás szétcsúszna a kameraképen.",
+"sec.sw":"Vezérlés és koreográfia",
+"sw.text":"Az Arduino programja két dolgot hangol össze: a léptetőmotor forgását (STEP/DIR jelekkel) és az RGB LED három csatornájának PWM-szintjét. A jelenetek előre programozottak, nincs hang- vagy képvezérlés. A jelenlegi műsor — <strong>„A kristályok tánca”</strong> — körülbelül <strong>4 perc 48 másodperc</strong>, és automatikusan ismétlődik.",
+"sc1":"<strong>Nyitány</strong> — fokozatosan erősödő fény.",
+"sc2":"<strong>Első felvonás</strong> — folyamatos forgás és színátmenetek.",
+"sc3":"<strong>Vörös felvonás</strong> — tiszta, pulzáló piros megvilágítás.",
+"sc4":"<strong>Drámai szünet</strong> — a motor megáll, a fény elhalkul.",
+"sc5":"<strong>Tükörvilág</strong> — ellenkező forgásirány, hidegebb színvilág.",
+"sc6":"<strong>Nagy finálé</strong> — intenzív RGB-fényjáték.",
+"sc7":"<strong>Levezetés</strong> — elsötétülés, majd újraindulás.",
+"sec.photos":"A prototípus",
+"photo1.cap":"A teljes elrendezés · kaleidoszkóptest a tápegység házára fektetve, külön tápellátás a motornak és a vezérlésnek, közös földeléssel · a laptopon a kamerakép rögzítés közben",
+"photo2.cap":"A megvilágított objektumkamra · a közös anódos RGB LED közvetlenül a kaleidoszkóp végébe világít; a szórt, színes fény adja a mintázat alapját",
+"photo3.cap":"Hajtás és képalkotás felülnézetből · a webkamera a nézőke előtt, jobbra a léptetőmotor, a testet rugalmas szíj forgatja",
+"sec.results":"Optikai eredmények",
+"res1.cap":"Zöld-türkiz-kék állapot · kristályszerű, határozott élű geometriai struktúrák — ugyanaz az optika, más megvilágítással és más forgási fázisban",
+"res.note":"<strong>Mindkét mintázat kamerakép.</strong> Ugyanannak a fizikai optikai rendszernek két különböző állapota: a megvilágítás színe és a forgási fázis változott, nem a kép. Utólagos képfeldolgozás, szűrő vagy generált grafika nincs benne — a szimmetriát a tükörcső geometriája hozza létre.",
+"sec.video":"Videó",
+"video.cap":"Részlet „A kristályok tánca” című műsorból — folyamatos felvétel a webkamera képéről",
+"sec.status":"Hol tart most",
+"st.done":"Működik",
+"st.d1":"Arduino-alapú léptetőmotor-vezérlés A4988-cal",
+"st.d2":"RGB LED PWM-es színkeverése",
+"st.d3":"Automatikus, ismétlődő fény- és mozgáskoreográfia",
+"st.d4":"Rugalmas szíjas mechanikai hajtás",
+"st.d5":"Kamerás megfigyelés és videórögzítés",
+"st.plan":"Fejlesztési irányok",
+"st.p1":"A szíjhajtás merevebbé tétele, a 6 s-os késés csökkentése",
+"st.p2":"Rendezett, burkolt elektronika",
+"st.p3":"A megvilágítás és a kameraparaméterek optimalizálása",
+"st.p4":"Új fény- és mozgásprogramok, zenével összehangolva",
+"st.p5":"Érdekes képkockák automatikus kiválasztása",
+"st.p6":"Kompaktabb, kiállítható változat",
+"sec.exp":"Tapasztalat",
+"exp.text":"A projekt tanulsága elsősorban mechanikai: egy rugalmas hajtás nem egyszerűen pontatlan, hanem <strong>késleltet</strong> — és a késés a vezérlőprogramot is átírja. A koreográfiát nem a motor mozgásához, hanem a kameraképen megjelenő mozgáshoz kellett igazítani, különben a fény- és mozgásváltások szétcsúsztak volna.<br><br>Elektronikai oldalon a két tápág közös földelése a kritikus pont: a motorág és a vezérlés külön táplálása csak közös referenciával működik, enélkül a STEP/DIR jelszintek értelmezhetetlenné válnak a meghajtó számára. Az A4988 EN bemenete bekötetlen, így a meghajtó folyamatosan engedélyezett — ez egyszerűsíti a programot, de a motor álló helyzetben is fogyaszt és melegszik. Egy későbbi változatban ez kézenfekvő javítási pont.",
+"footer.tag":"KaleidoCam · Arduino · A4988 · RGB PWM · optika"
+},
+en:{
+"title":"KaleidoCam — <em>programmable kinetic kaleidoscope</em>",
+"sub":"Arduino Nano · A4988 · stepper-driven rotation · RGB PWM illumination · camera-based imaging",
+"status":"Self-built experimental prototype",
+"hero.cap":"Camera still of the running system — pink/violet/blue state. This is the optical image of the physical kaleidoscope, not computer-generated graphics.",
+"sec.overview":"The project",
+"overview.text":"<strong>KaleidoCam</strong> is a kaleidoscope rotated by a stepper motor and lit by a programmable RGB source, with its optical image captured by a webcam. What repeats is the <strong>control</strong>: rotation and illumination follow a pre-written choreography. The <strong>image</strong> does not: the contents of the object chamber settle differently on every start, and the drive is elastic and open-loop, so each run of the same scene yields a different pattern.<br><br>The system sits at the intersection of three fields: <strong>optics</strong> (mirror tube, diffuse illumination, the contents of the object chamber), <strong>embedded control</strong> (step pulse generation, PWM colour mixing, timing) and <strong>mechanics</strong> (an elastic belt drive and the lag that comes with it). It is an experimental prototype — the point is that every pattern shown comes from a real, measurable physical state.",
+"sec.hw":"Hardware",
+"hw.k1":"Microcontroller","hw.n1":"ATmega328P, 16 MHz",
+"hw.k2":"Motor","hw.v2":"Stepper motor","hw.n2":"salvaged from a printer, driven by the A4988; rotates the kaleidoscope body",
+"hw.k3":"Driver","hw.n3":"STEP/DIR control; the EN input is left unconnected, so the driver is permanently enabled",
+"hw.k4":"Illumination","hw.n4":"three PWM channels, each dimmed separately",
+"hw.k5":"Camera","hw.n5":"HD webcam at the eyepiece",
+"hw.k6":"Power","hw.v6":"separate motor and 5 V rails","hw.n6":"with a common ground, so the STEP/DIR logic levels stay meaningful",
+"hw.k7":"Mechanics","hw.v7":"elastic belt drive","hw.n7":"rotating kaleidoscope body, non-rigid ratio",
+"hw.k8":"Step rate","hw.n8":"3000 µs high + 3000 µs low STEP level",
+"pin.fn":"Function","pin.pin":"Arduino Nano","pin.note":"Note",
+"pin.r1":"step pulse","pin.r2":"direction",
+"pin.r3n":"RGB red","pin.r3":"PWM",
+"pin.r4n":"RGB green","pin.r4":"PWM",
+"pin.r5n":"RGB blue","pin.r5":"PWM",
+"hw.belt":"<strong>The cost of the belt drive:</strong> because the drive is elastic, the kaleidoscope starts moving roughly <strong>6 seconds after</strong> the motor does. This is not a software delay but the compliance of the mechanics. The choreography is built around it: longer rotation segments and fewer direction changes — otherwise the light and the motion would drift apart on camera.",
+"sec.sw":"Control and choreography",
+"sw.text":"The Arduino program coordinates two things: the rotation of the stepper (via STEP/DIR) and the PWM level of the three RGB channels. The scenes are pre-programmed; there is no audio or image-driven control. The current show — <strong>“Dance of the Crystals”</strong> — runs about <strong>4 minutes 48 seconds</strong> and repeats automatically.",
+"sc1":"<strong>Overture</strong> — light fading up.",
+"sc2":"<strong>First act</strong> — continuous rotation and colour transitions.",
+"sc3":"<strong>Red act</strong> — pure, pulsing red illumination.",
+"sc4":"<strong>Dramatic pause</strong> — the motor stops, the light fades.",
+"sc5":"<strong>Mirror world</strong> — reversed rotation, colder palette.",
+"sc6":"<strong>Grand finale</strong> — intense RGB interplay.",
+"sc7":"<strong>Wind-down</strong> — fade to black, then restart.",
+"sec.photos":"The prototype",
+"photo1.cap":"The full setup · kaleidoscope body resting on the power supply case, separate rails for motor and control with a common ground · the laptop shows the camera image during recording",
+"photo2.cap":"The illuminated object chamber · the common-anode RGB LED shines directly into the end of the tube; the diffuse coloured light is what the pattern is built from",
+"photo3.cap":"Drive and imaging from above · webcam at the eyepiece, stepper motor on the right, the body turned by an elastic belt",
+"sec.results":"Optical results",
+"res1.cap":"Green/turquoise/blue state · crystalline, hard-edged geometric structures — same optics, different illumination and rotation phase",
+"res.note":"<strong>Both patterns are camera images.</strong> Two different states of the same physical optical system: the colour of the illumination and the rotation phase changed, not the image. There is no post-processing, filter or generated graphic — the symmetry comes from the geometry of the mirror tube.",
+"sec.video":"Video",
+"video.cap":"Excerpt from “Dance of the Crystals” — continuous recording of the webcam image",
+"sec.status":"Current state",
+"st.done":"Working",
+"st.d1":"Arduino-based stepper control with the A4988",
+"st.d2":"PWM colour mixing on the RGB LED",
+"st.d3":"Automatic, repeating light and motion choreography",
+"st.d4":"Elastic belt drive",
+"st.d5":"Camera monitoring and video recording",
+"st.plan":"Development directions",
+"st.p1":"A stiffer belt drive to cut the 6 s lag",
+"st.p2":"Tidier, enclosed electronics",
+"st.p3":"Optimising the illumination and the camera parameters",
+"st.p4":"New light and motion programs, synchronised to music",
+"st.p5":"Automatic selection of interesting frames",
+"st.p6":"A more compact, exhibitable version",
+"sec.exp":"What I learned",
+"exp.text":"The main lesson is mechanical: an elastic drive is not merely imprecise, it <strong>delays</strong> — and that delay rewrites the control program. The choreography had to be timed to the motion seen on camera rather than to the motion of the motor, otherwise the light and movement changes would have drifted apart.<br><br>On the electronics side the common ground between the two supply rails is the critical point: powering the motor and the control separately only works with a shared reference, without which the STEP/DIR logic levels mean nothing to the driver. The A4988 EN input is left unconnected, so the driver is permanently enabled — this keeps the program simple, but the motor draws current and heats up even when stationary. An obvious thing to fix in a later version.",
+"footer.tag":"KaleidoCam · Arduino · A4988 · RGB PWM · optics"
+},
+de:{
+"title":"KaleidoCam — <em>programmierbares kinetisches Kaleidoskop</em>",
+"sub":"Arduino Nano · A4988 · Schrittmotorantrieb · RGB-PWM-Beleuchtung · Kamerabasierte Bildgebung",
+"status":"Selbstgebauter experimenteller Prototyp",
+"hero.cap":"Kamerastandbild des laufenden Systems — rosa-violett-blauer Zustand. Das ist das optische Bild des physischen Kaleidoskops, keine erzeugte Grafik.",
+"sec.overview":"Das Projekt",
+"overview.text":"<strong>KaleidoCam</strong> ist ein von einem Schrittmotor gedrehtes, mit einer programmierbaren RGB-Quelle beleuchtetes Kaleidoskop, dessen optisches Bild von einer Webcam aufgenommen wird. Wiederholbar ist die <strong>Steuerung</strong>: Drehung und Beleuchtung folgen einer vorab geschriebenen Choreografie. Das <strong>Bild</strong> nicht: der Inhalt der Objektkammer legt sich bei jedem Start anders, und der Antrieb ist elastisch und ohne Rückführung — dieselbe Szene ergibt also bei jedem Durchlauf ein anderes Muster.<br><br>Das System liegt im Schnittpunkt dreier Gebiete: <strong>Optik</strong> (Spiegelrohr, diffuse Beleuchtung, Inhalt der Objektkammer), <strong>eingebettete Steuerung</strong> (Schrittimpulse, PWM-Farbmischung, Timing) und <strong>Mechanik</strong> (elastischer Riemenantrieb und die daraus folgende Verzögerung). Es ist ein experimenteller Prototyp — entscheidend ist, dass jedes gezeigte Muster aus einem realen, messbaren physikalischen Zustand stammt.",
+"sec.hw":"Hardware",
+"hw.k1":"Mikrocontroller","hw.n1":"ATmega328P, 16 MHz",
+"hw.k2":"Motor","hw.v2":"Schrittmotor","hw.n2":"aus einem Drucker ausgebaut, vom A4988 angesteuert; dreht den Kaleidoskopkörper",
+"hw.k3":"Treiber","hw.n3":"STEP/DIR-Ansteuerung; der EN-Eingang ist nicht beschaltet, der Treiber ist dauerhaft freigegeben",
+"hw.k4":"Beleuchtung","hw.n4":"drei PWM-Kanäle, einzeln gedimmt",
+"hw.k5":"Kamera","hw.n5":"HD-Webcam am Okular",
+"hw.k6":"Stromversorgung","hw.v6":"getrennte Motor- und 5-V-Schiene","hw.n6":"mit gemeinsamer Masse, damit die STEP/DIR-Pegel gültig bleiben",
+"hw.k7":"Mechanik","hw.v7":"elastischer Riemenantrieb","hw.n7":"drehender Kaleidoskopkörper, nicht starres Übersetzungsverhältnis",
+"hw.k8":"Schrittfrequenz","hw.n8":"3000 µs High + 3000 µs Low am STEP-Pegel",
+"pin.fn":"Funktion","pin.pin":"Arduino Nano","pin.note":"Hinweis",
+"pin.r1":"Schrittimpuls","pin.r2":"Drehrichtung",
+"pin.r3n":"RGB rot","pin.r3":"PWM",
+"pin.r4n":"RGB grün","pin.r4":"PWM",
+"pin.r5n":"RGB blau","pin.r5":"PWM",
+"hw.belt":"<strong>Der Preis des Riemenantriebs:</strong> wegen der Elastizität setzt sich das Kaleidoskop erst rund <strong>6 Sekunden nach</strong> dem Motor in Bewegung. Das ist keine Software-Verzögerung, sondern die Nachgiebigkeit der Mechanik. Die Choreografie ist darauf ausgelegt: längere Drehabschnitte, seltenere Richtungswechsel — sonst liefen Licht und Bewegung im Kamerabild auseinander.",
+"sec.sw":"Steuerung und Choreografie",
+"sw.text":"Das Arduino-Programm koordiniert zwei Dinge: die Drehung des Schrittmotors (über STEP/DIR) und den PWM-Pegel der drei RGB-Kanäle. Die Szenen sind vorprogrammiert, es gibt keine Audio- oder Bildsteuerung. Die aktuelle Show — <strong>„Tanz der Kristalle“</strong> — dauert etwa <strong>4 Minuten 48 Sekunden</strong> und wiederholt sich automatisch.",
+"sc1":"<strong>Ouvertüre</strong> — langsam aufblendendes Licht.",
+"sc2":"<strong>Erster Akt</strong> — gleichmäßige Drehung und Farbverläufe.",
+"sc3":"<strong>Roter Akt</strong> — reines, pulsierendes Rot.",
+"sc4":"<strong>Dramatische Pause</strong> — der Motor hält an, das Licht verklingt.",
+"sc5":"<strong>Spiegelwelt</strong> — umgekehrte Drehrichtung, kältere Farben.",
+"sc6":"<strong>Großes Finale</strong> — intensives RGB-Spiel.",
+"sc7":"<strong>Ausklang</strong> — Abdunkeln, dann Neustart.",
+"sec.photos":"Der Prototyp",
+"photo1.cap":"Der gesamte Aufbau · Kaleidoskopkörper auf dem Netzteilgehäuse, getrennte Versorgung für Motor und Steuerung mit gemeinsamer Masse · auf dem Laptop das Kamerabild während der Aufnahme",
+"photo2.cap":"Die beleuchtete Objektkammer · die RGB-LED mit gemeinsamer Anode leuchtet direkt in das Rohrende; das diffuse farbige Licht bildet die Grundlage des Musters",
+"photo3.cap":"Antrieb und Bildgebung von oben · Webcam am Okular, rechts der Schrittmotor, der Körper wird von einem elastischen Riemen gedreht",
+"sec.results":"Optische Ergebnisse",
+"res1.cap":"Grün-türkis-blauer Zustand · kristalline, scharfkantige geometrische Strukturen — dieselbe Optik, andere Beleuchtung und Drehphase",
+"res.note":"<strong>Beide Muster sind Kamerabilder.</strong> Zwei Zustände desselben physischen optischen Systems: geändert haben sich Lichtfarbe und Drehphase, nicht das Bild. Keine Nachbearbeitung, kein Filter, keine erzeugte Grafik — die Symmetrie entsteht durch die Geometrie des Spiegelrohrs.",
+"sec.video":"Video",
+"video.cap":"Ausschnitt aus „Tanz der Kristalle“ — durchgehende Aufnahme des Webcam-Bildes",
+"sec.status":"Aktueller Stand",
+"st.done":"Funktioniert",
+"st.d1":"Arduino-basierte Schrittmotorsteuerung mit dem A4988",
+"st.d2":"PWM-Farbmischung der RGB-LED",
+"st.d3":"Automatische, sich wiederholende Licht- und Bewegungschoreografie",
+"st.d4":"Elastischer Riemenantrieb",
+"st.d5":"Kameraüberwachung und Videoaufzeichnung",
+"st.plan":"Entwicklungsrichtungen",
+"st.p1":"Steiferer Riemenantrieb, um die 6-s-Verzögerung zu verringern",
+"st.p2":"Aufgeräumte, gekapselte Elektronik",
+"st.p3":"Optimierung von Beleuchtung und Kameraparametern",
+"st.p4":"Neue Licht- und Bewegungsprogramme, auf Musik abgestimmt",
+"st.p5":"Automatische Auswahl interessanter Einzelbilder",
+"st.p6":"Kompaktere, ausstellbare Variante",
+"sec.exp":"Erfahrungen",
+"exp.text":"Die wichtigste Lehre ist mechanisch: ein elastischer Antrieb ist nicht bloß ungenau, er <strong>verzögert</strong> — und diese Verzögerung schreibt das Steuerprogramm um. Die Choreografie musste auf die im Kamerabild sichtbare Bewegung getaktet werden, nicht auf die des Motors.<br><br>Auf der Elektronikseite ist die gemeinsame Masse der beiden Versorgungszweige der kritische Punkt: getrennte Versorgung von Motor und Steuerung funktioniert nur mit gemeinsamer Referenz, sonst sind die STEP/DIR-Pegel für den Treiber bedeutungslos. Der EN-Eingang des A4988 ist nicht beschaltet, der Treiber also dauerhaft freigegeben — das vereinfacht das Programm, aber der Motor zieht auch im Stillstand Strom und erwärmt sich. Ein naheliegender Punkt für eine spätere Version.",
+"footer.tag":"KaleidoCam · Arduino · A4988 · RGB-PWM · Optik"
+}
+};
+
+function setLang(lang){
+  const t=T[lang]||T.hu;
+  document.documentElement.lang=lang;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k=el.getAttribute('data-i18n');
+    if(t[k]!==undefined) el.innerHTML=t[k];
+  });
+  document.querySelectorAll('.lang-btn').forEach(b=>{
+    b.classList.toggle('active', b.textContent.trim().toLowerCase()===lang);
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>setLang('hu'));
+</script>
+<script>
+  // GoatCounter: csak akkor mérünk, ha az oldal nem a főoldal modaljában (iframe) van
+  if (window.self === window.top) {
+    var _gc = document.createElement('script');
+    _gc.async = true;
+    _gc.src = 'https://gc.zgo.at/count.js';
+    _gc.setAttribute('data-goatcounter', 'https://bodistamas.goatcounter.com/count');
+    document.body.appendChild(_gc);
+  }
+</script>
+</body>
+</html>
