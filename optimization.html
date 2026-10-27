@@ -605,7 +605,7 @@ function setVal(id, val){
 const T = {
   hu: {
     "pattern.intro": "Első ránézésre a bojler, a villanykörte, az erősítő és az étterem teljesen különböző problémák. Mégis mind ugyanolyan szerkezetű kérdést tesznek fel: <strong>meddig érdemes menni?",
-    "pattern.lambda": "A <strong>λ (lambda)</strong> paraméter azt fejezi ki, hogy számodra <em>mennyit ér</em> az egyik szempont a másikhoz képest. Ha az étteremben a vendégek élményét fontosabbnak tartod a bevételnél, nagy λ-t választasz — és az optimális telítettség alacsonyabb lesz. Ha a bevétel az elsődleges, kis λ-val dolgozol — és zsúfoltabb éttermet tolerálsz. <strong>Nincs egyetlen helyes λ — ez értékítélet.</strong> </div> <div class=\"pattern-box\" data-i18n=\"pattern.text\"> Formálisan minden probléma leírható így: <strong>max(nyereség − λ · költség)</strong>. Az optimum feltétele: a két hatás deriváltja egyenlő — vagyis a <em>marginálisnál</em> (a következő kis lépésnél) a nyereség és a költség éppen egyforma mértékben változik. Ha a nyereség gyorsabban nő, érdemes továbblépni. Ha a költség nő gyorsabban, vissza kell lépni. </div> <div class=\"eq-label\" data-i18n=\"eq.pattern.label\">Általános alak</div> <div class=\"eq-block\" style=\"text-align:center;padding:1.2rem\"> <div style=\"display:inline-flex;align-items:center;gap:.7rem;flex-wrap:wrap;justify-content:center\"> <div>$$\max_{x}$$</div> <div style=\"display:inline-flex;align-items:flex-start;gap:.3rem\"> <span style=\"font-size:1.4rem;color:var(--text-dim)\">[</span> <div style=\"text-align:center\"> <div>$\text{Gain}(x)$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.58rem;color:var(--accent2);margin-top:.15rem\">nyereség</div> </div> <div style=\"padding-top:.1rem\">$\;-\;\lambda\;\cdot\;$</div> <div style=\"text-align:center\"> <div>$\text{Cost}(x)$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.58rem;color:var(--red,#c05050);margin-top:.15rem\">költség</div> </div> <span style=\"font-size:1.4rem;color:var(--text-dim)\">]</span> </div> <div>$\;\Longrightarrow\;$</div> <div>$$\frac{d(\text{Gain})}{dx} = \lambda\cdot\frac{d(\text{Cost})}{dx}$$</div> </div> </div> <div style=\"font-family:'DM Mono',monospace;font-size:.7rem;color:var(--text-dim); padding:.7rem 1rem;border:1px solid var(--border);border-radius:2px; background:var(--bg2);line-height:1.8;margin-top:.4rem\"> <span style=\"color:var(--accent2)\">Bojler:</span> nyereség = megtakarított energia, költség = újramelegítés &nbsp;·&nbsp; <span style=\"color:var(--accent2)\">Izzó:</span> nyereség = spórolt áram, költség = rövidebb élettartam<br> <span style=\"color:var(--accent2)\">Erősítő:</span> nyereség = erősítés (Av), költség = torzítás (THD) &nbsp;·&nbsp; <span style=\"color:var(--accent2)\">Étterem:</span> nyereség = bevétel, költség = vendégelégedetlenség </div> </div> <!-- ══ PROBLEMS ══ --> <div class=\"section\"> <div class=\"section-label\" data-i18n=\"sec.problems\">Interaktív problémák</div> <div class=\"prob-tabs\"> <button class=\"prob-tab active\" onclick=\"showProb('boiler')\" data-i18n=\"tab.boiler\">🔥 Bojler</button> <button class=\"prob-tab\" onclick=\"showProb('bulb')\" data-i18n=\"tab.bulb\">💡 Izzó</button> <button class=\"prob-tab\" onclick=\"showProb('amp')\" data-i18n=\"tab.amp\">📡 Erősítő</button> <button class=\"prob-tab\" onclick=\"showProb('rest')\" data-i18n=\"tab.rest\">🍽️ Étterem</button> </div> <!-- BOILER --> <div class=\"prob-panel active\" id=\"panel-boiler\"> <div class=\"prob-card\"> <div class=\"prob-desc\" data-i18n=\"boiler.desc\"> Lakásban villanybojler napi 3 órát fűt. Energetikailag a kikapcsolás <em>mindig</em> nyer: a hőveszteség a hőmérséklet-különbséggel arányos, így a lehűlt tartály kevesebbet veszít, és a visszafűtés pontosan a kikapcsolás alatt elvesztett hőt pótolja. Az alábbi egyszerű modell ezért nem energetikai megtérülést számol, hanem azt: hány napi készenléti fűtés ér föl egy teljes, hidegről indított visszafűtéssel — vagyis mennyi kényelmet ér a döntés. </div> <div class=\"eq-label\" data-i18n=\"boiler.eq.label\">Egyszerű összevetés (kényelmi döntés)</div> <div class=\"eq-block\" style=\"text-align:center;padding:1.2rem\"> <div style=\"display:inline-flex;align-items:center;gap:.8rem;flex-wrap:wrap;justify-content:center;font-size:.9rem\"> <div style=\"text-align:center\"> <div>$P \cdot t_{\text{heat}} \cdot c \cdot N$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem\">napi cost × N nap</div> </div> <div style=\"color:var(--text-dim)\">$\;\geq\;$</div> <div style=\"text-align:center\"> <div>$P \cdot t_{\text{reheat}} \cdot c$</div> <div style=\"font-family:'DM Mono',monospace;font-size:.6rem;color:var(--text-dim);margin-top:.2rem\">újramelegítés (egyszeri)</div> </div> <div style=\"color:var(--text-dim)\">$\;\Rightarrow\;$</div> <div>$$N^* = \dfrac{t_{\text{reheat}}}{t_{\text{heat}}}$$</div> </div> </div> <div class=\"viz-wrap\"> <canvas id=\"boiler-canvas\" height=\"180\"></canvas> <div style=\"font-family:'DM Mono',monospace;font-size:.65rem;color:var(--accent2); padding:.4rem .2rem;letter-spacing:.06em;\"> ℹ︎ N* = t_reheat / t_heat — független P-től és c-től. Felső becslés: a lehűlt tartály kevesebbet veszít, ezért a valódi visszafűtés ennél olcsóbb. </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">P (kW) <input type=\"range\" id=\"b-power\" min=\"5\" max=\"30\" value=\"15\"> <span class=\"ctrl-val\" id=\"b-power-v\">1.5 kW</span> </label> </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">c (Ft/kWh) <input type=\"range\" id=\"b-price\" min=\"10\" max=\"80\" value=\"30\"> <span class=\"ctrl-val\" id=\"b-price-v\">30 Ft</span> </label> </div> <div class=\"viz-controls\"> <label class=\"ctrl-label\">t_reheat (h) <input type=\"range\" id=\"b-reheat\" min=\"2\" max=\"10\" value=\"5\"> <span class=\"ctrl-val\" id=\"b-reheat-v\">5 h</span> </label> </div> </div> <div class=\"prob-result\" id=\"boiler-result\">⟶ Eredmény itt jelenik meg</div> </div> <button class=\"expand-btn\" onclick=\"toggleExpand('boiler-math')\" data-i18n=\"btn.deepmath\">▸ Mélyebb matematika</button> <div class=\"expand-content\" id=\"boiler-math\"> <p data-i18n=\"boiler.math.p1\">A probléma diszkrét esemény + folytonos költség típusú. A \"kapcsolás\" egy Dirac-delta jellegű egyszeri költség, míg a napi fűtés folytonos.",
+    "pattern.lambda": "A <strong>λ (lambda)</strong> paraméter azt fejezi ki, hogy számodra <em>mennyit ér</em> az egyik szempont a másikhoz képest. Ha az étteremben a vendégek élményét fontosabbnak tartod a bevételnél, nagy λ-t választasz — és az optimális telítettség alacsonyabb lesz. Ha a bevétel az elsődleges, kis λ-val dolgozol — és zsúfoltabb éttermet tolerálsz. <strong>Nincs egyetlen helyes λ — ez értékítélet.</strong>",
         "title": "Optimumszámítás a <em>hétköznapokban</em>",
     "sub": "Bojlertől az Euler–Lagrange egyenletig · Interaktív szimulációk · Kód",
     "sec.pattern": "Közös minta",
@@ -768,6 +768,17 @@ const T = {
 };
 
 let lang='hu';
+function mjTypeset(el){
+  // A <head>-ben lévő MathJax = {...} csak konfiguráció: a typesetPromise csak akkor
+  // létezik, ha a könyvtár tényleg betöltött. Lassú/blokkolt CDN-nél enélkül kivételt
+  // dobna, és az indítási lánc félbeszakadna.
+  try{
+    if(window.MathJax && typeof MathJax.typesetPromise === 'function'){
+      const p = el ? MathJax.typesetPromise([el]) : MathJax.typesetPromise();
+      if(p && p.catch) p.catch(()=>{});
+    }
+  }catch(e){}
+}
 function setLang(l){
   lang=l; document.documentElement.lang=l;
   const t=T[l];
@@ -776,7 +787,7 @@ function setLang(l){
     if(t[k]!==undefined) el.innerHTML=t[k];
   });
   document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
-  if(window.MathJax) MathJax.typesetPromise();
+  mjTypeset();
 }
 
 // ════ TABS ════
@@ -800,7 +811,7 @@ function toggleExpand(id){
   const btn=el.previousElementSibling;
   el.classList.toggle('open');
   btn.classList.toggle('open');
-  if(window.MathJax && el.classList.contains('open')) MathJax.typesetPromise([el]);
+  if(el.classList.contains('open')) mjTypeset(el);
 }
 
 // ════ CANVAS HELPERS ════
@@ -869,7 +880,7 @@ function drawBoiler(){
   ctx.fillStyle='rgba(200,169,110,.7)'; ctx.fillText('Újramelegítési költség',lp+6,tp+28);
 
   const resEl=document.getElementById('boiler-result');
-  if(resEl) resEl.textContent=`N* = ${Nstar.toFixed(2)} nap TÁVOLLÉT után érdemes lekapcsolni a bojlert | Napi megtakarítás: ${daily.toFixed(0)} Ft | Újramelegítési cost: ${reheat.toFixed(0)} Ft`;
+  if(resEl) resEl.textContent=`${Nstar.toFixed(2)} napi készenléti fűtés ára = egy teljes visszafűtésé | Készenlét: ${daily.toFixed(0)} Ft/nap | Visszafűtés hidegről: ${reheat.toFixed(0)} Ft (felső becslés)`;
 }
 
 // ════ BULB ════
@@ -1128,7 +1139,7 @@ function drawAll(){
 }
 
 window.addEventListener('load',()=>{
-  setLang('hu');
+  try{ setLang('hu'); }catch(e){ console.error('setLang:', e); }
   initSliders();
 
   // Get container width from the page (always visible)

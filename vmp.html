@@ -645,6 +645,17 @@ const T = {
 };
 
 let lang = 'hu';
+function mjTypeset(el){
+  // A <head>-ben lévő MathJax = {...} csak konfiguráció: a typesetPromise csak akkor
+  // létezik, ha a könyvtár tényleg betöltött. Lassú/blokkolt CDN-nél enélkül kivételt
+  // dobna, és az indítási lánc félbeszakadna.
+  try{
+    if(window.MathJax && typeof MathJax.typesetPromise === 'function'){
+      const p = el ? MathJax.typesetPromise([el]) : MathJax.typesetPromise();
+      if(p && p.catch) p.catch(()=>{});
+    }
+  }catch(e){}
+}
 function setLang(l) {
   lang = l;
   document.documentElement.lang = l;
@@ -655,7 +666,7 @@ function setLang(l) {
   document.querySelectorAll('.lang-btn').forEach(b =>
     b.classList.toggle('active', b.textContent === l.toUpperCase())
   );
-  if (window.MathJax) MathJax.typesetPromise();
+  mjTypeset();
 }
 
 // ════════════════════════════════════════
